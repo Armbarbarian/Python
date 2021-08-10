@@ -6,7 +6,7 @@ root = Tk()
 # user input entry
 input = Entry(root, width=50, borderwidth=5)
 input.pack()
-input.insert(0, 'Enter your name: ')
+input.insert(0, 'Enter your name: ', END)
 
 # tell the button to do something by defining a function
 
