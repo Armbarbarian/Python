@@ -28,7 +28,7 @@ opt1.grid(row=1, column=0)
 
 # Colonies list drop down menu
 
-colonies_list = [i for i in range(30)]
+colonies_list = [i for i in range(100)]
 colonies_list
 colonies = StringVar(root)
 colonies.set('Select the Colony Number')
