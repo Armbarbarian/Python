@@ -177,19 +177,18 @@ calculate_2.grid(row=7, column=4)
 calculation_label_2 = Label(root, text=(''))
 calculation_label_2.grid(row=8, column=4)
 calculation_label_2.config(font=("Calibri", 14))
-'''
-# Show a table output
-frame = Frame(root)
-frame.grid(row=8, column=1)
-df = ttk.Treeview(frame, columns=(1, 2, 3, 4, 5), show='headings', height=5)
-df.grid(row=8, column=1)
 
-df.heading(1, text='Condition')
-df.heading(2, text='Strain')
-df.heading(3, text='Dilution')
-df.heading(4, text='Av. Colonies')
-df.heading(5, text='Viable Titre')
-'''
+# Show a table output
+'''frame = Frame(root)
+frame.grid(row=8, column=1)
+df = ttk.Treeview(frame, show='headings', height=5)
+df.grid(row=11)
+
+df.heading(text='Condition')
+df.heading(text='Strain')
+df.heading(text='Dilution')
+df.heading(text='Av. Colonies')
+df.heading(text='Viable Titre')'''
 
 
 # call the window up
