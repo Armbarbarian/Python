@@ -21,9 +21,9 @@ dilutions_list = ['10e-1', '10e-2', '10e-3', '10e-4', '10e-5', '10e-6', '10e-7',
 dilutions = StringVar(root)
 dilutions.set('Select a Dilution')
 
-opt1 = OptionMenu(root, dilutions, *dilutions_list)
-opt1.config(width=20, font=('Calibri', 14))
-opt1.grid(row=1, column=0)
+dil1 = OptionMenu(root, dilutions, *dilutions_list)
+dil1.config(width=20, font=('Calibri', 14))
+dil1.grid(row=1, column=0)
 
 
 # Colonies list drop down menu
