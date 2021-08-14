@@ -3,18 +3,23 @@
 import PySimpleGUI as sg
 import numpy as np
 import pandas as pd
+from datetime import datetime
+
+now = datetime.now()
+day = now.strftime("%d")
+month = now.strftime("%m")
+
 
 # sg.theme_previewer()
 # sg.theme_list()
 
 # add window colour
 sg.theme('DarkTeal9')
-EXCEL_FILE = 'out_VT_12-08.xlsx'
-df = pd.read_excel(EXCEL_FILE)
-df
 
 font = ('Calibri', 14)
 font_small = ('Calibri', 12)
+
+data=[]
 
 # set the layout of the window
 layout1 = [
@@ -31,10 +36,12 @@ layout1 = [
     [sg.Text('Colonies_2', size=(10, 1), font=font), sg.InputText(key='Colonies_2A', size=(15, 1), font=font),
         sg.InputText(key='Colonies_2B', size=(15, 1), font=font)],
     [sg.Text('Viable Titre', size=(10, 1), font=font), sg.InputText('', key='Titre', size=(15, 1), font=font)],
-    [sg.Button('Calculate cells/mL', font=font), sg.Submit('Update Spreadsheet', font=font), sg.Button('Clear', font=font), sg.Exit(font=font)]
+    [sg.Text("Choose a spreadsheet to update: "), sg.FileBrowse(key='-FILE-')],
+    [sg.Button('Calculate cells/mL', font=font), sg.Submit('Update Spreadsheet', font=font), sg.Button('Clear', font=font), sg.Exit(font=font)],
+    [sg.Button('Open Spreadsheet')]
 ]
 
-# clear function button
+# recall the spreadsheet
 
 
 def clear_input():
@@ -47,7 +54,7 @@ def clear_input():
 result = ''
 
 # set up the window and the layout to use for the window
-window = sg.Window('Viable Titre GUI', layout1, size=(500, 400))
+window = sg.Window('Viable Titre GUI', layout1, size=(600, 450)) #size=(500, 500)
 
 # while loop to keep the window up unless user closes it
 while True:
@@ -64,9 +71,14 @@ while True:
         result = np.sum([average1, average2]) / (vol * dilutions)
         window['Titre'].update(result)
     if event == 'Update Spreadsheet':
-        #print(event, values)
+        EXCEL_FILE = values['-FILE-']
+        df = pd.read_excel(EXCEL_FILE)
         df = df.append(values, ignore_index=True)
+        df = df.drop(['-FILE-'], axis=1)
         df.to_excel(EXCEL_FILE, index=False)
+        popup1 = sg.popup_yes_no('Do you want to save a separate csv file?')
+        if popup1 == 'Yes':
+            df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
         sg.popup('Data Saved!')
         # clear_input()
 window.close()
