@@ -1,0 +1,3 @@
+Strain,Condition,Time,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre
+tesdt,Cm,90,0.01,0.01,0.01,456,654,456,654,5550000.0
+test,Kan,60,0.01,10e-3,10e-2,4657,76,5467,76,4670909.090909091
