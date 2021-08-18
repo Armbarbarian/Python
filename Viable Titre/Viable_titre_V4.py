@@ -72,8 +72,6 @@ window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
 # empty list to append checked keys into
 checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
 
-''' # list of key lists
-checked = [['Strain'], ['Condition'], ['Time'], ['Volume'], ['Dilution_1'], ['Dilution_2'], ['Colonies_1A'], ['Colonies_1B'], ['Colonies_2A'], ['Colonies_2B'], ['Titre']]'''
 # while loop to keep the window up unless user closes it
 while True:
     event, values = window.read()
@@ -81,7 +79,8 @@ while True:
         break
     if event == 'Clear':
         clear_input()
-        # enable the check boxes to disable the inputs
+
+# enable the check boxes to disable the inputs
     if values['1_check'] == 0:
         window['Strain'].Update(disabled=True)
     if values['1_check'] == 1:
@@ -123,8 +122,8 @@ while True:
     if values['9_check'] == 1:
         window['Titre'].Update(disabled=False)
 
-    # append the key list which are highlighted
-    # Each if statement should update the checked list, not working currently
+# append the key list which are highlighted
+# Each if statement should update the checked list, not working currently
     if event == '1_check':
         if values['1_check'] == 0:
             checked.remove('Strain')
@@ -177,33 +176,34 @@ while True:
 
     # calculate the viable titre and output on screen
     if event == 'Calculate cells/mL':
-        average1 = np.mean([int(values['Colonies_1A']), int(values['Colonies_1B'])])
-        average2 = np.mean([int(values['Colonies_2A']), int(values['Colonies_2B'])])
-        vol = float(values['Volume'])
-        dilutions = np.sum([float(values['Dilution_1']), float(values['Dilution_2'])])
-        result = np.sum([average1, average2]) / (vol * dilutions)
-        window['Titre'].update(result)
+        try:
+            average1 = np.mean([int(values['Colonies_1A']), int(values['Colonies_1B'])])
+            average2 = np.mean([int(values['Colonies_2A']), int(values['Colonies_2B'])])
+            vol = float(values['Volume'])
+            dilutions = np.sum([float(values['Dilution_1']), float(values['Dilution_2'])])
+            result = np.sum([average1, average2]) / (vol * dilutions)
+            window['Titre'].update(result)
+        except:
+            sg.popup('Not enough data provided')
+
+# saving xlsx and csv file with cleaned data
     if event == 'Update Spreadsheet':
-        EXCEL_FILE = values['-FILE-']
-        df = pd.read_excel(EXCEL_FILE)
+        try:
+            EXCEL_FILE = values['-FILE-']
+            df = pd.read_excel(EXCEL_FILE)
 
-    # keep only columns that have been appended to checked list
-        df = df.append(values, ignore_index=True)
-        ''' # Cant seem to filter the values that are in checked.
-        for i in values:
-            if i in checked:
-                df = df.append(i in values, ignore_index=True)'''
+        # keep only columns that have been appended to checked list
+            df = df.append(values, ignore_index=True)
 
-    # Trying to only keep columns which are checked
-        # df = df.drop(['-FILE-'], axis=1)
-        # This manually drops the names of the check boxes
-        df = df.drop(['-FILE-', '1_check', '2_check', '3_check', '4_check',
-                      '5_check', '6_check', '7_check', '8_check', '9_check'], axis='columns')
-        df.to_excel(EXCEL_FILE, index=False)
-        popup1 = sg.popup_yes_no('Do you want to save a separate csv file?')
-        if popup1 == 'Yes':
-            df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
-        sg.popup('Data Saved!')
+        # This drops the names of the check boxes if NOT in checked list
+            df = df.drop(columns=[col for col in df if col not in checked])
+            df.to_excel(EXCEL_FILE, index=False)
+            popup1 = sg.popup_yes_no('Do you want to save a separate csv file?')
+            if popup1 == 'Yes':
+                df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
+                sg.popup('Data Saved!')
+        except:
+            sg.popup('No file selected')
     if event == 'View Data':
         try:
             CSV_FILE = ('output_'+day+'-'+month+'.csv')
@@ -222,12 +222,13 @@ while True:
         except:
             sg.popup_error('YOU DIED')
             window.close()
+
+# plotting the data (not ready yet)
     if event == 'Plot Data':
         sg.popup('Feature not ready')
-        '''
         try:
             print('Hello')
         except:
-            sg.popup('You Died')'''
+            sg.popup('You Died')
         # clear_input()
 window.close()

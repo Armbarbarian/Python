@@ -1,4 +1,0 @@
-Strain,Condition,Time,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre
-test,LB,,,,,,,,,
-test,LB,,,,,,,,,
-give up,Kan,30,0.01,10e-2,10e-1,543,34,43,34,29727.272727272724
