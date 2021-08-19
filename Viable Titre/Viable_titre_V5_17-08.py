@@ -42,7 +42,7 @@ header_list = []
 
 
 # function for the plot figure
-def draw_figure(canvas, figure):
+def draw_figure(canvas, figure, loc=(0, 0)):
     figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
     figure_canvas_agg.draw()
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
@@ -74,7 +74,7 @@ layout1 = [
     [sg.Text("Choose a spreadsheet to update: "), sg.FileBrowse(key='-FILE-')],
     [sg.Button('Calculate cells/mL', font=font), sg.Submit('Update Spreadsheet', font=font), sg.Button('Clear', font=font), sg.Exit(font=font)],
     [sg.Button('View Data', font=font)],
-    [sg.Button('Plot Data', font=font)]
+    [sg.Button('Analyse Data', font=font)]
 ]
 
 
@@ -246,7 +246,6 @@ while True:
                 event, values = browse_csv_window.read()
                 if event == 'csv_submit':
                     CSV_FILE_input = values['csv_file']
-                    print('this is working')
                     CSV_DF_input = pd.read_csv(CSV_FILE_input)
                 # retrieve a list of the values in the csv file
                     data_input = CSV_DF_input.values.tolist()
@@ -261,73 +260,95 @@ while True:
                     window_data_input = sg.Window('Your csv data displayed', layout_data_input)
                     event, values = window_data_input.read()
 # plotting the data (not ready yet)
-    if event == 'Plot Data':
-        master_df = pd.read_csv('output_'+day+'-'+month+'.csv')
-        print(master_df.head())
+    if event == 'Analyse Data':
+        master_df = pd.read_csv('output_17-08.csv')
+        headings2 = list(master_df.columns)
+        data_input2 = master_df.values.tolist()
+        empty_data = []
+        empty_heading = []
         analysis_layout = [
-            [sg.Text('Select type of analysis', font=font, size=(10, 0))],
-            [sg.Combo(['Growth Curve', 'Stand Alone Titre', 'Comparison of Two Strains'], key='analysis_type', size=(25, 1), font=font)],
-            [sg.Submit('Confirm Analysis', font=font)],
-            [sg.Text('_'*80)]
+            [sg.Text('Select a csv of your data:',  font=font, size=(20, 0)), sg.FileBrowse(key='csv_file2')],
+            [sg.Text('Select type of analysis', font=font, size=(20, 0)), sg.Combo(
+                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture'], key='analysis_type', size=(25, 1), font=font)],
+            [sg.Submit('Select Analysis', font=font)],
+            [sg.Text('_'*80)],
+            [sg.Text('Data to work out median', key='-Median Text-', font=font, visible=False)],
+            [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=False), sg.Combo(list(range(1, 11)), key='-Cultures Dropdown-', font=font, visible=False)],
+            [sg.Table(values=master_df, headings=headings2, key='-Median Table-', display_row_numbers=False, auto_size_columns=False,
+                      num_rows=min(25, len(master_df)), alternating_row_color='teal', visible=False)]
         ]
         window_analysis_question = sg.Window('Analysis', analysis_layout)
         event, values = window_analysis_question.read()
         if event == sg.WIN_CLOSED:
             continue
         # sg.popup('Feature not ready')
-    if event == 'Confirm Analysis':
+        if event == 'Select Analysis':
+            try:
+                if values['analysis_type'] == 'Calculate Median Culture':
+                    window_analysis_question['-Median Text-'].Update(visible=True)
+                    window_analysis_question['-Cultures Text-'].Update(visible=True)
+                    window_analysis_question['-Cultures Dropdown-'].Update(visible=True)
+                    window_analysis_question['-Median Table-'].Update(visible=True)
+                else:
+                    sg.popup('This type of analysis is not ready yet...')
+                    continue
+            except:
+                sg.popup('Select a csv file first')
+
+'''
         try:
             layout_test = [[sg.Text('Plot test')],
                            [sg.Canvas(key='Canvas')],
                            [sg.Button('Save Plot'), sg.Exit()]]
-            '''
-            temp_df = pd.read_csv('output_'+day+'-'+month+'.csv')
-            temp_list = list(temp_df.Strain)
-            strain_names = []
-            for name in temp_list:
-                if name not in strain_names:
-                    strain_names.append(name)
-            csv_1 = pd.read_csv('output_'+day+'-'+month+'.csv')
-            temp_names1 = list(csv_1.Strain[18:26])
-            temp_titre1 = list(csv_1.Titre[18:26])
-            temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
-            data_temp1 = temp_df1.sort_values(by='titre')
-            plt.scatter(data_temp1.names, data_temp1.titre, color='RoyalBlue')
-            plt.xlabel('Culture')
-            plt.ylabel('Cells/mL')
-            plt.title('SLM1043 Cultures')
-            plt.xticks(rotation=75)
-            fig = plt.gcf()
-            fig = matplotlib.figure.Figure(figsize=(5, 4), dpi=100)'''
             window_plot = sg.Window('Plot in progress', layout_test, size=(500, 300))
-            # add the plot to the window
-            '''fig_canvas_agg = draw_figure(window_plot['Canvas'].TKCanvas, fig)'''
             event, values = window_plot.read()
         except:
             sg.popup('You Died')
-            window.close()
-        # clear_input()
+            window.close()'''
+# clear_input()
 window.close()
 
 
-# making the plot to show signmoid curve and median
-'''
-csv_1 = pd.read_csv('output_'+day+'-'+month+'.csv')
+# making the plot to show sigmoid curve and median
+
+
+csv_1 = pd.read_csv('output_17-08.csv')
 csv_1
-data_temp1['titre'].median()
-temp_names1 = list(csv_1.Strain[18:26])
-temp_titre1 = list(csv_1.Titre[18:26])
+temp_names1 = list(csv_1.Strain[27:])
+temp_names1
+temp_titre1 = list(csv_1.Titre[27:])
 temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
 data_temp1 = temp_df1.sort_values(by='titre')
 data_temp1
+median1 = data_temp1['titre'].median()
+median1
+
+# find nearest value to the median out of a set array of values
+# https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
 
 
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+
+# find the nearest value
+nearest_median = find_nearest(data_temp1['titre'], median1)
+nearest_median
+
+# filter the OG dataframe to return the culture with that value
+median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median]
+median_culture1
+
+
+''' # plotting the data - work this out later
 plt.scatter(data_temp1.names, data_temp1.titre, color='RoyalBlue')
 plt.xlabel('Culture')
 plt.ylabel('Cells/mL')
 plt.title('SLM1043 Cultures')
-plt.xticks(rotation=75)
-plt.savefig('SLM1043_Kan_titre_plot.png')
-plt.show()
-fig = plt.gcf()
-# fig = matplotlib.figure.Figure(figsize=(5, 4), dpi=100)'''
+plt.xticks(rotation=75)'''
+
+range(1, 11)
+
+#fig = matplotlib.figure.Figure(figsize=(5, 4), dpi=100)
