@@ -237,7 +237,7 @@ while True:
                 header_list = list(CSV_DF.columns)
                 # sg.popup('Data found!')
                 layout_data = [
-                    [sg.Table(values=data, headings=header_list, display_row_numbers=False, auto_size_columns=False,
+                    [sg.Table(values=data, headings=header_list, font=font, key='Viewed_data', display_row_numbers=False, auto_size_columns=False,
                               num_rows=min(25, len(data)), alternating_row_color='teal')]  # teal, lightblue
                 ]
                 window_data = sg.Window('output_'+day+'-'+month+'.csv', layout_data)
@@ -300,7 +300,7 @@ while True:
                 # window_analysis_question['-Cultures Dropdown-'].Update(visible=True)
                 analysis_table_layout = [
                     [sg.Text('Select the rows to calculate the median from:')],
-                    [sg.Table(values=data_input2, headings=headings2, key='-Median Table-', display_row_numbers=True, auto_size_columns=False,
+                    [sg.Table(values=data_input2, headings=headings2, key='-Median Table-', font=font, display_row_numbers=True, auto_size_columns=False,
                               num_rows=min(10, len(data_input2)), alternating_row_color='RoyalBlue', visible=True,
                               enable_events=False)],
                     [sg.Text('Strain 1:', key='strain1', visible=True, font=font), sg.InputText(key='Median_strain1', size=(10, 0), font=font, visible=True)],
@@ -314,11 +314,9 @@ while True:
 
                     [sg.Text('', key='strain1_median_culture', font=font, visible=False), sg.Text('', key='strain1_median_titre', font=font, visible=False)],
                     [sg.Text('', key='strain2_median_culture', font=font, visible=False), sg.Text('', key='strain2_median_titre', font=font, visible=False)],
-                    # output 1
-                    [sg.Table(values=data_input2, headings=median_heading, key='-Median output1-', display_row_numbers=False, num_rows=1, auto_size_columns=False, alternating_row_color='green', visible=False,
-                              enable_events=False)],
-                    # output 2
-                    [sg.Table(values=data_input2, headings=median_heading, key='-Median output2-', display_row_numbers=False, num_rows=1, auto_size_columns=False, alternating_row_color='green', visible=False,
+
+                    # output of concat dfs showing median
+                    [sg.Table(values=data_input2, headings=median_heading, key='-Median output-', font=font, display_row_numbers=False, num_rows=2, auto_size_columns=False, background_color='green', visible=False,
                               enable_events=False)]
                 ]
                 window_median_table = sg.Window('Median Calculation', analysis_table_layout)
@@ -349,21 +347,21 @@ while True:
                     data_temp2 = temp_df2.sort_values(by='titre')
                     median1 = data_temp1['titre'].median()
                     median2 = data_temp2['titre'].median()
-                    # find the nearest value
+                # find the nearest value
                     nearest_median1 = find_nearest(data_temp1['titre'], median1)
                     nearest_median2 = find_nearest(data_temp2['titre'], median2)
-                    # filter the OG dataframe to return the culture with that value
+                # filter the OG dataframe to return the culture with that value
                     median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
                     median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
-                    #
-                    median1_list = median_culture1.values.tolist()
-                    median2_list = median_culture2.values.tolist()
-                    #median1_heading = temp_df1.columns.tolist()
+                    # concatenate the two dfs to show only one table
+                    median_concat = pd.concat([median_culture1, median_culture2], axis=0, ignore_index=True)
+                #
+                    median_list = median_concat.values.tolist()
+                    # median1_heading = temp_df1.columns.tolist() # trouble updating the headings
                     #median2_heading = temp_df2.columns.tolist()
 
                 # appending the table to show the median cultures
-                    window_median_table['-Median output1-'].Update(values=median1_list, visible=True)
-                    window_median_table['-Median output2-'].Update(values=median2_list, visible=True)
+                window_median_table['-Median output-'].Update(values=median_list, visible=True)
 
                 # save the selected rows into a df
                 # new_data1 = values['-Median Table-']
