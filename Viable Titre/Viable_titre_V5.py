@@ -84,6 +84,15 @@ window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
 # empty list to append checked keys into
 checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
 
+# median find nearest function
+
+
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+
 # while loop to keep the window up unless user closes it
 while True:
     event, values = window.read()
@@ -226,7 +235,7 @@ while True:
                 data = CSV_DF.values.tolist()
             # retrieve list of column names
                 header_list = list(CSV_DF.columns)
-                #sg.popup('Data found!')
+                # sg.popup('Data found!')
                 layout_data = [
                     [sg.Table(values=data, headings=header_list, display_row_numbers=False, auto_size_columns=False,
                               num_rows=min(25, len(data)), alternating_row_color='teal')]  # teal, lightblue
@@ -251,7 +260,7 @@ while True:
                     data_input = CSV_DF_input.values.tolist()
                 # retrieve list of column names
                     header_list_input = list(CSV_DF_input.columns)
-                    #sg.popup('Data input found!')
+                    # sg.popup('Data input found!')
                     browse_csv_window.close()
                     layout_data_input = [
                         [sg.Table(values=data_input, headings=header_list_input, display_row_numbers=False, auto_size_columns=False,
@@ -261,9 +270,6 @@ while True:
                     event, values = window_data_input.read()
 # plotting the data (not ready yet)
     if event == 'Analyse Data':
-        master_df = pd.read_csv('output_17-08.csv')
-        headings2 = list(master_df.columns)
-        data_input2 = master_df.values.tolist()
         empty_data = []
         empty_heading = []
         analysis_layout = [
@@ -272,10 +278,7 @@ while True:
                 ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture'], key='analysis_type', size=(25, 1), font=font)],
             [sg.Submit('Select Analysis', font=font)],
             [sg.Text('_'*80)],
-            [sg.Text('Data to work out median', key='-Median Text-', font=font, visible=False)],
-            [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=False), sg.Combo(list(range(1, 11)), key='-Cultures Dropdown-', font=font, visible=False)],
-            [sg.Table(values=master_df, headings=headings2, key='-Median Table-', display_row_numbers=False, auto_size_columns=False,
-                      num_rows=min(25, len(master_df)), alternating_row_color='teal', visible=False)]
+            [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=False), sg.Combo(list(range(1, 11)), key='-Cultures Dropdown-', font=font, visible=False)]
         ]
         window_analysis_question = sg.Window('Analysis', analysis_layout)
         event, values = window_analysis_question.read()
@@ -283,63 +286,97 @@ while True:
             continue
         # sg.popup('Feature not ready')
         if event == 'Select Analysis':
-            try:
-                if values['analysis_type'] == 'Calculate Median Culture':
-                    window_analysis_question['-Median Text-'].Update(visible=True)
-                    window_analysis_question['-Cultures Text-'].Update(visible=True)
-                    window_analysis_question['-Cultures Dropdown-'].Update(visible=True)
-                    window_analysis_question['-Median Table-'].Update(visible=True)
-                else:
-                    sg.popup('This type of analysis is not ready yet...')
-                    continue
-            except:
-                sg.popup('Select a csv file first')
 
-'''
-        try:
-            layout_test = [[sg.Text('Plot test')],
-                           [sg.Canvas(key='Canvas')],
-                           [sg.Button('Save Plot'), sg.Exit()]]
-            window_plot = sg.Window('Plot in progress', layout_test, size=(500, 300))
-            event, values = window_plot.read()
-        except:
-            sg.popup('You Died')
-            window.close()'''
+            if values['analysis_type'] == 'Calculate Median Culture':
+                master_df = pd.read_csv(values['csv_file2'])
+                headings2 = list(master_df.columns)
+                data_input2 = master_df.values.tolist()
+                data_strain = master_df.Strain.tolist()
+                data_titre = master_df.Titre.tolist()
+
+                median_heading = ['Culture', 'Titre']
+
+                # window_analysis_question['-Cultures Text-'].Update(visible=True)
+                # window_analysis_question['-Cultures Dropdown-'].Update(visible=True)
+                analysis_table_layout = [
+                    [sg.Text('Select the rows to calculate the median from:')],
+                    [sg.Table(values=data_input2, headings=headings2, key='-Median Table-', display_row_numbers=True, auto_size_columns=False,
+                              num_rows=min(10, len(data_input2)), alternating_row_color='RoyalBlue', visible=True,
+                              enable_events=False)],
+                    [sg.Text('Strain 1:', key='strain1', visible=True, font=font), sg.InputText(key='Median_strain1', size=(10, 0), font=font, visible=True)],
+                    [sg.Text('Strain 2:', key='strain2', visible=True, font=font), sg.InputText(key='Median_strain2', size=(10, 0), font=font, visible=True)],
+
+                    [sg.Text('Strain 1 row start', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1start-', font=font), sg.Text('Strain 1 row stop', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1stop-', font=font),
+                     sg.Text('Strain 2 row start', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2start-', font=font), sg.Text('Strain 2 row stop', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2stop-', font=font)],
+
+
+                    [sg.Submit('Calculate', font=font), sg.Exit('Close', key='close', font=font)],
+
+                    [sg.Text('', key='strain1_median_culture', font=font, visible=False), sg.Text('', key='strain1_median_titre', font=font, visible=False)],
+                    [sg.Text('', key='strain2_median_culture', font=font, visible=False), sg.Text('', key='strain2_median_titre', font=font, visible=False)],
+                    # output 1
+                    [sg.Table(values=data_input2, headings=median_heading, key='-Median output1-', display_row_numbers=False, num_rows=1, auto_size_columns=False, alternating_row_color='green', visible=False,
+                              enable_events=False)],
+                    # output 2
+                    [sg.Table(values=data_input2, headings=median_heading, key='-Median output2-', display_row_numbers=False, num_rows=1, auto_size_columns=False, alternating_row_color='green', visible=False,
+                              enable_events=False)]
+                ]
+                window_median_table = sg.Window('Median Calculation', analysis_table_layout)
+                event, values = window_median_table.read()
+
+                if event == sg.WIN_CLOSED:
+                    continue
+                if event == 'close':
+                    continue
+
+                if event == 'Calculate':
+                    # user input
+                    strain1_row_start = values['-1start-']
+                    strain1_row_stop = values['-1stop-']
+                    strain2_row_start = values['-2start-']
+                    strain2_row_stop = values['-2stop-']
+                    strain1_name = values['Median_strain1']
+                    strain2_name = values['Median_strain2']
+
+                # Actually calculating the median from the input rows given
+                    temp_names1 = list(master_df.Strain[strain1_row_start:strain1_row_stop])
+                    temp_names2 = list(master_df.Strain[strain2_row_start:strain2_row_stop])
+                    temp_titre1 = list(master_df.Titre[strain1_row_start:strain1_row_stop])
+                    temp_titre2 = list(master_df.Titre[strain2_row_start:strain2_row_stop])
+                    temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
+                    temp_df2 = pd.DataFrame({'names': temp_names2, 'titre': temp_titre2})
+                    data_temp1 = temp_df1.sort_values(by='titre')
+                    data_temp2 = temp_df2.sort_values(by='titre')
+                    median1 = data_temp1['titre'].median()
+                    median2 = data_temp2['titre'].median()
+                    # find the nearest value
+                    nearest_median1 = find_nearest(data_temp1['titre'], median1)
+                    nearest_median2 = find_nearest(data_temp2['titre'], median2)
+                    # filter the OG dataframe to return the culture with that value
+                    median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
+                    median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
+                    #
+                    median1_list = median_culture1.values.tolist()
+                    median2_list = median_culture2.values.tolist()
+                    #median1_heading = temp_df1.columns.tolist()
+                    #median2_heading = temp_df2.columns.tolist()
+
+                # appending the table to show the median cultures
+                    window_median_table['-Median output1-'].Update(values=median1_list, visible=True)
+                    window_median_table['-Median output2-'].Update(values=median2_list, visible=True)
+
+                # save the selected rows into a df
+                # new_data1 = values['-Median Table-']
+
+                # closing and exiting the median window
+            continue
+        else:
+            sg.popup('This type of analysis is not ready yet...')
+            window_analysis_question.close()
+
+
 # clear_input()
 window.close()
-
-
-# making the plot to show sigmoid curve and median
-
-
-csv_1 = pd.read_csv('output_17-08.csv')
-csv_1
-temp_names1 = list(csv_1.Strain[27:])
-temp_names1
-temp_titre1 = list(csv_1.Titre[27:])
-temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
-data_temp1 = temp_df1.sort_values(by='titre')
-data_temp1
-median1 = data_temp1['titre'].median()
-median1
-
-# find nearest value to the median out of a set array of values
-# https://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
-
-
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
-
-
-# find the nearest value
-nearest_median = find_nearest(data_temp1['titre'], median1)
-nearest_median
-
-# filter the OG dataframe to return the culture with that value
-median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median]
-median_culture1
 
 
 ''' # plotting the data - work this out later
@@ -348,7 +385,3 @@ plt.xlabel('Culture')
 plt.ylabel('Cells/mL')
 plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
-
-range(1, 11)
-
-#fig = matplotlib.figure.Figure(figsize=(5, 4), dpi=100)
