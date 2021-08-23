@@ -275,7 +275,7 @@ while True:
         analysis_layout = [
             [sg.Text('Select a csv of your data:',  font=font, size=(20, 0)), sg.FileBrowse(key='csv_file2')],
             [sg.Text('Select type of analysis', font=font, size=(20, 0)), sg.Combo(
-                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture'], key='analysis_type', size=(25, 1), font=font)],
+                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates'], key='analysis_type', size=(25, 1), font=font)],
             [sg.Submit('Select Analysis', font=font)],
             [sg.Text('_'*80)],
             [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=False), sg.Combo(list(range(1, 11)), key='-Cultures Dropdown-', font=font, visible=False)]
@@ -287,7 +287,7 @@ while True:
                 break
             # sg.popup('Feature not ready')
             if event == 'Select Analysis':
-            # Growth curve analysis
+                # Growth curve analysis
                 if values['analysis_type'] == 'Growth Curve':
                     sg.popup('Growth Curve Analysis not ready yet', font=font)
                     continue
@@ -373,7 +373,7 @@ while True:
                             #
                                 median_list = median_concat.values.tolist()
                                 # median1_heading = temp_df1.columns.tolist() # trouble updating the headings
-                                #median2_heading = temp_df2.columns.tolist()
+                                # median2_heading = temp_df2.columns.tolist()
 
                             # appending the table to show the median cultures
                                 window_median_table['-Median output-'].Update(values=median_list, visible=True)
@@ -383,9 +383,92 @@ while True:
                     # save the selected rows into a df
                     # new_data1 = values['-Median Table-']
                     # closing and exiting the median window
+                if values['analysis_type'] == 'Mutation Rates':
+                    try:
+                        master_df = pd.read_csv(values['csv_file2'])
+                        # master_df
+                        headings2 = list(master_df.columns)
+                        data_input2 = master_df.values.tolist()
+                        data_strain = master_df.Strain.tolist()
+                        data_titre = master_df.Titre.tolist()
 
+                        median_heading = ['Culture', 'Titre']
+                    except:
+                        sg.popup('No file selected', font=font)
+                        continue
+                    mutation_layout_text = [
+                        [sg.Text('Specify your parameters below:', font=font)],
+                        [sg.Text('_'*20)],  # divider
+                        [sg.Text('Median Culture Name:', font=font)],
+                        [sg.Text('Antibiotic Used:', font=font)],
+                        [sg.Text('_'*20)],
+                        [sg.Text('Number of Cultures (N):', font=font)],
+                        [sg.Text('Cell Count per Culture (n):', font=font)],
+                        [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
+                        [sg.Text('Mutation Rate (m):', font=font)],
+                        [sg.Text('Sigma Value:', font=font)],
+                        [sg.Text('Sigma / m:', font=font)],
+                        [sg.Text('m / n:', font=font)],
+                        [sg.Text('Sigma / n:', font=font)]
+                    ]
 
-# clear_input()
+                    mutation_layout_input = [
+
+                        [sg.InputText(key='-Median_culture1-', size=(10, 1), font=font)],
+                        [sg.InputText(key='-Ab-', size=(10, 1), font=font), sg.Button('Retrive Strains')],
+                        [sg.Text(' '*20)],
+                        [sg.InputText(key='-Cultures-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Cells-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Mutations-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Mrates-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Sigma-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-s/m-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-m/n-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-s/n-', size=(20, 1), font=font)]
+                    ]
+
+                    mutation_layout = [
+                        [[sg.Column(mutation_layout_text),
+                         sg.Column(mutation_layout_input, pad=((0, 0), (60, 0)))],
+                         [sg.Button('Calculate', font=font)]
+                         ]]
+
+                    mutation_window = sg.Window('Mutation Rates', mutation_layout)
+                    while True:
+                        event, values = mutation_window.read()
+                        if event == sg.WIN_CLOSED:
+                            mutation_window.close()
+                            break
+                        if event == 'Calculate':
+                            sg.popup('button working')
+                        if event == 'Retrive Strains':
+                            try:
+                                found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
+                            # cleaning the dataframe to get our median with 100uL plated
+                                true_medianstrain1 = found_strain1[found_strain1.Volume == 0.1]
+
+                                LB_strain1 = true_medianstrain1[true_medianstrain1.Condition == 'LB']
+                                Ab_strain1 = true_medianstrain1[true_medianstrain1.Condition == values['-Ab-']]
+
+                                LB_total_cells1 = LB_strain1.Titre*5
+                                Ab_total_cells1 = Ab_strain1.Titre*5
+
+                                fraction = Ab_total_cells1.item() / LB_total_cells1.item()
+                                m = np.log(fraction)
+                                print(fraction)
+                        # Update the input fields showing the number of cells
+                        # .item() retrieved the actual value
+
+                                mutation_window['-Cells-'].Update(LB_total_cells1.item())
+                                mutation_window['-Mutations-'].Update(Ab_total_cells1.item())
+                                mutation_window['-Mrates-'].Update(m)
+
+                                sg.popup('Mutation rates not calculated correctly yet...')
+
+                            except:
+                                sg.popup('No such strain found')
+
+                            # clear_input()
 window.close()
 
 
