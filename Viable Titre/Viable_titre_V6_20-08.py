@@ -336,11 +336,9 @@ while True:
                     window_median_table = sg.Window('Median Calculation', analysis_table_layout)
                     while True:
                         event, values = window_median_table.read()
-
-                        if event == sg.WIN_CLOSED or event == 'Close':
+                        if event == sg.WIN_CLOSED or event == 'Close': # this is bugged and crashes the program when closedwindow_median_table.close()
                             window_median_table.close()
                             break
-
                         if event == 'Calculate':
                             try:
                                 # user input
@@ -383,6 +381,7 @@ while True:
                     # save the selected rows into a df
                     # new_data1 = values['-Median Table-']
                     # closing and exiting the median window
+
                 if values['analysis_type'] == 'Mutation Rates':
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
@@ -401,11 +400,13 @@ while True:
                         [sg.Text('_'*20)],  # divider
                         [sg.Text('Median Culture Name:', font=font)],
                         [sg.Text('Antibiotic Used:', font=font)],
+                        [sg.Text('Mutation Rate Calculation:')],
+                        [sg.Button('Retrive Strains')],
                         [sg.Text('_'*20)],
                         [sg.Text('Number of Cultures (N):', font=font)],
                         [sg.Text('Cell Count per Culture (n):', font=font)],
                         [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
-                        [sg.Text('Mutation Rate (m):', font=font)],
+                        [sg.Text('Mutation Rate (\u03BC):', font=font)],
                         [sg.Text('Sigma Value:', font=font)],
                         [sg.Text('Sigma / m:', font=font)],
                         [sg.Text('m / n:', font=font)],
@@ -413,9 +414,11 @@ while True:
                     ]
 
                     mutation_layout_input = [
-
+                        [sg.Text(' '*20)],
                         [sg.InputText(key='-Median_culture1-', size=(10, 1), font=font)],
-                        [sg.InputText(key='-Ab-', size=(10, 1), font=font), sg.Button('Retrive Strains')],
+                        [sg.InputText(key='-Ab-', size=(10, 1), font=font)],
+                        [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt', 'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True)],
+                        [sg.Text(' '*20)],
                         [sg.Text(' '*20)],
                         [sg.InputText(key='-Cultures-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Cells-', size=(20, 1), font=font)],
@@ -429,7 +432,7 @@ while True:
 
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
-                         sg.Column(mutation_layout_input, pad=((0, 0), (60, 0)))],
+                         sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
                          [sg.Button('Calculate', font=font)]
                          ]]
 
@@ -440,7 +443,7 @@ while True:
                             mutation_window.close()
                             break
                         if event == 'Calculate':
-                            sg.popup('button working')
+                            sg.popup('Under Construction...')
                         if event == 'Retrive Strains':
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
@@ -453,17 +456,28 @@ while True:
                                 LB_total_cells1 = LB_strain1.Titre*5
                                 Ab_total_cells1 = Ab_strain1.Titre*5
 
-                                fraction = Ab_total_cells1.item() / LB_total_cells1.item()
-                                m = np.log(fraction)
-                                print(fraction)
+                        # Calculations for mutation rates, all slightly different
+                                Mrates_classic = Ab_total_cells1.item() / LB_total_cells1.item()
+                                #print(Mrates_classic)
+                                #m = np.log(Mrates)
+
+                                if values['-Mrate_method-'] == 'Method 1 (Drake): \u03BC = m / Nt':
+                                    Mrates = Ab_total_cells1.item() / LB_total_cells1.item()
+                                elif values['-Mrate_method-'] == 'Method 2: \u03BC = m / (Nt-1)':
+                                    Mrates = Ab_total_cells1.item() / (LB_total_cells1.item() - 1)
+                                elif values['-Mrate_method-'] == 'Method 3: \u03BC = m / 2Nt':
+                                    Mrates = Ab_total_cells1.item() / (2 * LB_total_cells1.item())
+                                elif values['-Mrate_method-'] == 'Method 4: \u03BC = m ln(2) / Nt':
+                                    Mrates = (Ab_total_cells1.item() * np.log(2)) / LB_total_cells1.item()
+                                else:
+                                    sg.popup('Something wrong with rate method...')
+                                #print(Mrates)
                         # Update the input fields showing the number of cells
                         # .item() retrieved the actual value
 
                                 mutation_window['-Cells-'].Update(LB_total_cells1.item())
                                 mutation_window['-Mutations-'].Update(Ab_total_cells1.item())
-                                mutation_window['-Mrates-'].Update(m)
-
-                                sg.popup('Mutation rates not calculated correctly yet...')
+                                mutation_window['-Mrates-'].Update(Mrates)
 
                             except:
                                 sg.popup('No such strain found')
@@ -478,3 +492,27 @@ plt.xlabel('Culture')
 plt.ylabel('Cells/mL')
 plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
+
+# manual calculations
+1.288e3 / 1272727272.7272723
+
+1272727272.7272723 / np.log(10818.18181818182)
+
+10818.18181818182 * np.log(2)/1272727272.7272723
+
+(1272727272.7272723 / 10818.18181818182) - np.log(10818.18181818182-1.24)
+
+np.log(1272727272.7272723)
+
+Mact = (10818.18181818182/5) * ((0.1 -1) / (0.1 * np.log(0.1)))
+Mact
+
+
+p0 = 1272727272.7272723 - 10818.18181818182
+q = ( 1 - p0)
+sigma = (p0*q) / (9 - 1)
+-sigma
+np.sqrt(-sigma)
+
+
+1.288e3
