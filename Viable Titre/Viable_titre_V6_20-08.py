@@ -405,7 +405,7 @@ while True:
                         [sg.Text('Number of Cultures (N):', font=font)],
                         [sg.Text('Cell Count per Culture (n):', font=font)],
                         [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
-                        [sg.Text('Mutation Rate (m):', font=font)],
+                        [sg.Text('Mutation Rate (u):', font=font)],
                         [sg.Text('Sigma Value:', font=font)],
                         [sg.Text('Sigma / m:', font=font)],
                         [sg.Text('m / n:', font=font)],
@@ -478,3 +478,6 @@ plt.xlabel('Culture')
 plt.ylabel('Cells/mL')
 plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
+
+
+# different mu
