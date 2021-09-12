@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE></TITLE>
+   <META NAME="Author" CONTENT="">
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (WinNT; I) [Netscape]">
+</HEAD>
+<BODY>
+
+<H1 ALIGN=CENTER>Hilfe zur Berechnung </H1>
+
+<H1 ALIGN=CENTER>der Mutatenzahlen und ihrer Medianwerte</H1>
+
+<H1 ALIGN=CENTER>
+<HR WIDTH="100%"></H1>
+
+<P>Das Programm wurde von Steffen Schmidt in Java-Script geschrieben und
+basiert auf der Diplomarbeit von Burkhard L&uuml;hr (Institut f&uuml;r
+molekulare Genetik - G&ouml;ttingen 1996). Burkhard L&uuml;hr schrieb folgendes
+zu dem Algorithmus (Seite 61 ff) (Inhalt leicht ge&auml;ndert):</P>
+
+<P><A HREF="#Bestimmung">Bestimmung der Mutantenzahlen und ihres Medianwertes</A></P>
+
+<P><A HREF="#Abschätzung">Absch&auml;tzung der Mutationsraten</A></P>
+
+<P><A HREF="#Standardabweichung">Standardabweichung f&uuml;r die Anzahl
+der Mutationsereignisse</A></P>
+
+<P><A HREF="#Das Programm">Das Programm selber</A></P>
+
+<P><A HREF="#Lea">Literatur</A></P>
+
+<P>
+<HR WIDTH="100%"></P>
+
+<H2><A NAME="Bestimmung"></A>Bestimmung der Mutantenzahlen und ihres Medianwertes</H2>
+
+<P>Mit jeweils 1000-10000 Zellen einer &Uuml;bernachtkultur des zu untersuchenden
+Stammes wurde parallel eine ungerade Anzahl von Kulturen (in der Regel
+11 Kulturr&ouml;hrchen mit 5 ml YPD+) angeimpft. Diese Kulturen wurde zun&auml;chst
+f&uuml;r 3 Tage ohne Agitation bei 30 &deg;C inkubiert, da die Zellen bei
+einer so geringen Dichte sonst nicht zu wachsen begannen. Wenn ein Zellsediment
+sichtbar war, wurden die Kulturen f&uuml;r weitere 2 Tage bei 30 &deg;C
+gerollt und danach Aliquots auf selektivem Agar ausplattiert. Dier Agar
+wurde so gew&auml;hlt, da&szlig; nur Zellen, die eine bestimmte Klasse
+von Mutationen tragen, wachsen und dadurch eine Zellkolonie bilden konnten.
+Der Rest der Fl&uuml;ssigkulturen wurde bei 4 &deg;C gelagert. Nach 3 -
+6 Tagen konnte dann die Anzahl der Mutantenkolonien bestimmt und dadurch
+die Anzahl der Mutanten r in einer jeden Kultur bestimmt werden. Ma&szlig;gebend
+f&uuml;r die folgenden Berechnungen war dann der Medianwert ro, bei 11
+Kulturen also der sechstgr&ouml;sste Wert. Diese Methode wird von den Autoren
+<A HREF="#Lea">D.E. Lea und C.A. Coulson (1948)</A> als hinreichend genau
+angesehen, wenn alle oder fast alle Parallelkulturen Mutanten enthalten.
+
+<HR WIDTH="100%"></P>
+
+<H2><A NAME="Abschätzung"></A>Absch&auml;tzung der Mutationsraten</H2>
+
+<P>Der N&auml;herungswert f&uuml;r die Anzahl der Mutationsereignisse m,
+die der Entstehung von ro Mutanten zugrunde lagen, erf&uuml;llen folgende
+Gleichungen:</P>
+
+<P><IMG SRC="formel1.jpg" HEIGHT=38 WIDTH=313></P>
+
+<P>Nach der Subtraktion von ro lie&szlig; sich m als einzige Nullstelle
+einer streng monoton steigenden funktion betrachten, wobei ro als Konstante
+angesehen werden konnte. Deshalb lie&szlig; sich m durch Newtonsche Iteration
+bestimmen. Die Folge</P>
+
+<P><IMG SRC="formel2.jpg" HEIGHT=63 WIDTH=465></P>
+
+<P>konvergierte also gegen m. Als Startwert m1 wurde ro verwendet. Die
+Berechnungen erfolgen mit einem Programm in Java-Script. Der Algorithmus
+kann variabel bei verschiedenen Iterationsgrenzen abgebrochen werden. Es
+wurde vorausgesetzt, da&szlig; die Gesamtzellzahl f&uuml;r die Berechnung
+der Mutationsrate m/n die Zellzahl der Mediankultur verwendet, die mit
+einer Neubauer Zellkammer bestimmt wurde.</P>
+
+<P>
+<HR WIDTH="100%"></P>
+
+<H2><A NAME="Standardabweichung"></A>Standardabweichung f&uuml;r die Anzahl
+der Mutationsereignisse</H2>
+
+<P>Die errechnete Anzahl der Mutationsereignisse m, stellt einen statistischen
+N&auml;herungswert dar. Die dazugeh&ouml;rige Standardabweichung kann mit
+Hilfe folgender Gleichung berechnet werden:</P>
+
+<P><IMG SRC="formel3.jpg" HEIGHT=65 WIDTH=326></P>
+
+<P>Dabei ist N der Stichprobenumfang, also die Anzahl der Parallelkulturen,
+die f&uuml;r die Bestimmung von ro eingesetzt wurde (<A HREF="#Lea">Lea
+and Coulson, 1948)</A>. 
+<HR WIDTH="100%"></P>
+
+<H2><A NAME="Das Programm"></A>Das Programm selber</H2>
+
+<P>..ist hoffentlich denkbar einfach zu bedienen. Die hellgrau unterlegten
+Felder dienen zur Eingabe. Die dunkelgrauen Felder sind die Ergebnisse.
+Mit &quot;Berechnen&quot; werden die Werte ausgerechnet. Mit Rechnen_Hinzuf&uuml;gen
+k&ouml;nnen die Werte berechnet und gleichzeitig in einer Tabelle rechts
+eingef&uuml;gt werden. Mit Hinzuf&uuml;gen werden die aktuellen Werte in
+die Tabelle eingef&uuml;gt. </P>
+
+<P>Die Tabelle kann folgenderma&szlig;en ausgedruckt werden: Mit der linken
+Maustaste das Fenster mit der Tabelle doppelt-anklicken. Dann unter File
+Print Preview nachschauen ob's auch stimmt und mit Print ausdrucken...</P>
+
+<P><A HREF="frame.html">Viel Spass!</A></P>
+
+<P>
+<HR WIDTH="100%"></P>
+
+<P><A NAME="Lea"></A><B>Lea, D.E. &amp; C.A. Coulson. </B>1948. the distribution
+of mutants in bacterial populations, <I>J. Genet.</I> <B>49</B>:264-248</P>
+
+<P>
+<HR WIDTH="100%"></P>
+
+<P>Written by: <A HREF="mailto: sschmid2@Uni-MolGen.gwdg.de">Steffen Schmidt</A>,10.08.1998</P>
+
+</BODY>
+</HTML>

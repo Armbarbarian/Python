@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>Berechnung der Mutationsrate in Zellkolonien</TITLE>
+   <META NAME="Author" CONTENT="Steffen Schmidt">
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (WinNT; I) [Netscape]">
+<SCRIPT LANGUAGE="JavaScript1.1">
+
+// Objekte erzeugen
+
+   var Ausgabeframe = new Ausgabe();
+   var Eingabe = new Eingabetest();	
+      
+// Hauptprogramm im Objekt Berechnen
+function rechnen()
+{  
+   var Ergebnis = 
+      new Berechnung(document.eingabe.vektor, 
+		     document.eingabe.Iterationsgrenze.selectedIndex);  
+   if ((Eingabe.test()) == false)
+   {
+      alert(Eingabe.msg);
+      return false;
+   }
+
+   // Rechnung
+   Ergebnis.mutationsrate();
+   Ergebnis.standardabweichung();
+
+   // Ausgabe
+   document.eingabe.m.value   = ENG(Ergebnis.m);
+   document.eingabe.s.value   = ENG(Ergebnis.s);
+   document.eingabe.s_m.value = ENG(Ergebnis.s / Ergebnis.m);
+   document.eingabe.m_n.value = ENG(Ergebnis.m / document.eingabe.n.value);
+   document.eingabe.s_n.value = ENG(Ergebnis.s / document.eingabe.n.value);
+
+   return true;
+}
+
+
+//-----------------------------------------------------------------------------
+// Eingabetest
+//
+// Es wird ueberprueft, ob in den Eingabefenstern korrekte Werte stehen
+
+// Konstruktor
+
+function Eingabetest()
+{
+   this.vektor = new Array(3);
+   this.test   = eingabe_ueberpruefen;
+}
+
+// Eigentliche Testfkt.
+
+function eingabe_ueberpruefen()
+{
+   var leere_Eingabe = "", falsches_Zeichen = "";
+
+   for (var i = 0; i < 4; i++)
+   {
+      var e = document.eingabe.elements[i];
+
+      if (e.type == "text")
+      {
+	 if (e.value == null || e.value == "")
+	 {
+	    leere_Eingabe += "\n        " + e.name;
+	 }
+	 else if (!(this.vektor[i] = parseFloat(e.value)))
+	 {
+	    falsches_Zeichen += "\n        " + e.name;
+	 }
+      }
+   }
+
+   if (leere_Eingabe || falsches_Zeichen)
+   {
+      this.msg = 
+	 "----------------------------------------\n" +
+	 " ES SIND FOLGENDE FEHLER AUFGETRETEN\n" +
+	 "----------------------------------------\n\n";
+
+      if (leere_Eingabe)
+      {
+	 this.msg += "Es erfolgte keine Eingabe in:\n";
+	 this.msg += leere_Eingabe;
+      }
+      if (falsches_Zeichen)
+      {
+	 this.msg += "\n\n Bitte Zahlen eingeben in:\n";
+	 this.msg += falsches_Zeichen;
+      }
+
+      return (false);
+   }
+
+   return (true);
+}
+//|
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Berechnung
+//
+// Es werden nach der angegebenen Formel die Werte berechnet
+
+// Konstruktor
+
+function Berechnung(v, grenze)
+{
+   this.vektor = v;
+
+   var grenzen             = new Array(1e-6, 1e-7, 1e-8, 1e-9, 1e-10);
+   this.grenze             = grenzen[grenze];
+
+   this.s                  = 0.0;
+   this.N                  = document.eingabe.N.value;
+   this.m                  = document.eingabe.r0.value;
+   this.mutationsrate      = MutationBerechnen;
+   this.standardabweichung = SigmaBerechnen;
+}
+
+// Mutationsrate berechnen...
+
+function MutationBerechnen()
+{   
+   var m0 = 0.0, r0 = this.m;
+
+   while (Math.abs(m0 - this.m) >= this.grenze)
+   {
+      m0 = this.m;
+      divident = (1.24 * m0) + (m0 * Math.log(m0)) - r0;
+      divisor  = 2.24 + Math.log(m0);
+      this.m = m0 - (divident / divisor);
+   }
+}
+
+// Standardabweichung...
+
+function SigmaBerechnen()
+{
+   divident = 12.7;
+   divisor =  (2.24 + Math.log(this.m)) * (2.24 + Math.log(this.m));
+   
+   this.s = this.m * Math.sqrt((1/this.N) * (divident/divisor));
+}
+
+//-----------------------------------------------------------------------------
+// Zellinhalt loeschen
+
+function InhalteLoeschen()
+{
+   for (i = 0; i < document.eingabe.elements.length; i++)
+   {
+      var e = document.eingabe.elements[i];
+
+      //if (e.type == "text")
+      {
+	 e.value == "";
+      }
+   }
+
+   Ausgabeframe.leeren();
+}
+//|
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// ENG
+//
+// Schreibt zahlen eventuell als Exponenten
+
+function ENG (z)
+{
+   x = parseFloat(z);
+
+   if ((1.0 >= x) && (x >= 0.1))
+   {
+
+      x += "O";
+      return ("0" + runde_zahl(x,4));
+   }
+   if (x < 1.0)
+   {
+
+      for (e = 0; x < 0.1; e += 3)
+      {
+	 x = x * 1000.0;
+      }
+     
+      if (1.0 > x)
+	 return ("0" + runde_zahl(x, 3) + "e-" + e);
+      else 
+	 return (runde_zahl(x, 4) + "e-" + e);
+   }
+   if (x > 1000.0)
+   {
+      for (e = 0.0; x > 1000.0; e += 3)
+      {
+	x /= 1000.0;
+      }
+      return (runde_zahl(x, 5) + "e" + e);
+   }
+   x += "O";
+   return runde_zahl(x, 5);
+}
+
+
+function runde_zahl(x, stelle)
+{
+   x += "O";					    // Umwandeln in String
+   var z = parseInt(x.substring(stelle, (stelle + 1))); /* Letzte Stelle */
+
+   if (z >= 5)
+   {
+      return (x.substring(0, (stelle - 1))
+	      + (parseInt(x.substring(stelle - 1, stelle)) + 1));
+   }
+   else
+      return (x.substring(0, stelle));
+}
+
+
+//-----------------------------------------------------------------------------
+// Funktion zur Ausgabe in den Frame Ausgabe
+
+function Ausgabe()
+{
+   this.msg = new Array("<TD>N</TD>", "<TD>n</TD>", "<TD>ro</TD>", 
+			"<TD>m</TD>", "<TD>s</TD>", "<TD>s/m</TD>", 
+			"<TD>m/n</TD>", "<TD>s/n</TD>");
+   this.add = hinzufuegen;
+   this.leeren = erase;
+}
+
+function erase()
+{
+   this.msg = null;
+   this.msg = new Array("<TD>N</TD>", "<TD>n</TD>", "<TD>ro</TD>", 
+			"<TD>m</TD>", "<TD>s</TD>", "<TD>s/m</TD>", 
+			"<TD>m/n</TD>", "<TD>s/n</TD>");
+   parent.Ausgabe.document.close();
+   parent.Ausgabe.document.write("<HTML></HTML>"); 
+}
+
+function hinzufuegen()
+{ 
+  
+   // Die Werte in die Msg einlesen
+
+   for (i = 0; i <= 8 ; i++)
+      this.msg[i-1] += "<TD>"+ document.eingabe.elements[i].value + "<\TD>";
+
+   // Die Ausgabe in eine Tabelle zusammenstellen
+   START = "<HTML><BODY><TABLE BORDER=1><TR>";
+   END   = "</TABLE></BODY></HTML>";
+   
+   var out = START;
+
+   for (i = 0; i < this.msg.length; i++)    
+      out += this.msg[i] + "</TR><TR>";
+
+   out += END;
+
+   // Ausgabe in den Frame Ausgabe!
+   parent.Ausgabe.document.close();
+   parent.Ausgabe.document.write(out);
+}
+
+//|
+//=============================================================================
+</SCRIPT>
+</HEAD>
+<BODY>
+
+<H1>Berechnung der Mutationsrate von Kolonien</H1>
+
+<P>Es wird ein Iterationsverfahren dazu verwendet<FORM NAME="eingabe"></P>
+
+<TABLE BORDER=1 >
+<TR>
+<TD>Anzahl der Kulturen (N)</TD>
+
+<TD><INPUT TYPE=text NAME="N" SIZE = 8></TD>
+
+<TD ROWSPAN=3>Iterationsgrenze:<BR>
+<SELECT NAME="Iterationsgrenze"><OPTION VALUE=1e-6>1e-6 <OPTION VALUE=1e-7>1e-7
+<OPTION VALUE=1e-8 SELECTED>1e-8 <OPTION VALUE=1e-9>1e-9 <OPTION VALUE=1e-10>1e-10
+</SELECT></TD>
+</TR>
+
+<TR>
+<TD>Zellzahl (n)</TD>
+
+<TD><INPUT TYPE=text NAME="n" SIZE = 8></TD>
+</TR>
+
+<TR>
+<TD>Mutationsereignisse (r<SUB>0</SUB>)</TD>
+
+<TD><INPUT TYPE=text NAME="r0" SIZE = 8></TD>
+</TR>
+
+<TR BGCOLOR="#808080">
+<TD>Mutationsrate (m)</TD>
+
+<TD><INPUT TYPE=text NAME="m" SIZE = 8></TD>
+</TR>
+
+<TR BGCOLOR="#808080">
+<TD>
+<CENTER><P>sigma</P></CENTER>
+</TD>
+
+<TD><INPUT TYPE=text NAME="s" SIZE = 8></TD>
+</TR>
+
+<TR BGCOLOR="#808080">
+<TD>
+<CENTER><P><SUP>sigma</SUP>/<SUB>m</SUB> </P></CENTER>
+</TD>
+
+<TD><INPUT TYPE=text NAME="s_m" SIZE = 8></TD>
+</TR>
+
+<TR BGCOLOR="#808080">
+<TD>
+<CENTER><P><SUP>m</SUP>/<SUB>n</SUB> </P></CENTER>
+</TD>
+
+<TD><INPUT TYPE=text NAME="m_n" SIZE = 8></TD>
+</TR>
+
+<TR BGCOLOR="#808080">
+<TD>
+<CENTER><P><SUP>sigma</SUP>/<SUB>n</SUB> </P></CENTER>
+</TD>
+
+<TD><INPUT TYPE=text NAME="s_n" SIZE = 8></TD>
+</TR>
+</TABLE>
+
+<P><INPUT TYPE=button VALUE="Berechnen" NAME="Rechnen" OnClick="rechnen()"><INPUT TYPE=button VALUE="Rechnen & Hinzufügen" NAME="R&H" OnClick="if (rechnen() == true){Ausgabeframe.add();}"><INPUT TYPE=button VALUE="Hinzufügen" NAME="add" OnClick="Ausgabeframe.add()"><BR>
+<INPUT TYPE=reset VALUE="Loeschen" NAME="Alles Loeschen" OnClick="InhalteLoeschen()"></FORM></P>
+
+</BODY>
+</HTML>

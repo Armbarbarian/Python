@@ -444,6 +444,7 @@ while True:
                             break
                         if event == 'Calculate':
                             sg.popup('Under Construction...')
+
                         if event == 'Retrive Strains':
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
@@ -485,7 +486,7 @@ while True:
                             # clear_input()
 window.close()
 
-
+# trying to get a plotter page in the app to show possible VT comparison, this is not essential as can be done in R easily.
 ''' # plotting the data - work this out later
 plt.scatter(data_temp1.names, data_temp1.titre, color='RoyalBlue')
 plt.xlabel('Culture')
@@ -494,25 +495,42 @@ plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
 
 # manual calculations
-1.288e3 / 1272727272.7272723
-
-1272727272.7272723 / np.log(10818.18181818182)
-
-10818.18181818182 * np.log(2)/1272727272.7272723
-
-(1272727272.7272723 / 10818.18181818182) - np.log(10818.18181818182-1.24)
-
-np.log(1272727272.7272723)
-
-Mact = (10818.18181818182/5) * ((0.1 -1) / (0.1 * np.log(0.1)))
-Mact
+n = 1272727272.7272723
+m = 10818.18181818182
+u = 8.500000000000005e-6
+m0 = 0.0
+r0 = (1.24 * m) + (m * np.log(m))
+divident = (1.24 * n) + (n * np.log(n)) - r0
+divisor = 2.24 + np.log(m)
+m =  r0 - (divident / divisor)
+m
 
 
-p0 = 1272727272.7272723 - 10818.18181818182
-q = ( 1 - p0)
-sigma = (p0*q) / (9 - 1)
--sigma
-np.sqrt(-sigma)
 
-
+# mutationrate from the 1998 program
 1.288e3
+'''
+from the mutation rate program in what looks like javascript to calculate mutation rate
+
+# mutation rate
+// Mutationsrate berechnen...
+function MutationBerechnen()
+{
+   var m0 = 0.0, r0 = this.m;
+   while (Math.abs(m0 - this.m) >= this.grenze)
+   {
+      m0 = this.m;
+      divident = (1.24 * m0) + (m0 * Math.log(m0)) - r0;
+      divisor  = 2.24 + Math.log(m0);
+      this.m = m0 - (divident / divisor);
+   }
+}
+
+# sigma
+function SigmaBerechnen()
+{
+   divident = 12.7;
+   divisor =  (2.24 + Math.log(this.m)) * (2.24 + Math.log(this.m));
+   this.s = this.m * Math.sqrt((1/this.N) * (divident/divisor));
+}
+'''
