@@ -407,6 +407,7 @@ while True:
                         [sg.Text('Cell Count per Culture (n):', font=font)],
                         [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
                         [sg.Text('Mutation Rate (\u03BC):', font=font)],
+                        [sg.Text('Mutation Rate (m):', font=font)],
                         [sg.Text('Sigma Value:', font=font)],
                         [sg.Text('Sigma / m:', font=font)],
                         [sg.Text('m / n:', font=font)],
@@ -424,6 +425,7 @@ while True:
                         [sg.InputText(key='-Cells-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Mutations-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Mrates-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Sigma-', size=(20, 1), font=font)],
                         [sg.InputText(key='-s/m-', size=(20, 1), font=font)],
                         [sg.InputText(key='-m/n-', size=(20, 1), font=font)],
@@ -433,7 +435,7 @@ while True:
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
                          sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
-                         [sg.Button('Calculate', font=font)]
+                         [sg.Button('Save Mutation Data', font=font)]
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
@@ -442,9 +444,6 @@ while True:
                         if event == sg.WIN_CLOSED:
                             mutation_window.close()
                             break
-                        if event == 'Calculate':
-                            sg.popup('Under Construction...')
-
                         if event == 'Retrive Strains':
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
@@ -473,6 +472,7 @@ while True:
                                 else:
                                     sg.popup('Something wrong with rate method...')
                                 #print(Mrates)
+
                         # Update the input fields showing the number of cells
                         # .item() retrieved the actual value
 
@@ -483,6 +483,37 @@ while True:
                             except:
                                 sg.popup('No such strain found')
 
+                        if event == 'Save Mutation Data':
+                            popup2 = sg.popup_yes_no('Do you want to append an existing file?')
+                            if popup2 == 'No':
+                                try:
+                                    mutation_dict = {'Cultures': [values['-Cultures-']],
+                                                     'Total_cells': [values['-Cells-']],
+                                                     'Mutant_cells': [values['-Mutations-']],
+                                                     'Rate_u': [values['-Mrates-']],
+                                                     'Rate_m': [values['-Mrates_m-']],
+                                                     'Sigma': [values['-Sigma-']],
+                                                     'Sigma_m': [values['-s/m-']],
+                                                     'm_n': [values['-m/n-']],
+                                                     'Sigma_n': [values['-s/n-']]}
+                                    mutation_dataframe = pd.DataFrame(mutation_dict)
+                                    mutation_dataframe.to_csv(('mutationrate'+day+'-'+month+'.csv'), index = False)
+                                except:
+                                    sg.popup('You died...')
+                            if popup2 == 'Yes':
+                                browse_file_layout = [
+                                    [sg.Text('Select your csv file:'), sg.FileBrowse(key='csv_file')],
+                                    [sg.Submit(key='csv_submit')]
+                                ]
+                                browse_csv_window = sg.Window('Find the csv file to display', browse_file_layout)
+                                event, values = browse_csv_window.read()
+                                if event == 'csv_submit':
+                                    CSV_FILE_input = values['csv_file']
+                                    df1 = pd.read_csv(CSV_FILE_input)
+                                    df1 = df1.append(values, ignore_index=True)
+                                    df1.to_csv((CSV_FILE_input), index = False)
+                                    sg.popup('Data saved!')
+# left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
 window.close()
 
@@ -495,16 +526,31 @@ plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
 
 # manual calculations
+iter = 1e-8
+N = 9
 n = 1272727272.7272723
 m = 10818.18181818182
 u = 8.500000000000005e-6
-m0 = 0.0
-r0 = (1.24 * m) + (m * np.log(m))
-divident = (1.24 * n) + (n * np.log(n)) - r0
-divisor = 2.24 + np.log(m)
-m =  r0 - (divident / divisor)
-m
 
+ # trying out a while loop that takes into account the iterations
+m0 = 0.0
+r0 = m
+while (np.abs(m0 - m) >= iter):
+    m0 = m
+    divident = (1.24 * m0) + (m0 * np.log(m0)) - r0;
+    divisor  = 2.24 + np.log(m0)
+    u = m0 - (divident / divisor)
+    print(u) # mutation rate is not the same as in the html program
+
+# sigma value
+divident_s = 12.7
+divisor_s =  (2.24 + np.log(m)) * (2.24 + np.log(m))
+s = m * np.sqrt((1/N) * (divident_s/divisor_s))
+s
+
+dict = {'col1':[1], 'col2':[3]}
+mutation_dataframe = pd.DataFrame(dict)
+mutation_dataframe
 
 
 # mutationrate from the 1998 program

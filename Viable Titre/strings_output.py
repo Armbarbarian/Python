@@ -1,5 +1,3 @@
-# https://pythonforundergradengineers.com/unicode-characters-in-python.html
-
 print('\u0394') # Delta
 print('\u03B1') # alpha
 print('\u03BB') # lamda
