@@ -69,14 +69,16 @@ layout1 = [
         sg.InputText(key='Colonies_1B', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='7_check', change_submits=True, enable_events=True)],
     [sg.Text('Colonies_2', size=(10, 1), font=font), sg.InputText(key='Colonies_2A', size=(15, 1), font=font),
         sg.InputText(key='Colonies_2B', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='8_check', change_submits=True, enable_events=True)],
+    [sg.Button('Calculate cells/mL', font=font, pad=((0,0),(0,0))), sg.Button('Clear', font=font)],
     [sg.Text('Viable Titre', size=(10, 1), font=font),
         sg.InputText('', key='Titre', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='9_check', change_submits=True, enable_events=True)],
-    [sg.Text("Choose a spreadsheet to update: "), sg.FileBrowse(key='-FILE-')],
-    [sg.Button('Calculate cells/mL', font=font), sg.Submit('Update Spreadsheet', font=font), sg.Button('Clear', font=font), sg.Exit(font=font)],
-    [sg.Text('_'*40)],
-    [sg.Text('Other Tools:')],
-    [sg.Button('View Data', font=font, button_color='#6495ED')],
-    [sg.Button('Analyse Data', font=font, button_color='#6495ED')]
+    [sg.Text('_'*65)],
+    [sg.Text("Choose a spreadsheet to update: ", font=font), sg.FileBrowse(key='-FILE-')],
+    [sg.Submit('Update Spreadsheet', font=font)],
+    [sg.Text('_'*65)],
+    [sg.Text('Other Tools:', font=font)],
+    [sg.Button('View Data', font=font, button_color='darkcyan'), sg.Button('Analyse Data', font=font, button_color='darkcyan'),
+        sg.Exit(font=font, button_color='firebrick', size=(10,1), pad=((150,0),(0,0)))]
 ]
 
 
@@ -387,6 +389,7 @@ while True:
 
                 if values['analysis_type'] == 'Mutation Rates':
                     window_analysis_question.close()
+                    sg.popup('NOTE: You must use the 1998 HTML program \nin conjunction which this data entry app', font=font)
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
                         # master_df
@@ -439,13 +442,13 @@ while True:
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
                          sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
-                         [sg.Button('Save Mutation Data', font=font)]
+                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font)]
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
                     while True:
                         event, values = mutation_window.read()
-                        if event == sg.WIN_CLOSED:
+                        if event == sg.WIN_CLOSED or event == 'Exit':
                             mutation_window.close()
                             break
                         if event == 'Retrive Strains':
