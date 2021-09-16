@@ -27,11 +27,12 @@ font_small = ('Calibri', 12)
 # set empty results string for VT output, paired with Calculate cells/mL
 result = ''
 
+# empty list to append checked keys into
+checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
+
 # clear function paired with clear button
-
-
 def clear_input():
-    for key in values:
+    for key in checked:
         window[key]('')
     return None
 
@@ -48,6 +49,7 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
     return figure_canvas_agg
 
+markers = ['LB', 'Kan', 'Cm', 'Tc', 'Tm', 'Apra', 'Amp', 'Rif']
 
 # set the layout of the window
 layout1 = [
@@ -56,7 +58,7 @@ layout1 = [
     [sg.Text('Strain', size=(10, 1), font=font),
         sg.InputText(key='Strain', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='1_check', change_submits=True, enable_events=True)],
     [sg.Text('Condition', size=(10, 1), font=font),
-        sg.Combo(['LB', 'Kan', 'Cm', 'Tc', 'Rif'], key='Condition', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='2_check', change_submits=True, enable_events=True)],
+        sg.Combo(markers, key='Condition', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='2_check', change_submits=True, enable_events=True)],
     [sg.Text('Time (mins)', size=(10, 1), font=font),
         sg.Combo(['0', '30', '60', '90', '120', '150', '180'], key='Time', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='3_check', change_submits=True, enable_events=True)],
     [sg.Text('Volume (mL)', size=(10, 1), font=font),
@@ -85,12 +87,7 @@ layout1 = [
 # set up the window and the layout to use for the window
 window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
 
-# empty list to append checked keys into
-checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
-
 # median find nearest function
-
-
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -221,7 +218,7 @@ while True:
         # This drops the names of the check boxes if NOT in checked list
             df = df.drop(columns=[col for col in df if col not in checked])
             df.to_excel(EXCEL_FILE, index=False)
-            popup1 = sg.popup_yes_no('Do you want to save a separate csv file?')
+            popup1 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
             if popup1 == 'Yes':
                 df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
                 sg.popup('Data Saved!')
@@ -230,7 +227,7 @@ while True:
 
 # Viewing the data saved under Output
     if event == 'View Data':
-        auto_manual_selection = sg.popup_yes_no('Do you want to manually select the file?')
+        auto_manual_selection = sg.popup_yes_no('Do you want to manually select the file?', font=font)
         if auto_manual_selection == 'No':
             try:
                 CSV_FILE = ('output_'+day+'-'+month+'.csv')
@@ -252,8 +249,8 @@ while True:
         else:
             if auto_manual_selection == 'Yes':
                 browse_file_layout = [
-                    [sg.Text('Select your csv file:'), sg.FileBrowse(key='csv_file')],
-                    [sg.Submit(key='csv_submit')]
+                    [sg.Text('Select your csv file:', font=font), sg.FileBrowse(key='csv_file', font=font)],
+                    [sg.Submit(key='csv_submit', font=font)]
                 ]
                 browse_csv_window = sg.Window('Find the csv file to display', browse_file_layout)
                 event, values = browse_csv_window.read()
