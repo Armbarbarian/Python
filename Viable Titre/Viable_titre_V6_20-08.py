@@ -73,8 +73,10 @@ layout1 = [
         sg.InputText('', key='Titre', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='9_check', change_submits=True, enable_events=True)],
     [sg.Text("Choose a spreadsheet to update: "), sg.FileBrowse(key='-FILE-')],
     [sg.Button('Calculate cells/mL', font=font), sg.Submit('Update Spreadsheet', font=font), sg.Button('Clear', font=font), sg.Exit(font=font)],
-    [sg.Button('View Data', font=font)],
-    [sg.Button('Analyse Data', font=font)]
+    [sg.Text('_'*40)],
+    [sg.Text('Other Tools:')],
+    [sg.Button('View Data', font=font, button_color='#6495ED')],
+    [sg.Button('Analyse Data', font=font, button_color='#6495ED')]
 ]
 
 
@@ -334,11 +336,9 @@ while True:
                                   enable_events=False)]
                     ]
                     window_median_table = sg.Window('Median Calculation', analysis_table_layout)
+                    window_analysis_question.close()
                     while True:
                         event, values = window_median_table.read()
-                        if event == sg.WIN_CLOSED or event == 'Close': # this is bugged and crashes the program when closedwindow_median_table.close()
-                            window_median_table.close()
-                            break
                         if event == 'Calculate':
                             try:
                                 # user input
@@ -377,12 +377,16 @@ while True:
                                 window_median_table['-Median output-'].Update(values=median_list, visible=True)
                             except:
                                 sg.popup('Enter row numbers first', font=font)
-
+                        if event == sg.WIN_CLOSED or event == 'Close':
+                            break
+                    window_median_table.close()
+                    continue
                     # save the selected rows into a df
                     # new_data1 = values['-Median Table-']
                     # closing and exiting the median window
 
                 if values['analysis_type'] == 'Mutation Rates':
+                    window_analysis_question.close()
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
                         # master_df
@@ -475,27 +479,25 @@ while True:
 
                         # Update the input fields showing the number of cells
                         # .item() retrieved the actual value
-
                                 mutation_window['-Cells-'].Update(LB_total_cells1.item())
                                 mutation_window['-Mutations-'].Update(Ab_total_cells1.item())
                                 mutation_window['-Mrates-'].Update(Mrates)
-
                             except:
                                 sg.popup('No such strain found')
 
                         if event == 'Save Mutation Data':
                             popup2 = sg.popup_yes_no('Do you want to append an existing file?')
+                            mutation_dict = {'Cultures': [values['-Cultures-']],
+                                             'Total_cells': [values['-Cells-']],
+                                             'Mutant_cells': [values['-Mutations-']],
+                                             'Rate_u': [values['-Mrates-']],
+                                             'Rate_m': [values['-Mrates_m-']],
+                                             'Sigma': [values['-Sigma-']],
+                                             'Sigma_m': [values['-s/m-']],
+                                             'm_n': [values['-m/n-']],
+                                             'Sigma_n': [values['-s/n-']]}
                             if popup2 == 'No':
                                 try:
-                                    mutation_dict = {'Cultures': [values['-Cultures-']],
-                                                     'Total_cells': [values['-Cells-']],
-                                                     'Mutant_cells': [values['-Mutations-']],
-                                                     'Rate_u': [values['-Mrates-']],
-                                                     'Rate_m': [values['-Mrates_m-']],
-                                                     'Sigma': [values['-Sigma-']],
-                                                     'Sigma_m': [values['-s/m-']],
-                                                     'm_n': [values['-m/n-']],
-                                                     'Sigma_n': [values['-s/n-']]}
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
                                     mutation_dataframe.to_csv(('mutationrate'+day+'-'+month+'.csv'), index = False)
                                 except:
@@ -510,9 +512,12 @@ while True:
                                 if event == 'csv_submit':
                                     CSV_FILE_input = values['csv_file']
                                     df1 = pd.read_csv(CSV_FILE_input)
-                                    df1 = df1.append(values, ignore_index=True)
+                                    mutation_dataframe = pd.DataFrame(mutation_dict)
+                                    df1 = df1.append(mutation_dataframe, ignore_index=True)
                                     df1.to_csv((CSV_FILE_input), index = False)
                                     sg.popup('Data saved!')
+                                    browse_csv_window.close()
+                                    continue
 # left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
 window.close()
