@@ -325,7 +325,7 @@ while True:
                          sg.Text('Strain 2 row start', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2start-', font=font), sg.Text('Strain 2 row stop', font=font), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2stop-', font=font)],
 
 
-                        [sg.Submit('Calculate', font=font), sg.Exit('Close', font=font)],
+                        [sg.Submit('Calculate', font=font), sg.Exit('Close', font=font, button_color='firebrick')],
 
                         [sg.Text('', key='strain1_median_culture', font=font, visible=False), sg.Text('', key='strain1_median_titre', font=font, visible=False)],
                         [sg.Text('', key='strain2_median_culture', font=font, visible=False), sg.Text('', key='strain2_median_titre', font=font, visible=False)],
@@ -374,6 +374,7 @@ while True:
 
                             # appending the table to show the median cultures
                                 window_median_table['-Median output-'].Update(values=median_list, visible=True)
+                                sg.popup('Now make a note of the median cultures', font=font)
                             except:
                                 sg.popup('Enter row numbers first', font=font)
                         if event == sg.WIN_CLOSED or event == 'Close':
@@ -439,7 +440,7 @@ while True:
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
                          sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
-                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font)]
+                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10,1), pad=((210,0),(0,0)))]
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
