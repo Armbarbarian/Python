@@ -31,6 +31,8 @@ result = ''
 checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
 
 # clear function paired with clear button
+
+
 def clear_input():
     for key in checked:
         window[key]('')
@@ -49,7 +51,9 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
     return figure_canvas_agg
 
+
 markers = ['LB', 'Kan', 'Cm', 'Tc', 'Tm', 'Apra', 'Amp', 'Rif']
+
 
 # set the layout of the window
 layout1 = [
@@ -71,7 +75,7 @@ layout1 = [
         sg.InputText(key='Colonies_1B', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='7_check', change_submits=True, enable_events=True)],
     [sg.Text('Colonies_2', size=(10, 1), font=font), sg.InputText(key='Colonies_2A', size=(15, 1), font=font),
         sg.InputText(key='Colonies_2B', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='8_check', change_submits=True, enable_events=True)],
-    [sg.Button('Calculate cells/mL', font=font, pad=((0,0),(0,0))), sg.Button('Clear', font=font)],
+    [sg.Button('Calculate cells/mL', font=font, pad=((0, 0), (0, 0))), sg.Button('Clear', font=font)],
     [sg.Text('Viable Titre', size=(10, 1), font=font),
         sg.InputText('', key='Titre', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='9_check', change_submits=True, enable_events=True)],
     [sg.Text('_'*65)],
@@ -80,7 +84,7 @@ layout1 = [
     [sg.Text('_'*65)],
     [sg.Text('Other Tools:', font=font)],
     [sg.Button('View Data', font=font, button_color='darkcyan'), sg.Button('Analyse Data', font=font, button_color='darkcyan'),
-        sg.Exit(font=font, button_color='firebrick', size=(10,1), pad=((150,0),(0,0)))]
+        sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((150, 0), (0, 0)))]
 ]
 
 
@@ -88,17 +92,23 @@ layout1 = [
 window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
 
 # median find nearest function
+
+
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]
 
 
-# while loop to keep the window up unless user closes it
+# while loop to keep the window up unless user closes it and asks if you want to close
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == 'Exit':
-        break
+        close_popup = sg.popup_yes_no('Have you saved your work?', font=font)
+        if close_popup == 'No':
+            continue
+        else:
+            break
     if event == 'Clear':
         clear_input()
 
@@ -239,7 +249,7 @@ while True:
                 # sg.popup('Data found!')
                 layout_data = [
                     [sg.Table(values=data, headings=header_list, font=font, key='Viewed_data', display_row_numbers=False, auto_size_columns=False,
-                              num_rows=min(25, len(data)), alternating_row_color='teal')]  # teal, lightblue
+                              num_rows=min(25, len(data)), alternating_row_color='teal', enable_events=False), sg.Button('Append Spreadsheet', key='-Append_csv-', font=font)],  # teal, lightblue
                 ]
                 window_data = sg.Window('output_'+day+'-'+month+'.csv', layout_data)
                 event, values = window_data.read()
@@ -269,6 +279,9 @@ while True:
                     ]
                     window_data_input = sg.Window('Your csv data displayed', layout_data_input)
                     event, values = window_data_input.read()
+        if event == '-Append_csv-':
+            sg.popup('THIS WORKS')  # LO here to try and enable events and delete rows if needed. 17/09/21
+
 # plotting the data (not ready yet)
     if event == 'Analyse Data':
         empty_data = []
@@ -423,7 +436,8 @@ while True:
                         [sg.Text(' '*20)],
                         [sg.InputText(key='-Median_culture1-', size=(10, 1), font=font)],
                         [sg.InputText(key='-Ab-', size=(10, 1), font=font)],
-                        [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt', 'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True)],
+                        [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
+                                  'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True)],
                         [sg.Text(' '*20)],
                         [sg.Text(' '*20)],
                         [sg.InputText(key='-Cultures-', size=(20, 1), font=font)],
@@ -440,7 +454,7 @@ while True:
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
                          sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
-                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10,1), pad=((210,0),(0,0)))]
+                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((210, 0), (0, 0)))]
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
@@ -463,7 +477,7 @@ while True:
 
                         # Calculations for mutation rates, all slightly different
                                 Mrates_classic = Ab_total_cells1.item() / LB_total_cells1.item()
-                                #print(Mrates_classic)
+                                # print(Mrates_classic)
                                 #m = np.log(Mrates)
 
                                 if values['-Mrate_method-'] == 'Method 1 (Drake): \u03BC = m / Nt':
@@ -476,7 +490,7 @@ while True:
                                     Mrates = (Ab_total_cells1.item() * np.log(2)) / LB_total_cells1.item()
                                 else:
                                     sg.popup('Something wrong with rate method...')
-                                #print(Mrates)
+                                # print(Mrates)
 
                         # Update the input fields showing the number of cells
                         # .item() retrieved the actual value
@@ -500,7 +514,7 @@ while True:
                             if popup2 == 'No':
                                 try:
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
-                                    mutation_dataframe.to_csv(('mutationrate'+day+'-'+month+'.csv'), index = False)
+                                    mutation_dataframe.to_csv(('mutationrate'+day+'-'+month+'.csv'), index=False)
                                 except:
                                     sg.popup('You died...')
                             if popup2 == 'Yes':
@@ -515,7 +529,7 @@ while True:
                                     df1 = pd.read_csv(CSV_FILE_input)
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
                                     df1 = df1.append(mutation_dataframe, ignore_index=True)
-                                    df1.to_csv((CSV_FILE_input), index = False)
+                                    df1.to_csv((CSV_FILE_input), index=False)
                                     sg.popup('Data saved!')
                                     browse_csv_window.close()
                                     continue
@@ -538,23 +552,23 @@ n = 1272727272.7272723
 m = 10818.18181818182
 u = 8.500000000000005e-6
 
- # trying out a while loop that takes into account the iterations
+# trying out a while loop that takes into account the iterations
 m0 = 0.0
 r0 = m
 while (np.abs(m0 - m) >= iter):
     m0 = m
-    divident = (1.24 * m0) + (m0 * np.log(m0)) - r0;
-    divisor  = 2.24 + np.log(m0)
+    divident = (1.24 * m0) + (m0 * np.log(m0)) - r0
+    divisor = 2.24 + np.log(m0)
     u = m0 - (divident / divisor)
-    print(u) # mutation rate is not the same as in the html program
+    print(u)  # mutation rate is not the same as in the html program
 
 # sigma value
 divident_s = 12.7
-divisor_s =  (2.24 + np.log(m)) * (2.24 + np.log(m))
+divisor_s = (2.24 + np.log(m)) * (2.24 + np.log(m))
 s = m * np.sqrt((1/N) * (divident_s/divisor_s))
 s
 
-dict = {'col1':[1], 'col2':[3]}
+dict = {'col1': [1], 'col2': [3]}
 mutation_dataframe = pd.DataFrame(dict)
 mutation_dataframe
 
