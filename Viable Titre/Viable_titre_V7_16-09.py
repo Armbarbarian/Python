@@ -344,8 +344,10 @@ while True:
                         [sg.Text('', key='strain2_median_culture', font=font, visible=False), sg.Text('', key='strain2_median_titre', font=font, visible=False)],
 
                         # output of concat dfs showing median
-                        [sg.Table(values=data_input2, headings=median_heading, key='-Median output-', font=font, display_row_numbers=False, num_rows=2, auto_size_columns=False, background_color='green', visible=False,
-                                  enable_events=False)]
+                        [sg.Table(values=data_input2, headings=median_heading, key='-Median output-', font=font, display_row_numbers=False, num_rows=4, auto_size_columns=False, background_color='green', visible=False,
+                                  enable_events=False),
+                         sg.Button('Add to CSV', key='AddButton', visible=False)]
+
                     ]
                     window_median_table = sg.Window('Median Calculation', analysis_table_layout)
                     window_analysis_question.close()
@@ -378,6 +380,9 @@ while True:
                             # filter the OG dataframe to return the culture with that value
                                 median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
                                 median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
+                                # print(median_culture1)
+                                # print(median_culture2)
+
                                 # concatenate the two dfs to show only one table
                                 median_concat = pd.concat([median_culture1, median_culture2], axis=0, ignore_index=True)
                             #
@@ -386,10 +391,43 @@ while True:
                                 # median2_heading = temp_df2.columns.tolist()
 
                             # appending the table to show the median cultures
+                            # show the button to update the spreadhseet
                                 window_median_table['-Median output-'].Update(values=median_list, visible=True)
+                                window_median_table['AddButton'].Update(visible=True)
+
                                 sg.popup('Now make a note of the median cultures', font=font)
                             except:
                                 sg.popup('Enter row numbers first', font=font)
+
+                        if event == 'AddButton':
+                            try:
+                                CSV_FILE = ('output_'+day+'-'+month+'.csv')
+                                CSV_DF = pd.read_csv(CSV_FILE)
+                                # use median_list to search df for indexes
+                                indexes = []
+                                cult1_strain = median_culture1['names'].to_list()
+                                cult2_strain = median_culture2['names'].to_list()
+                                joined_cult = cult1_strain + cult2_strain
+                        # Retreiving the cultures that are the median values
+                                for strain1 in joined_cult:
+                                    if strain1 in CSV_DF.values:
+                                        indices1 = str(CSV_DF[CSV_DF['Strain'] == strain1].index.values)
+                                        if indices1 not in indexes:
+                                            indexes.append(indices1)
+                                    else:
+                                        sg.popup('YOU DIED on culture 1')
+
+                                if 'Median' not in CSV_DF.columns:  # LO here trying to add more than two cultures
+                                    CSV_DF['Median'] = 'NA'
+                                else:
+                                    continue
+                                for strain in joined_cult:
+                                    CSV_DF.loc[CSV_DF.Strain == strain, 'Median'] = 'True'
+                                CSV_DF.to_csv('UPDATED_output'+'_'+day+'-'+month+'.csv')
+                                sg.popup('Data has been added!', font=font)
+                            except:
+                                sg.popup('YOU DIED earlier')
+
                         if event == sg.WIN_CLOSED or event == 'Close':
                             break
                     window_median_table.close()
@@ -537,6 +575,14 @@ while True:
                             # clear_input()
 window.close()
 
+
+##########################################################################################
+#
+#                                         TEST SPACE
+#
+##########################################################################################
+
+
 # trying to get a plotter page in the app to show possible VT comparison, this is not essential as can be done in R easily.
 ''' # plotting the data - work this out later
 plt.scatter(data_temp1.names, data_temp1.titre, color='RoyalBlue')
@@ -600,3 +646,32 @@ function SigmaBerechnen()
    this.s = this.m * Math.sqrt((1/this.N) * (divident/divisor));
 }
 '''
+
+# retrieving index for the median values in the dataframe to append/add with button
+# https://www.edureka.co/community/43215/how-to-find-the-index-of-a-particular-value-in-a-dataframe
+CSV_FILE = ('output_'+day+'-'+month+'.csv')
+CSV_DF = pd.read_csv(CSV_FILE)
+CSV_DF
+xlist = ['DG011 #5', 'DG011 #6', 'DG012 #5']
+indexes = []
+for strain in xlist:
+    if strain in CSV_DF.values:
+        indices = str(CSV_DF[CSV_DF['Strain'] == strain].index.values)
+        if indices not in xlist:
+            indexes.append(indices)
+    else:
+        print('not here')
+# print(indexes)
+
+
+# append dataframe with new column
+CSV_FILE = ('output_'+day+'-'+month+'.csv')
+CSV_DF = pd.read_csv(CSV_FILE)
+xlist = ['DG011 #5', 'DG011 #6', 'DG012 #5']
+test_df = CSV_DF
+test_df['Median'] = 'NA'
+test_df
+for strain in xlist:
+    test_df.loc[test_df.Strain == strain, 'Median'] = 'True'
+
+test_df
