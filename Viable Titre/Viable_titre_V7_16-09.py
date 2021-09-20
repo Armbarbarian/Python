@@ -456,6 +456,7 @@ while True:
                         [sg.Text('_'*20)],  # divider
                         [sg.Text('Median Culture Name:', font=font)],
                         [sg.Text('Antibiotic Used:', font=font)],
+                        [sg.Text('Plated Volume:', font=font)],
                         [sg.Text('Mutation Rate Calculation:')],
                         [sg.Button('Retrive Strains')],
                         [sg.Text('_'*20)],
@@ -472,8 +473,9 @@ while True:
 
                     mutation_layout_input = [
                         [sg.Text(' '*20)],
-                        [sg.InputText(key='-Median_culture1-', size=(10, 1), font=font)],
+                        [sg.Combo(data_strain, key='-Median_culture1-', size=(10, 1), font=font)],
                         [sg.InputText(key='-Ab-', size=(10, 1), font=font)],
+                        [sg.Combo(['0.1', '0.01'], key='-Vol-', size=(10, 1), font=font)],
                         [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
                                   'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True)],
                         [sg.Text(' '*20)],
@@ -505,8 +507,8 @@ while True:
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
                             # cleaning the dataframe to get our median with 100uL plated
-                                true_medianstrain1 = found_strain1[found_strain1.Volume == 0.1]
-
+                                true_medianstrain1 = found_strain1[found_strain1.Volume == float(values['-Vol-'])]
+                                # values['-Vol-']
                                 LB_strain1 = true_medianstrain1[true_medianstrain1.Condition == 'LB']
                                 Ab_strain1 = true_medianstrain1[true_medianstrain1.Condition == values['-Ab-']]
 
@@ -540,7 +542,8 @@ while True:
 
                         if event == 'Save Mutation Data':
                             popup2 = sg.popup_yes_no('Do you want to append an existing file?')
-                            mutation_dict = {'Cultures': [values['-Cultures-']],
+                            mutation_dict = {'Strain': [values['-Median_culture1-']],
+                                             'Cultures': [values['-Cultures-']],
                                              'Total_cells': [values['-Cells-']],
                                              'Mutant_cells': [values['-Mutations-']],
                                              'Rate_u': [values['-Mrates-']],
