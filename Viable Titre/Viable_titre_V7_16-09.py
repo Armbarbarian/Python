@@ -1,5 +1,6 @@
 # MySimplegui Viable Titre
-
+import io
+import os
 from datetime import datetime
 import PySimpleGUI as sg
 import numpy as np
@@ -7,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib
+from PIL import Image
 matplotlib.use('TkAgg')
 plt.style.use('ggplot')
 
@@ -52,7 +54,26 @@ def draw_figure(canvas, figure, loc=(0, 0)):
     return figure_canvas_agg
 
 
+# list of markers for home screen
 markers = ['LB', 'Kan', 'Cm', 'Tc', 'Tm', 'Apra', 'Amp', 'Rif']
+
+
+# pre render term image to show in mutaiton rates
+file_types = [("JPEG (*.jpg)", "*.jpg"),
+              ("All files (*.*)", "*.*")]
+
+
+# https://stackoverflow.com/questions/58692537/use-png-files-from-a-dictionary-to-display-in-a-image-widget-in-pysimplegui-pyt
+def get_img_data(f, maxsize=(1200, 850)):
+    '''
+    uses PIL to generate data from the image
+    '''
+    img = Image.open(f)
+    img.thumbnail(maxsize)
+    bio = io.BytesIO()
+    img.save(bio, format='PNG')
+    del img
+    return bio.getvalue()
 
 
 # set the layout of the window
@@ -458,12 +479,13 @@ while True:
                         [sg.Text('Antibiotic Used:', font=font)],
                         [sg.Text('Plated Volume:', font=font)],
                         [sg.Text('Mutation Rate Calculation:')],
-                        [sg.Button('Retrive Strains')],
+                        [sg.Button('Retrieve Strain')],
                         [sg.Text('_'*20)],
                         [sg.Text('Number of Cultures (N):', font=font)],
                         [sg.Text('Cell Count per Culture (n):', font=font)],
                         [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
-                        [sg.Text('Mutation Rate (\u03BC):', font=font)],
+                        # [sg.Text('Fraction of mutants:', font=font)], # same as Mrates
+                        [sg.Text('Mutation Rate \u03BC (Fraction):', font=font)],
                         [sg.Text('Mutation Rate (m):', font=font)],
                         [sg.Text('Sigma Value:', font=font)],
                         [sg.Text('Sigma / m:', font=font)],
@@ -483,6 +505,7 @@ while True:
                         [sg.InputText(key='-Cultures-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Cells-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Mutations-', size=(20, 1), font=font)],
+                        # [sg.InputText(key='-Fraction-', size=(20, 1), font=font)], # same as Mrates
                         [sg.InputText(key='-Mrates-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font)],
                         [sg.InputText(key='-Sigma-', size=(20, 1), font=font)],
@@ -493,8 +516,10 @@ while True:
 
                     mutation_layout = [
                         [[sg.Column(mutation_layout_text),
-                         sg.Column(mutation_layout_input, pad=((0, 0), (40, 0)))],
-                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((210, 0), (0, 0)))]
+                         sg.Column(mutation_layout_input, pad=((0, 0), (40, 0))),
+                          sg.Button('View Terms', font=font, pad=((0, 0), (0.0))),
+                          sg.Image(key='-Terms-', visible=False), sg.Button('Close Image', key='-close_image-', visible=False)],
+                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((330, 0), (0, 0)))]
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
@@ -503,7 +528,7 @@ while True:
                         if event == sg.WIN_CLOSED or event == 'Exit':
                             mutation_window.close()
                             break
-                        if event == 'Retrive Strains':
+                        if event == 'Retrieve Strain':
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
                             # cleaning the dataframe to get our median with 100uL plated
@@ -512,10 +537,14 @@ while True:
                                 LB_strain1 = true_medianstrain1[true_medianstrain1.Condition == 'LB']
                                 Ab_strain1 = true_medianstrain1[true_medianstrain1.Condition == values['-Ab-']]
 
-                                LB_total_cells1 = LB_strain1.Titre*5
-                                Ab_total_cells1 = Ab_strain1.Titre*5
+                                LB_titre = LB_strain1.Titre
+                                Ab_titre = Ab_strain1.Titre
+
+                                LB_total_cells1 = LB_titre*5
+                                Ab_total_cells1 = Ab_titre*5
 
                         # Calculations for mutation rates, all slightly different
+                                #Fraction = Ab_titre.item() / LB_titre.item()
                                 Mrates_classic = Ab_total_cells1.item() / LB_total_cells1.item()
                                 # print(Mrates_classic)
                                 #m = np.log(Mrates)
@@ -536,7 +565,9 @@ while True:
                         # .item() retrieved the actual value
                                 mutation_window['-Cells-'].Update(LB_total_cells1.item())
                                 mutation_window['-Mutations-'].Update(Ab_total_cells1.item())
+                                # mutation_window['-Fraction-'].Update(Fraction)
                                 mutation_window['-Mrates-'].Update(Mrates)
+
                             except:
                                 sg.popup('No such strain found')
 
@@ -574,6 +605,33 @@ while True:
                                     sg.popup('Data saved!')
                                     browse_csv_window.close()
                                     continue
+                        if event == 'View Terms':
+                            try:
+                                wd = os.getcwd()
+                                FILE = 'Foster2006_terms.png'
+                                rendered = get_img_data(FILE)
+                                term_layout = [
+                                    [sg.Image(key='-Terms-')],
+                                    [sg.Exit('Close', font=font)]
+                                ]
+                                if event == 'Close' or event == sg.WIN_CLOSED:
+                                    break
+                                if os.path.exists(FILE):
+                                    image = Image.open(FILE)
+                                    image.thumbnail((600, 600))
+                                    bio = io.BytesIO()
+                                    image.save(bio, format="PNG")
+                                    mutation_window['-Terms-'].update(data=bio.getvalue())
+                                    mutation_window['-close_image-'].update(visible=True)
+                                    mutation_window['-Terms-'].update(visible=True)
+
+                            except:
+                                sg.popup('Not working')
+                        # Allow for opening and closing the image at will
+                        if event == '-close_image-':
+                            mutation_window['-Terms-'].update(visible=False)
+                            mutation_window['-close_image-'].update(visible=False)
+
 # left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
 window.close()
@@ -678,3 +736,9 @@ for strain in xlist:
     test_df.loc[test_df.Strain == strain, 'Median'] = 'True'
 
 test_df
+
+
+248181818
+2.5e+09
+1E-6
+10e-7
