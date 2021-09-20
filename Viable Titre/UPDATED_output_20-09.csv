@@ -1,0 +1,4 @@
+,Strain,Condition,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre,Median
+0,RCe700 TEST,LB,0.1,1e-06,1e-07,247,247,26,26,2481818181.818181,NA
+1,RCe700 TEST,LB,0.1,1e-06,1e-07,247,247,26,26,2481818181.818181,NA
+2,RCe700,Rif,0.1,1.0,0.0,24,24,0,0,240.0,NA

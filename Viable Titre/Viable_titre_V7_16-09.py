@@ -295,7 +295,7 @@ while True:
                     # sg.popup('Data input found!')
                     browse_csv_window.close()
                     layout_data_input = [
-                        [sg.Table(values=data_input, headings=header_list_input, display_row_numbers=False, auto_size_columns=False,
+                        [sg.Table(values=data_input, headings=header_list_input, font=font, display_row_numbers=False, auto_size_columns=False,
                                   num_rows=min(25, len(data_input)), alternating_row_color='RoyalBlue')]  # teal, lightblue
                     ]
                     window_data_input = sg.Window('Your csv data displayed', layout_data_input)
@@ -642,7 +642,6 @@ window.close()
 #                                         TEST SPACE
 #
 ##########################################################################################
-
 
 # trying to get a plotter page in the app to show possible VT comparison, this is not essential as can be done in R easily.
 ''' # plotting the data - work this out later
