@@ -476,24 +476,24 @@ while True:
                         data_strain = master_df.Strain.tolist()
                         # continue
                     mutation_layout_text = [
-                        [sg.Text('Specify your parameters below:', font=font, visible=True)],
-                        [sg.Text('_'*20)],  # divider
-                        [sg.Text('Median Culture Name:', font=font, visible=True)],
-                        [sg.Text('Antibiotic Used:', font=font, visible=True)],
-                        [sg.Text('Plated Volume:', font=font, visible=True)],
-                        [sg.Text('Mutation Rate Calculation:', visible=True)],
+                        [sg.Text('Specify your parameters below:', font=font, key='-parameters_text-', visible=True)],
+                        [sg.Text('_'*20, key='-divider1-')],  # divider
+                        [sg.Text('Median Culture Name:', font=font, key='-Name_text-', visible=True)],
+                        [sg.Text('Antibiotic Used:', font=font, key='-Antibiotic_text-', visible=True)],
+                        [sg.Text('Plated Volume:', font=font, key='-Volume_text-', visible=True)],
+                        [sg.Text('Mutation Rate Calculation:', key='-Rate_text-', visible=True)],
                         [sg.Button('Retrieve Strain', visible=True)],
                         [sg.Text('_'*20)],
-                        [sg.Text('Number of Cultures (N):', font=font, visible=True)],
-                        [sg.Text('Cell Count per Culture (n):', font=font, visible=True)],
-                        [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font, visible=True)],
+                        [sg.Text('Number of Cultures (N):', font=font, key='-Number_text-', visible=True)],
+                        [sg.Text('Cell Count per Culture (n):', font=font, key='-Count_text-', visible=True)],
+                        [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font, key='-Events_text-', visible=True)],
                         # [sg.Text('Fraction of mutants:', font=font)], # same as Mrates
-                        [sg.Text('Mutation Rate \u03BC (Fraction):', font=font, visible=True)],
-                        [sg.Text('Mutation Rate (m):', font=font, visible=True)],
-                        [sg.Text('Sigma Value:', font=font, visible=True)],
-                        [sg.Text('Sigma / m:', font=font, visible=True)],
-                        [sg.Text('m / n:', font=font, visible=True)],
-                        [sg.Text('Sigma / n:', font=font, visible=True)]
+                        [sg.Text('Mutation Rate \u03BC (Fraction):', font=font, key='-u_text-', visible=True)],
+                        [sg.Text('Mutation Rate (m):', font=font, key='-m_text-', visible=True)],
+                        [sg.Text('Sigma Value:', font=font, key='-s_text-', visible=True)],
+                        [sg.Text('Sigma / m:', font=font, key='-sm_text-', visible=True)],
+                        [sg.Text('m / n:', font=font, key='-mn_text-', visible=True)],
+                        [sg.Text('Sigma / n:', font=font, key='-sn_text-', visible=True)]
                     ]
 
                     mutation_layout_input = [
@@ -649,29 +649,54 @@ while True:
                             mutation_window['-strain1_dropdown-'].Update(visible=True)
                             mutation_window['-strain2_dropdown-'].Update(visible=True)
                             mutation_window['-divider1-'].Update(visible=True)
+
                             # make the OG calculation info invisible
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
-                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-Cultures-'].Update(visible=False)
+                            mutation_window['-Cells-'].Update(visible=False)
+                            mutation_window['-Mutations-'].Update(visible=False)
+                            mutation_window['-Mrates-'].Update(visible=False)
+                            mutation_window['-Mrates_m-'].Update(visible=False)
+                            mutation_window['-Sigma-'].Update(visible=False)
+                            mutation_window['-s/m-'].Update(visible=False)
+                            mutation_window['-m/n-'].Update(visible=False)
+                            mutation_window['-s/n-'].Update(visible=False)
+                            # _____________________________________________________
+                            mutation_window['-parameters_text-'].Update(visible=False)
+                            mutation_window['-Name_text-'].Update(visible=False)
+                            mutation_window['-Antibiotic_text-'].Update(visible=False)
+                            mutation_window['-Volume_text-'].Update(visible=False)
+                            mutation_window['-Rate_text-'].Update(visible=False)
+                            mutation_window['Retrieve Strain'].Update(visible=False)
+                            mutation_window['-Number_text-'].Update(visible=False)
+                            mutation_window['-Events_text-'].Update(visible=False)
+                            mutation_window['-u_text-'].Update(visible=False)
+                            mutation_window['-m_text-'].Update(visible=False)
+                            mutation_window['-s_text-'].Update(visible=False)
+                            mutation_window['-sm_text-'].Update(visible=False)
+                            mutation_window['-mn_text-'].Update(visible=False)
+                            mutation_window['-sn_text-'].Update(visible=False)
 
                         # sample
-                            [sg.InputText(key='-Cultures-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-Cells-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-Mutations-', size=(20, 1), font=font, visible=True)],
-                            # [sg.InputText(key='-Fraction-', size=(20, 1), font=font)], # same as Mrates
-                            [sg.InputText(key='-Mrates-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-Sigma-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-s/m-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-m/n-', size=(20, 1), font=font, visible=True)],
-                            [sg.InputText(key='-s/n-', size=(20, 1), font=font, visible=True)]
+                            '''
+                            [sg.Text('Specify your parameters below:', font=font, key='-parameters_text-', visible=True)],
+                            [sg.Text('_'*20)],  # divider
+                            [sg.Text('Median Culture Name:', font=font, key='-Name_text-', visible=True)],
+                            [sg.Text('Antibiotic Used:', font=font, key='-Antibiotic_text-', visible=True)],
+                            [sg.Text('Plated Volume:', font=font, key='-Volume_text-', visible=True)],
+                            [sg.Text('Mutation Rate Calculation:', key='-Rate_text-', visible=True)],
+                            [sg.Button('Retrieve Strain', visible=True)],
+                            [sg.Text('_'*20)],
+                            [sg.Text('Number of Cultures (N):', font=font, key='-Number_text-', visible=True)],
+                            [sg.Text('Cell Count per Culture (n):', font=font, key='-Count_text-', visible=True)],
+                            [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font, key='-Events_text-', visible=True)],
+                            # [sg.Text('Fraction of mutants:', font=font)], # same as Mrates
+                            [sg.Text('Mutation Rate \u03BC (Fraction):', font=font, key='-u_text-', visible=True)],
+                            [sg.Text('Mutation Rate (m):', font=font, key='-m_text-', visible=True)],
+                            [sg.Text('Sigma Value:', font=font, key='-s_text-', visible=True)],
+                            [sg.Text('Sigma / m:', font=font, key='-sm_text-', visible=True)],
+                            [sg.Text('m / n:', font=font, key='-mn_text-', visible=True)],
+                            [sg.Text('Sigma / n:', font=font, key='-sn_text-', visible=True)]
+                            '''
 
                             # left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
