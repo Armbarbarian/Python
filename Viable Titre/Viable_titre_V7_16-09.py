@@ -301,7 +301,7 @@ while True:
                     window_data_input = sg.Window('Your csv data displayed', layout_data_input)
                     event, values = window_data_input.read()
         if event == '-Append_csv-':
-            sg.popup('THIS WORKS')  # LO here to try and enable events and delete rows if needed. 17/09/21
+            sg.popup('Feature not available')
 
 # plotting the data (not ready yet)
     if event == 'Analyse Data':
@@ -470,48 +470,51 @@ while True:
 
                         median_heading = ['Culture', 'Titre']
                     except:
-                        sg.popup('No file selected', font=font)
-                        continue
+                        #sg.popup('Other file selected', font=font)
+                        headings3 = list(master_df.columns)
+                        data_input3 = master_df.values.tolist()
+                        data_strain = master_df.Strain.tolist()
+                        # continue
                     mutation_layout_text = [
-                        [sg.Text('Specify your parameters below:', font=font)],
+                        [sg.Text('Specify your parameters below:', font=font, visible=True)],
                         [sg.Text('_'*20)],  # divider
-                        [sg.Text('Median Culture Name:', font=font)],
-                        [sg.Text('Antibiotic Used:', font=font)],
-                        [sg.Text('Plated Volume:', font=font)],
-                        [sg.Text('Mutation Rate Calculation:')],
-                        [sg.Button('Retrieve Strain')],
+                        [sg.Text('Median Culture Name:', font=font, visible=True)],
+                        [sg.Text('Antibiotic Used:', font=font, visible=True)],
+                        [sg.Text('Plated Volume:', font=font, visible=True)],
+                        [sg.Text('Mutation Rate Calculation:', visible=True)],
+                        [sg.Button('Retrieve Strain', visible=True)],
                         [sg.Text('_'*20)],
-                        [sg.Text('Number of Cultures (N):', font=font)],
-                        [sg.Text('Cell Count per Culture (n):', font=font)],
-                        [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font)],
+                        [sg.Text('Number of Cultures (N):', font=font, visible=True)],
+                        [sg.Text('Cell Count per Culture (n):', font=font, visible=True)],
+                        [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font, visible=True)],
                         # [sg.Text('Fraction of mutants:', font=font)], # same as Mrates
-                        [sg.Text('Mutation Rate \u03BC (Fraction):', font=font)],
-                        [sg.Text('Mutation Rate (m):', font=font)],
-                        [sg.Text('Sigma Value:', font=font)],
-                        [sg.Text('Sigma / m:', font=font)],
-                        [sg.Text('m / n:', font=font)],
-                        [sg.Text('Sigma / n:', font=font)]
+                        [sg.Text('Mutation Rate \u03BC (Fraction):', font=font, visible=True)],
+                        [sg.Text('Mutation Rate (m):', font=font, visible=True)],
+                        [sg.Text('Sigma Value:', font=font, visible=True)],
+                        [sg.Text('Sigma / m:', font=font, visible=True)],
+                        [sg.Text('m / n:', font=font, visible=True)],
+                        [sg.Text('Sigma / n:', font=font, visible=True)]
                     ]
 
                     mutation_layout_input = [
                         [sg.Text(' '*20)],
-                        [sg.Combo(data_strain, key='-Median_culture1-', size=(10, 1), font=font)],
-                        [sg.InputText(key='-Ab-', size=(10, 1), font=font)],
-                        [sg.Combo(['0.1', '0.01'], key='-Vol-', size=(10, 1), font=font)],
+                        [sg.Combo(data_strain, key='-Median_culture1-', size=(10, 1), font=font, visible=True)],
+                        [sg.InputText(key='-Ab-', size=(10, 1), font=font, visible=True)],
+                        [sg.Combo(['0.1', '0.01'], key='-Vol-', size=(10, 1), font=font, visible=True)],
                         [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
-                                  'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True)],
+                                  'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True, visible=True)],
                         [sg.Text(' '*20)],
                         [sg.Text(' '*20)],
-                        [sg.InputText(key='-Cultures-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-Cells-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-Mutations-', size=(20, 1), font=font)],
+                        [sg.InputText(key='-Cultures-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-Cells-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-Mutations-', size=(20, 1), font=font, visible=True)],
                         # [sg.InputText(key='-Fraction-', size=(20, 1), font=font)], # same as Mrates
-                        [sg.InputText(key='-Mrates-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-Sigma-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-s/m-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-m/n-', size=(20, 1), font=font)],
-                        [sg.InputText(key='-s/n-', size=(20, 1), font=font)]
+                        [sg.InputText(key='-Mrates-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-Sigma-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-s/m-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-m/n-', size=(20, 1), font=font, visible=True)],
+                        [sg.InputText(key='-s/n-', size=(20, 1), font=font, visible=True)]
                     ]
 
                     mutation_layout = [
@@ -519,7 +522,13 @@ while True:
                          sg.Column(mutation_layout_input, pad=((0, 0), (40, 0))),
                           sg.Button('View Terms', font=font, pad=((0, 0), (0.0))),
                           sg.Image(key='-Terms-', visible=False), sg.Button('Close Image', key='-close_image-', visible=False)],
-                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((330, 0), (0, 0)))]
+                         [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((330, 0), (0, 0)))],
+                         [sg.Button('Compare Two Strains', font=font, button_color='teal')],
+                         [sg.Text('_'*30, key='-divider1-', visible=False)],
+                         [sg.Text('Strain 1:', key='-strain1-', visible=False),
+                            sg.Combo(data_strain, key='-strain1_dropdown-', visible=False)],
+                         [sg.Text('Strain 2:', key='-strain2-', visible=False),
+                         sg.Combo(data_strain, key='-strain2_dropdown-', visible=False)],
                          ]]
 
                     mutation_window = sg.Window('Mutation Rates', mutation_layout)
@@ -632,7 +641,39 @@ while True:
                             mutation_window['-Terms-'].update(visible=False)
                             mutation_window['-close_image-'].update(visible=False)
 
-# left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
+                        # Calculating the factor between two strains
+                        if event == 'Compare Two Strains':
+                            # make the comparison entry info visible
+                            mutation_window['-strain1-'].Update(visible=True)
+                            mutation_window['-strain2-'].Update(visible=True)
+                            mutation_window['-strain1_dropdown-'].Update(visible=True)
+                            mutation_window['-strain2_dropdown-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            # make the OG calculation info invisible
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+                            mutation_window['-divider1-'].Update(visible=True)
+
+                        # sample
+                            [sg.InputText(key='-Cultures-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-Cells-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-Mutations-', size=(20, 1), font=font, visible=True)],
+                            # [sg.InputText(key='-Fraction-', size=(20, 1), font=font)], # same as Mrates
+                            [sg.InputText(key='-Mrates-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-Mrates_m-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-Sigma-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-s/m-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-m/n-', size=(20, 1), font=font, visible=True)],
+                            [sg.InputText(key='-s/n-', size=(20, 1), font=font, visible=True)]
+
+                            # left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
 window.close()
 
