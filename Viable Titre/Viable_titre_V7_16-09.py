@@ -718,7 +718,7 @@ plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
 
 # manual calculations
-iter = 1e-8
+iter = 1e-
 N = 9
 n = 1272727272.7272723
 m = 10818.18181818182
@@ -746,7 +746,8 @@ mutation_dataframe
 
 
 # mutationrate from the 1998 program
-1.288e3
+target = 1.288e3
+target
 '''
 from the mutation rate program in what looks like javascript to calculate mutation rate
 
