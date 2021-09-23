@@ -270,7 +270,7 @@ while True:
                 # sg.popup('Data found!')
                 layout_data = [
                     [sg.Table(values=data, headings=header_list, font=font, key='Viewed_data', display_row_numbers=False, auto_size_columns=False,
-                              num_rows=min(25, len(data)), alternating_row_color='teal', enable_events=False), sg.Button('Append Spreadsheet', key='-Append_csv-', font=font)],  # teal, lightblue
+                              num_rows=min(25, len(data)), alternating_row_color='teal', enable_events=True), sg.Button('Append Spreadsheet', key='-Append_csv-', font=font)],  # teal, lightblue
                 ]
                 window_data = sg.Window('output_'+day+'-'+month+'.csv', layout_data)
                 event, values = window_data.read()
@@ -482,9 +482,9 @@ while True:
                         [sg.Text('Antibiotic Used:', font=font, key='-Antibiotic_text-', visible=True)],
                         [sg.Text('Plated Volume:', font=font, key='-Volume_text-', visible=True)],
                         [sg.Text('Mutation Rate Calculation:', key='-Rate_text-', visible=True)],
-                        [sg.Button('Retrieve Strain', visible=True)],
-                        [sg.Text('_'*20)],
                         [sg.Text('Number of Cultures (N):', font=font, key='-Number_text-', visible=True)],
+                        [sg.Button('Retrieve Strain and Calculate', visible=True)],
+                        [sg.Text('_'*20)],
                         [sg.Text('Cell Count per Culture (n):', font=font, key='-Count_text-', visible=True)],
                         [sg.Text('Mutation Events per Culture (r\N{SUBSCRIPT ZERO}):', font=font, key='-Events_text-', visible=True)],
                         # [sg.Text('Fraction of mutants:', font=font)], # same as Mrates
@@ -503,9 +503,9 @@ while True:
                         [sg.Combo(['0.1', '0.01'], key='-Vol-', size=(10, 1), font=font, visible=True)],
                         [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
                                   'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True, visible=True)],
-                        [sg.Text(' '*20)],
-                        [sg.Text(' '*20)],
                         [sg.InputText(key='-Cultures-', size=(20, 1), font=font, visible=True)],
+                        [sg.Text(' '*20)],
+                        [sg.Text(' '*20)],
                         [sg.InputText(key='-Cells-', size=(20, 1), font=font, visible=True)],
                         [sg.InputText(key='-Mutations-', size=(20, 1), font=font, visible=True)],
                         # [sg.InputText(key='-Fraction-', size=(20, 1), font=font)], # same as Mrates
@@ -524,7 +524,7 @@ while True:
                           sg.Image(key='-Terms-', visible=False), sg.Button('Close Image', key='-close_image-', visible=False)],
                          [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((330, 0), (0, 0)))],
                          [sg.Button('Compare Two Strains', font=font, button_color='teal')],
-                         [sg.Text('_'*30, key='-divider1-', visible=False)],
+                         [sg.Text('_'*30, key='-divider10-', visible=False)],
                          [sg.Text('Strain 1:', key='-strain1-', visible=False),
                             sg.Combo(data_strain, key='-strain1_dropdown-', visible=False)],
                          [sg.Text('Strain 2:', key='-strain2-', visible=False),
@@ -537,7 +537,7 @@ while True:
                         if event == sg.WIN_CLOSED or event == 'Exit':
                             mutation_window.close()
                             break
-                        if event == 'Retrieve Strain':
+                        if event == 'Retrieve Strain and Calculate':
                             try:
                                 found_strain1 = master_df.loc[master_df['Strain'] == values['-Median_culture1-']]
                             # cleaning the dataframe to get our median with 100uL plated
@@ -570,12 +570,53 @@ while True:
                                     sg.popup('Something wrong with rate method...')
                                 # print(Mrates)
 
+                        # Calculate m number and sigma value here
+                        # This replaces the need for the Javascript program! completed 23/09/21
+                        # ________________________________________________________________________
+
+                                iter = 1e-8
+                                N = float(values['-Cultures-'])
+                                n = LB_total_cells1.item()
+                                m = Ab_total_cells1.item()
+                                u = Mrates_classic
+
+                                # mutation number
+                                m0 = 0.0
+                                r0 = m
+                                while (np.abs(m0 - m) >= iter):
+                                    m0 = m
+                                    divident = (1.24 * m0) + (m0 * np.log(m0)) - r0
+                                    divisor = 2.24 + np.log(m0)
+                                    m = m0 - (divident / divisor)
+
+                                # sigma value
+                                divident_s = 12.7
+                                divisor_s = (2.24 + np.log(m)) * (2.24 + np.log(m))
+                                sigma = m * np.sqrt((1/N) * (divident_s/divisor_s))
+                                sg.popup('Check sigma')
+
+                                # Sigma / m
+                                s_m = sigma / m
+
+                                # m/ n
+                                m_n = m / n
+
+                                # Sigma / n
+                                s_n = sigma / n
+
+                        # ________________________________________________________________________
+
                         # Update the input fields showing the number of cells
                         # .item() retrieved the actual value
                                 mutation_window['-Cells-'].Update(LB_total_cells1.item())
                                 mutation_window['-Mutations-'].Update(Ab_total_cells1.item())
                                 # mutation_window['-Fraction-'].Update(Fraction)
                                 mutation_window['-Mrates-'].Update(Mrates)
+                                mutation_window['-Mrates_m-'].Update(m)
+                                mutation_window['-Sigma-'].Update(sigma)
+                                mutation_window['-s/m-'].Update(s_m)
+                                mutation_window['-m/n-'].Update(m_n)
+                                mutation_window['-s/n-'].Update(s_n)
 
                             except:
                                 sg.popup('No such strain found')
@@ -718,31 +759,30 @@ plt.title('SLM1043 Cultures')
 plt.xticks(rotation=75)'''
 
 # manual calculations
-iter = 1e-
+iter = 1e-8
 N = 9
-n = 1272727272.7272723
-m = 10818.18181818182
-u = 8.500000000000005e-6
+n = 1304545455
+m = 8954
+u = 6.86E-06
 
-# trying out a while loop that takes into account the iterations
+
+# This replaces the need for the Javascript program! completed 23/09/21
 m0 = 0.0
 r0 = m
 while (np.abs(m0 - m) >= iter):
     m0 = m
     divident = (1.24 * m0) + (m0 * np.log(m0)) - r0
     divisor = 2.24 + np.log(m0)
-    u = m0 - (divident / divisor)
-    print(u)  # mutation rate is not the same as in the html program
+    m = m0 - (divident / divisor)
+    print(m)  # mutation rate is not the same as in the html program
+m
 
 # sigma value
+# from HTML
 divident_s = 12.7
 divisor_s = (2.24 + np.log(m)) * (2.24 + np.log(m))
 s = m * np.sqrt((1/N) * (divident_s/divisor_s))
 s
-
-dict = {'col1': [1], 'col2': [3]}
-mutation_dataframe = pd.DataFrame(dict)
-mutation_dataframe
 
 
 # mutationrate from the 1998 program
