@@ -29,7 +29,7 @@ font_small = ('Calibri', 12)
 # set empty results string for VT output, paired with Calculate cells/mL
 result = ''
 
-# empty list to append checked keys into
+# list to append checked keys into
 checked = ['Strain', 'Condition', 'Time', 'Volume', 'Dilution_1', 'Dilution_2', 'Colonies_1A', 'Colonies_1B', 'Colonies_2A', 'Colonies_2B', 'Titre']
 
 # clear function paired with clear button
@@ -100,7 +100,7 @@ layout1 = [
     [sg.Text('Viable Titre', size=(10, 1), font=font),
         sg.InputText('', key='Titre', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='9_check', change_submits=True, enable_events=True)],
     [sg.Text('_'*65)],
-    [sg.Text("Choose a spreadsheet to update: ", font=font), sg.FileBrowse(key='-FILE-')],
+    [sg.Text("Choose an existing spreadsheet to update: ", font=font), sg.FileBrowse(key='-FILE-')],
     [sg.Submit('Update Spreadsheet', font=font)],
     [sg.Text('_'*65)],
     [sg.Text('Other Tools:', font=font)],
@@ -244,9 +244,9 @@ while True:
         try:
             EXCEL_FILE = values['-FILE-']
             df = pd.read_excel(EXCEL_FILE)
-        # keep only columns that have been appended to checked list
+            # keep only columns that have been appended to checked list
             df = df.append(values, ignore_index=True)
-        # This drops the names of the check boxes if NOT in checked list
+            # This drops the names of the check boxes if NOT in checked list
             df = df.drop(columns=[col for col in df if col not in checked])
             df.to_excel(EXCEL_FILE, index=False)
             popup1 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
@@ -254,7 +254,28 @@ while True:
                 df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
                 sg.popup('Data Saved!')
         except:
-            sg.popup('No file selected')
+            popup1 = sg.popup_yes_no('Do you want to create a new Excel file?', font=font)
+            if popup1 == 'Yes':
+                popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
+                if popup2 == 'Yes':
+                    df = pd.DataFrame()
+                    df = df.append(values, ignore_index=True)
+                    df = df.drop(columns=[col for col in df if col not in checked])
+                    df.to_excel('output_'+day+'-'+month+'.xlsx')
+                    df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
+                    #window.Element('-FILE-').InitialFolder = 'C:\\Users\\Danie\\Documents\\Python1\\Python\\Viable Titre'
+                    sg.popup('2 files created with todays date\nAlso browse to the file to make things easier...')
+                if popup2 == 'No':
+                    df = pd.DataFrame()
+                    df = df.append(values, ignore_index=True)
+                    df = df.drop(columns=[col for col in df if col not in checked])
+                    df.to_excel('output_'+day+'-'+month+'.xlsx')
+                    sg.popup('File created, set to todays date')
+            if popup1 == 'No':
+                sg.popup('Please select an existing Excel file to update')
+                continue
+
+            #popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
 
 # Viewing the data saved under Output
     if event == 'View Data':
@@ -816,6 +837,7 @@ function SigmaBerechnen()
 
 # retrieving index for the median values in the dataframe to append/add with button
 # https://www.edureka.co/community/43215/how-to-find-the-index-of-a-particular-value-in-a-dataframe
+'''
 CSV_FILE = ('output_'+day+'-'+month+'.csv')
 CSV_DF = pd.read_csv(CSV_FILE)
 CSV_DF
@@ -829,8 +851,9 @@ for strain in xlist:
     else:
         print('not here')
 # print(indexes)
+'''
 
-
+'''
 # append dataframe with new column
 CSV_FILE = ('output_'+day+'-'+month+'.csv')
 CSV_DF = pd.read_csv(CSV_FILE)
@@ -842,9 +865,14 @@ for strain in xlist:
     test_df.loc[test_df.Strain == strain, 'Median'] = 'True'
 
 test_df
-
+'''
 
 248181818
 2.5e+09
 1E-6
 10e-7
+
+
+dict = {'A': [1, 2, 3],
+        'B': [4, 5, 6]}
+pd.DataFrame(dict)

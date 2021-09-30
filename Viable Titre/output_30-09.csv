@@ -1,0 +1,5 @@
+Strain,Condition,Time,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre
+,,,,,,,,,,
+test,,,0.01,0.01,0.01,53.0,6.0,6.0,6.0,177500.0
+test,,,0.01,0.01,0.01,53.0,6.0,6.0,6.0,177500.0
+6546,Cm,90,0.01,10e-3,10e-3,6745,4567,7,7,28315000.0
