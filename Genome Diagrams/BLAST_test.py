@@ -1,7 +1,13 @@
 # BLAST in Python
+
+import os
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio import SeqIO
 from Bio.Seq import Seq
+from Bio.Blast import NCBIXML
+
+
+os.getcwd()
 
 # SUbject genome to search
 # wild type in this case
@@ -24,4 +30,9 @@ terI = Seq('AACATGGAAGTTGTAACTAACCG')
 terJ = Seq('ACGCAGTAAGTTGTAACTAATGC')
 
 # blastn
-result_handle = NCBIWWW.qblast('blastn', 'nt', )
+blastx_cline = NcbiblastnCommandline(query=terA, db=genome, evalue=0.001, outfmt=5, out='C:\\Users\\Danie\\Documents\\Python1\\Python\\Genome Diagrams\\test.xml')
+
+blastx_cline
+
+for record in blast_result:
+    print(record)
