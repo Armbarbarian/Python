@@ -9,10 +9,10 @@ from tkinter.filedialog import askopenfilename
 
 # working directory
 os.getcwd()
-# os.chdir() # if needed
+os.chdir('C:\\Users\\Danie\\Documents\\GitHub\\Python\\Genome Diagrams') # if needed
 
 # open your genbank file manuall if needed
-genome = askopenfilename()
+#genome = askopenfilename()
 
 # read gb file
 GB = SeqIO.read('MG1655.gb', 'genbank')
