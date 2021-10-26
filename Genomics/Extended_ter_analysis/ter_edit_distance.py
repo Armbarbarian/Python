@@ -28,6 +28,12 @@ terJ = Seq('ACGCAGTAAGTTGTAACTAATGC')
 # Given two strings s and t, calculate the edit distance
 # this is a dynamic programming approach that other bioinformaticians would be happy with.
 # from GitHub copilot OMGenomics example
+'''
+This can work where s and t are different lengths
+May be better to use hamming_distance() if the strings are the same length.
+'''
+
+
 def edit_distance(s, t):
     d = [[0 for j in range(len(t)+1)] for i in range(len(s)+1)]
     for i in range(1, len(s)+1):
@@ -49,6 +55,19 @@ edit_distance('PLEASANTLY', 'MEANLY')
 # edit distance on ter sites from MG1655
 edit_distance(str(terA), str(terB))  # 1
 edit_distance(str(terA), str(terE))  # 7
+
+
+# Hamming distance
+'''
+This requires the same string length fro both s and t
+'''
+
+
+def hamming_distance(s, t):
+    return sum(1 for i in range(len(s)) if s[i] != t[i])
+
+
+hamming_distance(str(terA), str(terB))
 
 
 ####################################################################
@@ -114,6 +133,20 @@ for seq1 in MG1655_ter.seq:
 for seq2 in Sakai_ter.seq:
     my_dict['Sakai'].append(seq2)
 my_df = pd.DataFrame(my_dict)
+my_df[0:1]
+
+
+# using hamming_distance instead of edit_distance
+# terA analysis
+MG_terA = MG1655[(MG1655.qname == 'terA')].seq
+Sakai_terA = Sakai[(Sakai.qname == 'terA')].seq
+hamming_distance(str(MG_terA), str(Sakai_terA))  # 1
+# terA extended analysis
+MG_terAx = MG1655_ter[MG1655_ter.qname == 'terA'].seq
+Sakai_terAx = Sakai_ter[Sakai_ter.qname == 'terA'].seq
+hamming_distance(str(MG_terAx), str(Sakai_terAx))  # 66
+[MG_terAx]
+
 
 # next put these results into another table, sort of like a distance matrix / array
 
