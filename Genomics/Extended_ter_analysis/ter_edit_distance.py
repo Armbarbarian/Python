@@ -90,4 +90,33 @@ EDL933 = pd.read_csv('EDL933.csv')
 MG1655
 Sakai
 
-MG1655['seq']
+# terA analysis
+MG_terA = MG1655[(MG1655.qname == 'terA')].seq
+Sakai_terA = Sakai[(Sakai.qname == 'terA')].seq
+edit_distance(str(MG_terA), str(Sakai_terA))  # 1
+
+
+# read in extended ter nt csv from R bt2 program
+Ecoli_exTer = pd.read_csv('Ecoli_extended_ter_26-10.csv')
+MG1655_ter = Ecoli_exTer[Ecoli_exTer.rname == 'MG1655']
+Sakai_ter = Ecoli_exTer[Ecoli_exTer.rname == 'Sakai']
+
+# terA extended analysis
+MG_terAx = MG1655_ter[MG1655_ter.qname == 'terA'].seq
+Sakai_terAx = Sakai_ter[Sakai_ter.qname == 'terA'].seq
+edit_distance(str(MG_terAx), str(Sakai_terAx))  # 5
+
+# analyse the dataframes directly instead of writing them manually
+my_dict = {'MG1655': [], 'Sakai': []}
+
+for seq1 in MG1655_ter.seq:
+    my_dict['MG1655'].append(seq1)
+for seq2 in Sakai_ter.seq:
+    my_dict['Sakai'].append(seq2)
+my_df = pd.DataFrame(my_dict)
+
+# next put these results into another table, sort of like a distance matrix / array
+
+
+# checking where the ter site is located inside the extended string
+len(my_df.MG1655[0][48:])
