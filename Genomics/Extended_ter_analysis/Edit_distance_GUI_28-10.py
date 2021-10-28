@@ -174,15 +174,18 @@ layout1 = [
     [sg.Text('Edit and Hamming Distance of FASTA sequences', font=font)],
     [sg.Text('_'*100)],
     [sg.Text('How do you want to run the analysis?', font=font),
-        sg.Combo(['Manual FASTA upload', 'Upload csv from previous alignment'], key='-upload_type-', font=font, size=(28, 1)),
+        sg.Combo(['Manual Sequence Upload', 'FASTA Upload', 'Upload CSV from alignment'], key='-upload_type-', font=font, size=(28, 1)),
         sg.Button('Select')],
 
     # Analysis type
     [sg.Text('Choose the algorithm:', font=font), sg.Combo(['Edit Distance', 'Hamming Distance'], key='-dist_type-', size=(15, 1), font=font, disabled=True)],
 
     # Files
-    [sg.FileBrowse('', key='-file1-', disabled=True), sg.Text('')],
-    [sg.FileBrowse('', key='-file2-', disabled=True), sg.Text('')],
+    [sg.FileBrowse('', key='-file1-', disabled=True), sg.Text('Sequence 1', key='-sequence1_text-')],
+    [sg.InputText(key='-input_seq1-', font=font, visible=False, disabled=True)],
+
+    [sg.FileBrowse('', key='-file2-', disabled=True), sg.Text('Sequence 2', key='-sequence2_text-')],
+    [sg.InputText(key='-input_seq2-', font=font, visible=False, disabled=True)],
     [sg.Text('Note: Hamming distance algorithm requires sequences of the same length')],
 
     # csv specific parameters
@@ -212,43 +215,85 @@ while True:
 
     # choosing the distance algorithm loops and setting layout
     if event == 'Select':
-        if values['-upload_type-'] == 'Manual FASTA upload':
+        if values['-upload_type-'] == 'Manual Sequence Upload':
+            window['-dist_type-'].Update(disabled=False)
+            window['-input_seq1-'].Update(disabled=False, visible=True)
+            window['-input_seq2-'].Update(disabled=False, visible=True)
+            window['-file1-'].Update('', disabled=True)
+            window['-file2-'].Update('', disabled=True)
+            window['-sequence1_text-'].Update('Sequence 1')
+            window['-sequence2_text-'].Update('Sequence 2')
+            window['Run'].Update(disabled=False)
+        if values['-upload_type-'] == 'FASTA Upload':
             window['-dist_type-'].Update(disabled=False)
             window['-file1-'].Update('FASTA 1', disabled=False)
             window['-file2-'].Update('FASTA 2', disabled=False)
+            window['-input_seq1-'].Update(visible=False)
+            window['-input_seq2-'].Update(visible=False)
             window['Run'].Update(disabled=False)
-        if values['-upload_type-'] == 'Upload csv from previous alignment':
+        if values['-upload_type-'] == 'Upload CSV from alignment':
             window['-dist_type-'].Update(disabled=False)
             window['-file1-'].Update('CSV 1', disabled=False)
             window['-file2-'].Update('CSV 2', disabled=False)
+            window['-input_seq1-'].Update(visible=False)
+            window['-input_seq2-'].Update(visible=False)
             window['Run'].Update(disabled=False)
 
     # Run analysis loops
     if event == 'Run':
-        if values['-upload_type-'] == 'Manual FASTA upload':
-        # Edit
+        # Pasting sequences from input
+        if values['-upload_type-'] == 'Manual Sequence Upload':
+            # Edit
             if values['-dist_type-'] == 'Edit Distance':
-                #sg.popup('Edit chosen',  font=font)
-                with open(values['-file1-']) as fasta1:
-                    for i in SeqIO.parse(fasta1, 'fasta'):
-                        seq1 = i.seq
-                with open(values['-file2-']) as fasta2:
-                    for j in SeqIO.parse(fasta2, 'fasta'):
-                        seq2 = j.seq
-
-                result = edit_distance(str(seq1), str(seq2))
-                sg.popup('Edit Distance: ' + str(result), font=font)
-
+                try:
+                    seq1 = Seq(values['-input_seq1-'])
+                    seq2 = Seq(values['-input_seq2-'])
+                    result = edit_distance(str(seq1), str(seq2))
+                    sg.popup('Edit Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...', font=font)
+                except:
+                    sg.popup('something went wrong')
             # Hamming
             if values['-dist_type-'] == 'Hamming Distance':
-                #sg.popup('Hamming chosen', font=font)
-                with open(values['-file1-']) as fasta1:
-                    for i in SeqIO.parse(fasta1, 'fasta'):
-                        seq1 = i.seq
-                with open(values['-file2-']) as fasta2:
-                    for j in SeqIO.parse(fasta2, 'fasta'):
-                        seq2 = j.seq
-                result = hamming_distance(str(seq1), str(seq2))
-                sg.popup('Hamming Distance: ' + str(result),  font=font)
-        else:
-            sg.popup('working on it', font=font)
+                try:
+                    seq1 = Seq(values['-input_seq1-'])
+                    seq2 = Seq(values['-input_seq2-'])
+                    result = hamming_distance(str(seq1), str(seq2))
+                    sg.popup('Hamming Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...',  font=font)
+                except:
+                    sg.popup('Sequences not of same length')
+        # FASTA file upload
+        if values['-upload_type-'] == 'FASTA Upload':
+            # Edit
+            if values['-dist_type-'] == 'Edit Distance':
+                try:
+                    #sg.popup('Edit chosen',  font=font)
+                    with open(values['-file1-']) as fasta1:
+                        for i in SeqIO.parse(fasta1, 'fasta'):
+                            seq1 = i.seq
+                    with open(values['-file2-']) as fasta2:
+                        for j in SeqIO.parse(fasta2, 'fasta'):
+                            seq2 = j.seq
+
+                    result = edit_distance(str(seq1), str(seq2))
+                    sg.popup('Edit Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...', font=font)
+                except:
+                    sg.popup('Something went wrong')
+            # Hamming
+            if values['-dist_type-'] == 'Hamming Distance':
+                try:
+                    #sg.popup('Hamming chosen', font=font)
+                    with open(values['-file1-']) as fasta1:
+                        for i in SeqIO.parse(fasta1, 'fasta'):
+                            seq1 = i.seq
+                    with open(values['-file2-']) as fasta2:
+                        for j in SeqIO.parse(fasta2, 'fasta'):
+                            seq2 = j.seq
+                    result = hamming_distance(str(seq1), str(seq2))
+                    sg.popup('Hamming Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...',  font=font)
+                except:
+                    sg.popup('Sequences not of same length')
+
+
+        # CSV files into dataframes
+        if values['-upload_type-'] == 'Upload CSV from alignment':
+            sg.popup('Feature under construction')
