@@ -28,6 +28,7 @@ terI = Seq('AACATGGAAGTTGTAACTAACCG')
 terJ = Seq('ACGCAGTAAGTTGTAACTAATGC')
 
 
+
 # Given two strings s and t, calculate the edit distance
 # this is a dynamic programming approach that other bioinformaticians would be happy with.
 # from GitHub copilot OMGenomics example
@@ -52,25 +53,17 @@ def edit_distance(s, t):
     return d[len(s)][len(t)]
 
 
-edit_distance('PLEASANTLY', 'MEANLY')
-
-
-# edit distance on ter sites from MG1655
-edit_distance(str(terA), str(terB))  # 1
-edit_distance(str(terA), str(terE))  # 7
-
 
 # Hamming distance
 '''
 This requires the same string length fro both s and t
 '''
 
-
 def hamming_distance(s, t):
     return sum(1 for i in range(len(s)) if s[i] != t[i])
 
 
-hamming_distance(str(terA), str(terB))
+
 
 
 ####################################################################
@@ -78,10 +71,8 @@ hamming_distance(str(terA), str(terB))
 #           compare two ter sites from different genomes
 #
 ####################################################################
-os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Genomics\\Extended_ter_analysis')
-
-
-# read in the csv files with their sequence from bowtie2 in R
+'''
+# read in the csv files with their xuence from bowtie2 in R
 MG1655 = pd.read_csv('MG1655.csv')
 BW2952 = pd.read_csv('BW2952.csv')
 REL606 = pd.read_csv('REL606.csv')
@@ -108,10 +99,10 @@ TW14359 = pd.read_csv('TW14359.csv')
 Sakai = pd.read_csv('Sakai.csv')
 EDL933 = pd.read_csv('EDL933.csv')
 
-# two dustantly related genomes, one pathogenic and one comensal
-MG1655
-Sakai
+'''
 
+
+'''
 # terA analysis
 MG_terA = MG1655[(MG1655.qname == 'terA')].seq
 Sakai_terA = Sakai[(Sakai.qname == 'terA')].seq
@@ -137,8 +128,9 @@ for seq2 in Sakai_ter.seq:
     my_dict['Sakai'].append(seq2)
 my_df = pd.DataFrame(my_dict)
 my_df[0:1]
+'''
 
-
+'''
 # using hamming_distance instead of edit_distance
 # terA analysis
 MG_terA = MG1655[(MG1655.qname == 'terA')].seq
@@ -149,13 +141,11 @@ MG_terAx = MG1655_ter[MG1655_ter.qname == 'terA'].seq
 Sakai_terAx = Sakai_ter[Sakai_ter.qname == 'terA'].seq
 hamming_distance(str(MG_terAx), str(Sakai_terAx))  # 66
 [MG_terAx]
-
+'''
 
 # next put these results into another table, sort of like a distance matrix / array
 
 
-# checking where the ter site is located inside the extended string
-len(my_df.MG1655[0][48:])
 
 
 #_____________________________________________________________________________________________________________________________
@@ -164,23 +154,43 @@ len(my_df.MG1655[0][48:])
 
 # add window colour
 # 'DarkTeal9', 'DarkGrey14', 'LightBlue2', 'LightBlue8'
-sg.theme('LightBlue2')
+sg.theme('DarkTeal9')
 
 font = ('Calibri', 14)
 font_small = ('Calibri', 12)
 
 
 # clear function paired with clear button
+'''
 def clear_input():
     for key in checked:
         window[key]('')
     return None
-
+'''
 
 
 # Layout for window
-Layout1 = [
-    [sg.Text('Edit and Hamming Distance of FASTA sequences', font=font)]
+layout1 = [
+    [sg.Text('Edit and Hamming Distance of FASTA sequences', font=font)],
+    [sg.Text('_'*100)],
+    [sg.Text('How do you want to run the analysis?', font=font),
+        sg.Combo(['Manual FASTA upload', 'Upload csv from previous alignment'], key='-upload_type-', font=font, size=(28, 1)),
+        sg.Button('Select')],
+
+    # Analysis type
+    [sg.Text('Choose the algorithm:', font=font), sg.Combo(['Edit Distance', 'Hamming Distance'], key='-dist_type-', size=(15, 1), font=font, disabled=True)],
+
+    # Files
+    [sg.FileBrowse('', key='-file1-', disabled=True), sg.Text('')],
+    [sg.FileBrowse('', key='-file2-', disabled=True), sg.Text('')],
+    [sg.Text('Note: Hamming distance algorithm requires sequences of the same length')],
+
+    # csv specific parameters
+
+    # Buttons
+    [sg.Button('Run', font=font, button_color='darkcyan', size=(10, 1), disabled=True),
+    #sg.Button('Clear', font=font, button_color='darkcyan', size=(10, 1)),
+        sg.Button('Exit', font=font, button_color='firebrick', size=(10, 1))]
 ]
 
 # set up the window and the layout to use for the window
@@ -197,4 +207,48 @@ while True:
         else:
             break
     if event == 'Clear':
-        clear_input()
+        #clear_input()
+        sg.popup('Button not working')
+
+    # choosing the distance algorithm loops and setting layout
+    if event == 'Select':
+        if values['-upload_type-'] == 'Manual FASTA upload':
+            window['-dist_type-'].Update(disabled=False)
+            window['-file1-'].Update('FASTA 1', disabled=False)
+            window['-file2-'].Update('FASTA 2', disabled=False)
+            window['Run'].Update(disabled=False)
+        if values['-upload_type-'] == 'Upload csv from previous alignment':
+            window['-dist_type-'].Update(disabled=False)
+            window['-file1-'].Update('CSV 1', disabled=False)
+            window['-file2-'].Update('CSV 2', disabled=False)
+            window['Run'].Update(disabled=False)
+
+    # Run analysis loops
+    if event == 'Run':
+        if values['-upload_type-'] == 'Manual FASTA upload':
+        # Edit
+            if values['-dist_type-'] == 'Edit Distance':
+                #sg.popup('Edit chosen',  font=font)
+                with open(values['-file1-']) as fasta1:
+                    for i in SeqIO.parse(fasta1, 'fasta'):
+                        seq1 = i.seq
+                with open(values['-file2-']) as fasta2:
+                    for j in SeqIO.parse(fasta2, 'fasta'):
+                        seq2 = j.seq
+
+                result = edit_distance(str(seq1), str(seq2))
+                sg.popup('Edit Distance: ' + str(result), font=font)
+
+            # Hamming
+            if values['-dist_type-'] == 'Hamming Distance':
+                #sg.popup('Hamming chosen', font=font)
+                with open(values['-file1-']) as fasta1:
+                    for i in SeqIO.parse(fasta1, 'fasta'):
+                        seq1 = i.seq
+                with open(values['-file2-']) as fasta2:
+                    for j in SeqIO.parse(fasta2, 'fasta'):
+                        seq2 = j.seq
+                result = hamming_distance(str(seq1), str(seq2))
+                sg.popup('Hamming Distance: ' + str(result),  font=font)
+        else:
+            sg.popup('working on it', font=font)
