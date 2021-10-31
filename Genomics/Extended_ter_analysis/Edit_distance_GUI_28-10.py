@@ -28,7 +28,6 @@ terI = Seq('AACATGGAAGTTGTAACTAACCG')
 terJ = Seq('ACGCAGTAAGTTGTAACTAATGC')
 
 
-
 # Given two strings s and t, calculate the edit distance
 # this is a dynamic programming approach that other bioinformaticians would be happy with.
 # from GitHub copilot OMGenomics example
@@ -53,17 +52,14 @@ def edit_distance(s, t):
     return d[len(s)][len(t)]
 
 
-
 # Hamming distance
 '''
 This requires the same string length fro both s and t
 '''
 
+
 def hamming_distance(s, t):
     return sum(1 for i in range(len(s)) if s[i] != t[i])
-
-
-
 
 
 ####################################################################
@@ -146,13 +142,14 @@ hamming_distance(str(MG_terAx), str(Sakai_terAx))  # 66
 # next put these results into another table, sort of like a distance matrix / array
 
 
-
-
-#_____________________________________________________________________________________________________________________________
+# _____________________________________________________________________________________________________________________________
 #                                                   GUI for Edit vs Hamming Distance
-#_____________________________________________________________________________________________________________________________
+# _____________________________________________________________________________________________________________________________
 
 # add window colour
+# sg.theme_previewer()
+#theme_name_list = sg.theme_list()
+# print(theme_name_list)
 # 'DarkTeal9', 'DarkGrey14', 'LightBlue2', 'LightBlue8'
 sg.theme('DarkTeal9')
 
@@ -171,7 +168,7 @@ def clear_input():
 
 # Layout for window
 layout1 = [
-    [sg.Text('Edit and Hamming Distance of FASTA sequences', font=font)],
+    [sg.Text('Edit and Hamming Distance of short FASTA sequences', font=font)],
     [sg.Text('_'*100)],
     [sg.Text('How do you want to run the analysis?', font=font),
         sg.Combo(['Manual Sequence Upload', 'FASTA Upload', 'Upload CSV from alignment'], key='-upload_type-', font=font, size=(28, 1)),
@@ -192,13 +189,12 @@ layout1 = [
 
     # Buttons
     [sg.Button('Run', font=font, button_color='darkcyan', size=(10, 1), disabled=True),
-    #sg.Button('Clear', font=font, button_color='darkcyan', size=(10, 1)),
+     #sg.Button('Clear', font=font, button_color='darkcyan', size=(10, 1)),
         sg.Button('Exit', font=font, button_color='firebrick', size=(10, 1))]
 ]
 
 # set up the window and the layout to use for the window
 window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
-
 
 
 while True:
@@ -210,7 +206,7 @@ while True:
         else:
             break
     if event == 'Clear':
-        #clear_input()
+        # clear_input()
         sg.popup('Button not working')
 
     # choosing the distance algorithm loops and setting layout
@@ -249,7 +245,7 @@ while True:
                     seq1 = Seq(values['-input_seq1-'])
                     seq2 = Seq(values['-input_seq2-'])
                     result = edit_distance(str(seq1), str(seq2))
-                    sg.popup('Edit Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...', font=font)
+                    sg.popup('Edit Distance: ' + str(result) + '\n' + seq1[:20] + '...' + '\n'*2 + seq2[:20] + '...', font=font)
                 except:
                     sg.popup('something went wrong')
             # Hamming
@@ -258,7 +254,7 @@ while True:
                     seq1 = Seq(values['-input_seq1-'])
                     seq2 = Seq(values['-input_seq2-'])
                     result = hamming_distance(str(seq1), str(seq2))
-                    sg.popup('Hamming Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...',  font=font)
+                    sg.popup('Hamming Distance: ' + str(result) + '\n' + seq1[:20] + '...' + '\n'*2 + seq2[:20] + '...',  font=font)
                 except:
                     sg.popup('Sequences not of same length')
         # FASTA file upload
@@ -275,7 +271,7 @@ while True:
                             seq2 = j.seq
 
                     result = edit_distance(str(seq1), str(seq2))
-                    sg.popup('Edit Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...', font=font)
+                    sg.popup('Edit Distance: ' + str(result) + '\n' + seq1[:20] + '...' + '\n'*2 + seq2[:20] + '...', font=font)
                 except:
                     sg.popup('Something went wrong')
             # Hamming
@@ -289,10 +285,9 @@ while True:
                         for j in SeqIO.parse(fasta2, 'fasta'):
                             seq2 = j.seq
                     result = hamming_distance(str(seq1), str(seq2))
-                    sg.popup('Hamming Distance: ' + str(result) + '\n'  + seq1[:20] + '...' + '\n'*2  + seq2[:20] + '...',  font=font)
+                    sg.popup('Hamming Distance: ' + str(result) + '\n' + seq1[:20] + '...' + '\n'*2 + seq2[:20] + '...',  font=font)
                 except:
                     sg.popup('Sequences not of same length')
-
 
         # CSV files into dataframes
         if values['-upload_type-'] == 'Upload CSV from alignment':
