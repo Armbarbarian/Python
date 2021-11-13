@@ -76,6 +76,13 @@ def get_img_data(f, maxsize=(1200, 850)):
     return bio.getvalue()
 
 
+# median find nearest function
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+
 # set the layout of the window
 layout1 = [
     # [sg.Combo(['Light mode', 'Dark mode'], key='mode', change_submits=True, enable_events=True, pad=((400, 0), (0, 0)))], # set up light and dark mode feature
@@ -111,15 +118,6 @@ layout1 = [
 
 # set up the window and the layout to use for the window
 window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
-
-# median find nearest function
-
-
-def find_nearest(array, value):
-    array = np.asarray(array)
-    idx = (np.abs(array - value)).argmin()
-    return array[idx]
-
 
 # while loop to keep the window up unless user closes it and asks if you want to close
 while True:
@@ -465,7 +463,7 @@ while True:
                                     continue
                                 for strain in joined_cult:
                                     CSV_DF.loc[CSV_DF.Strain == strain, 'Median'] = 'True'
-                                CSV_DF.to_csv('UPDATED_output'+'_'+day+'-'+month+'.csv')
+                                CSV_DF.to_csv('MEDIAN_output'+'_'+day+'-'+month+'.csv')
                                 sg.popup('Data has been added!', font=font)
                             except:
                                 sg.popup('YOU DIED earlier')
