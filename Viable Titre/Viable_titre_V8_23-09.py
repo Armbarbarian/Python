@@ -478,7 +478,6 @@ while True:
 
                 if values['analysis_type'] == 'Mutation Rates':
                     window_analysis_question.close()
-                    sg.popup('NOTE: You must use the 1998 HTML program \nin conjunction which this data entry app', font=font)
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
                         # master_df
@@ -612,7 +611,6 @@ while True:
                                 divident_s = 12.7
                                 divisor_s = (2.24 + np.log(m)) * (2.24 + np.log(m))
                                 sigma = m * np.sqrt((1/N) * (divident_s/divisor_s))
-                                sg.popup('Check sigma')
 
                                 # Sigma / m
                                 s_m = sigma / m
