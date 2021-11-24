@@ -117,7 +117,7 @@ layout1 = [
 
 
 # set up the window and the layout to use for the window
-window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
+window = sg.Window('Viable Titre GUI', layout1, resizable=True, finalize=True)  # size=(600, 450)
 
 # while loop to keep the window up unless user closes it and asks if you want to close
 while True:
@@ -128,6 +128,14 @@ while True:
             continue
         else:
             break
+
+# Resize window options to stop callbacks
+    elif event == 'Configure':
+        if window.TKroot.state() == 'zoomed':
+            status.update(value='Window zoomed and maximized !')
+        else:
+            status.update(value='Window normal')
+
     if event == 'Clear':
         clear_input()
 
@@ -291,7 +299,7 @@ while True:
                     [sg.Table(values=data, headings=header_list, font=font, key='Viewed_data', display_row_numbers=False, auto_size_columns=False,
                               num_rows=min(25, len(data)), alternating_row_color='teal', enable_events=True), sg.Button('Append Spreadsheet', key='-Append_csv-', font=font)],  # teal, lightblue
                 ]
-                window_data = sg.Window('output_'+day+'-'+month+'.csv', layout_data)
+                window_data = sg.Window('output_'+day+'-'+month+'.csv', layout_data, resizable=True, finalize=True)
                 event, values = window_data.read()
             except:
                 sg.popup_error('YOU DIED')
@@ -317,7 +325,7 @@ while True:
                         [sg.Table(values=data_input, headings=header_list_input, font=font, display_row_numbers=False, auto_size_columns=False,
                                   num_rows=min(25, len(data_input)), alternating_row_color='RoyalBlue')]  # teal, lightblue
                     ]
-                    window_data_input = sg.Window('Your csv data displayed', layout_data_input)
+                    window_data_input = sg.Window('Your csv data displayed', layout_data_input, resizable=True, finalize=True)
                     event, values = window_data_input.read()
         if event == '-Append_csv-':
             sg.popup('Feature not available')
@@ -333,7 +341,7 @@ while True:
             [sg.Submit('Select Analysis', font=font)],
             [sg.Text('_'*80)]
         ]
-        window_analysis_question = sg.Window('Analysis', analysis_layout)
+        window_analysis_question = sg.Window('Analysis', analysis_layout, resizable=True, finalize=True)
         while True:
             event, values = window_analysis_question.read()
             if event == sg.WIN_CLOSED:
@@ -369,26 +377,34 @@ while True:
 # Specifying up to 8 side by side strains being cultured.
 # Update them depending on the values of the Strain Dropdown
 # organised in column format for easier viewing and layout
-                    StrainStarts = [
-                    [sg.Text('Strain 1 row start', key='-1start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1start-', font=font , visible=False)],
-                    [sg.Text('Strain 2 row start', key='-2start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2start-', font=font , visible=False)],
-                    [sg.Text('Strain 3 row start', key='-3start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-3start-', font=font , visible=False)],
-                    [sg.Text('Strain 4 row start', key='-4start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-4start-', font=font , visible=False)],
-                    [sg.Text('Strain 5 row start', key='-5start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-5start-', font=font , visible=False)],
-                    [sg.Text('Strain 6 row start', key='-6start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-6start-', font=font , visible=False)],
-                    [sg.Text('Strain 7 row start', key='-7start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-7start-', font=font , visible=False)],
-                    [sg.Text('Strain 8 row start', key='-8start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-8start-', font=font , visible=False)]
+                    Strains_col1 = [
+                        [sg.Text('Strain 1 row start', key='-1start_text-', font=font, visible=False),
+                         sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1start-', font=font, visible=False)],
+                        [sg.Text('Strain 2 row start', key='-2start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2start-', font=font, visible=False)],
+                        [sg.Text('Strain 3 row start', key='-3start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-3start-', font=font, visible=False)],
+                        [sg.Text('Strain 4 row start', key='-4start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-4start-', font=font, visible=False)]
                     ]
 
-                    StrainStops = [
-                    [sg.Text('Strain 1 row stop', key='-1stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1stop-', font=font, visible=False)],
-                    [sg.Text('Strain 2 row stop', key='-2stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2stop-', font=font, visible=False)],
-                    [sg.Text('Strain 3 row stop', key='-3stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-3stop-', font=font, visible=False)],
-                    [sg.Text('Strain 4 row stop', key='-4stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-4stop-', font=font, visible=False)],
-                    [sg.Text('Strain 5 row stop', key='-5stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-5stop-', font=font, visible=False)],
-                    [sg.Text('Strain 6 row stop', key='-6stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-6stop-', font=font, visible=False)],
-                    [sg.Text('Strain 7 row stop', key='-7stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-7stop-', font=font, visible=False)],
-                    [sg.Text('Strain 8 row stop', key='-8stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-8stop-', font=font, visible=False)]
+                    Strains_col2 = [
+                        [sg.Text('Strain 1 row stop', key='-1stop_text-', font=font, visible=False),
+                         sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-1stop-', font=font, visible=False)],
+                        [sg.Text('Strain 2 row stop', key='-2stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-2stop-', font=font, visible=False)],
+                        [sg.Text('Strain 3 row stop', key='-3stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-3stop-', font=font, visible=False)],
+                        [sg.Text('Strain 4 row stop', key='-4stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-4stop-', font=font, visible=False)]
+                    ]
+
+                    Strains_col3 = [
+                        [sg.Text('Strain 5 row start', key='-5start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-5start-', font=font, visible=False)],
+                        [sg.Text('Strain 6 row start', key='-6start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-6start-', font=font, visible=False)],
+                        [sg.Text('Strain 7 row start', key='-7start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-7start-', font=font, visible=False)],
+                        [sg.Text('Strain 8 row start', key='-8start_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-8start-', font=font, visible=False)]
+                    ]
+
+                    Strains_col4 = [
+                        [sg.Text('Strain 5 row stop', key='-5stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-5stop-', font=font, visible=False)],
+                        [sg.Text('Strain 6 row stop', key='-6stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-6stop-', font=font, visible=False)],
+                        [sg.Text('Strain 7 row stop', key='-7stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-7stop-', font=font, visible=False)],
+                        [sg.Text('Strain 8 row stop', key='-8stop_text-', font=font, visible=False), sg.Combo(list(range(0, len(data_input2)+1, 1)), key='-8stop-', font=font, visible=False)]
                     ]
 
                     analysis_table_layout = [
@@ -398,9 +414,11 @@ while True:
                                   enable_events=False)],
                         [sg.Text('Set up some parameters first:', key='-param Text-', font=font, visible=True)],
                         [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=True), sg.Combo(list(range(1, 12)), key='-Cultures Dropdown-', font=font, visible=True)],
-                        [sg.Text('how many strains do you have?', key='-Strains Text-', font=font, visible=True), sg.Combo(list(range(1, 12)), key='-Strains Dropdown-', font=font, visible=True), sg.Button('Go', key='paramButton', visible=True, disabled=False)],
+                        [sg.Text('how many strains do you have?', key='-Strains Text-', font=font, visible=True), sg.Combo(list(range(1, 12)),
+                                                                                                                           key='-Strains Dropdown-', font=font, visible=True), sg.Button('Go', key='paramButton', visible=True, disabled=False)],
 
-                        [sg.Column(StrainStarts), sg.Column(StrainStops)],
+                        [sg.Column(Strains_col1, background_color='lightgray'), sg.Column(Strains_col2, background_color='lightgray'),
+                         sg.Column(Strains_col3, background_color='gray'), sg.Column(Strains_col4, background_color='gray')],
                         [sg.Submit('Calculate', font=font), sg.Exit('Close', font=font, button_color='firebrick')],
                         [sg.Text('', key='strain1_median_culture', font=font, visible=False), sg.Text('', key='strain1_median_titre', font=font, visible=False)],
                         # output of concat dfs showing median
@@ -409,70 +427,66 @@ while True:
                          sg.Button('Add to CSV', key='AddButton', visible=False)]
                     ]
 
-                    window_median_table = sg.Window('Median Calculation', analysis_table_layout)
+                    window_median_table = sg.Window('Median Calculation', analysis_table_layout, resizable=True, finalize=True)
                     window_analysis_question.close()
                     while True:
                         event, values = window_median_table.read()
-                        if event  == 'paramButton':
+                        if event == 'paramButton':
                             window_median_table['paramButton'].Update(disabled=True)
                             NumCultures = int(values['-Cultures Dropdown-'])
                             NumStrains = int(values['-Strains Dropdown-'])
 
 
-#There must be another way to simplify the code below to update the rows as we need them
-#Some conditional based on the number of Strains provided
+# There must be another way to simplify the code below to update the rows as we need them
+# Some conditional based on the number of Strains provided
 
 
 # Number of Strains if then conditions
-                            if NumStrains == 1:
+                            if NumStrains >= 1:
                                 window_median_table['-1start_text-'].Update(visible=True)
                                 window_median_table['-1stop_text-'].Update(visible=True)
                                 window_median_table['-1start-'].Update(visible=True)
                                 window_median_table['-1stop-'].Update(visible=True)
-                            if NumStrains == 2:
-                                window_median_table['-1start_text-'].Update(visible=True)
-                                window_median_table['-1stop_text-'].Update(visible=True)
-                                window_median_table['-1start-'].Update(visible=True)
-                                window_median_table['-1stop-'].Update(visible=True)
+                            if NumStrains >= 2:
                                 window_median_table['-2start_text-'].Update(visible=True)
                                 window_median_table['-2stop_text-'].Update(visible=True)
                                 window_median_table['-2start-'].Update(visible=True)
                                 window_median_table['-2stop-'].Update(visible=True)
-                            if NumStrains == 3:
-                                window_median_table['-1start_text-'].Update(visible=True)
-                                window_median_table['-1stop_text-'].Update(visible=True)
-                                window_median_table['-1start-'].Update(visible=True)
-                                window_median_table['-1stop-'].Update(visible=True)
-                                window_median_table['-2start_text-'].Update(visible=True)
-                                window_median_table['-2stop_text-'].Update(visible=True)
-                                window_median_table['-2start-'].Update(visible=True)
-                                window_median_table['-2stop-'].Update(visible=True)
+                            if NumStrains >= 3:
                                 window_median_table['-3start_text-'].Update(visible=True)
                                 window_median_table['-3stop_text-'].Update(visible=True)
                                 window_median_table['-3start-'].Update(visible=True)
                                 window_median_table['-3stop-'].Update(visible=True)
-                            if NumStrains == 4:
-                                window_median_table['-1start_text-'].Update(visible=True)
-                                window_median_table['-1stop_text-'].Update(visible=True)
-                                window_median_table['-1start-'].Update(visible=True)
-                                window_median_table['-1stop-'].Update(visible=True)
-                                window_median_table['-2start_text-'].Update(visible=True)
-                                window_median_table['-2stop_text-'].Update(visible=True)
-                                window_median_table['-2start-'].Update(visible=True)
-                                window_median_table['-2stop-'].Update(visible=True)
-                                window_median_table['-3start_text-'].Update(visible=True)
-                                window_median_table['-3stop_text-'].Update(visible=True)
-                                window_median_table['-3start-'].Update(visible=True)
-                                window_median_table['-3stop-'].Update(visible=True)
+                            if NumStrains >= 4:
                                 window_median_table['-4start_text-'].Update(visible=True)
                                 window_median_table['-4stop_text-'].Update(visible=True)
                                 window_median_table['-4start-'].Update(visible=True)
                                 window_median_table['-4stop-'].Update(visible=True)
+                            if NumStrains >= 5:
+                                window_median_table['-5start_text-'].Update(visible=True)
+                                window_median_table['-5stop_text-'].Update(visible=True)
+                                window_median_table['-5start-'].Update(visible=True)
+                                window_median_table['-5stop-'].Update(visible=True)
+                            if NumStrains >= 6:
+                                window_median_table['-6start_text-'].Update(visible=True)
+                                window_median_table['-6stop_text-'].Update(visible=True)
+                                window_median_table['-6start-'].Update(visible=True)
+                                window_median_table['-6stop-'].Update(visible=True)
+                            if NumStrains >= 7:
+                                window_median_table['-7start_text-'].Update(visible=True)
+                                window_median_table['-7stop_text-'].Update(visible=True)
+                                window_median_table['-7start-'].Update(visible=True)
+                                window_median_table['-7stop-'].Update(visible=True)
+                            if NumStrains >= 8:
+                                window_median_table['-8start_text-'].Update(visible=True)
+                                window_median_table['-8stop_text-'].Update(visible=True)
+                                window_median_table['-8start-'].Update(visible=True)
+                                window_median_table['-8stop-'].Update(visible=True)
 
 
-#The below calculations and appending a dataframe work, but are restricted in the sense that
-#I have to code how many strains are mentioned.
-#I need to allow for a condition based on how many strains we have as mentioned above.
+# The below calculations and appending a dataframe work, but are restricted in the sense that
+# I have to code how many strains are mentioned.
+# I need to allow for a condition based on how many strains we have as mentioned above.
 
 # Calculating the Median
                         if event == 'Calculate':
@@ -545,10 +559,9 @@ while True:
                                 sg.popup('Enter row numbers first', font=font)
 
 
-
-#This needs to be more streamline to add True or False in the correct column to be called
-#Later when retrieving the median cultures, this way we won't have to make more csv files
-#which keeps the process cleaner.
+# This needs to be more streamline to add True or False in the correct column to be called
+# Later when retrieving the median cultures, this way we won't have to make more csv files
+# which keeps the process cleaner.
 
                         if event == 'AddButton':
                             try:
@@ -660,7 +673,7 @@ while True:
                          sg.Combo(data_strain, key='-strain2_dropdown-', visible=False)],
                          ]]
 
-                    mutation_window = sg.Window('Mutation Rates', mutation_layout)
+                    mutation_window = sg.Window('Mutation Rates', mutation_layout, resizable=True, finalize=True)
                     while True:
                         event, values = mutation_window.read()
                         if event == sg.WIN_CLOSED or event == 'Exit':
