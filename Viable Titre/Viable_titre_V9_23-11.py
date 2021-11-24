@@ -490,73 +490,96 @@ while True:
 
 # Calculating the Median
                         if event == 'Calculate':
-                            try:
-                                # user input
+                            NumStrain_NameList = []
+                            NumStrain_Df = pd.DataFrame()
+                            # user input
+                            if NumStrains >= 1:
                                 strain1_row_start = values['-1start-']
                                 strain1_row_stop = values['-1stop-']
+                                try:
+                                    temp_names1 = list(master_df.Strain[strain1_row_start:strain1_row_stop])
+                                    temp_titre1 = list(master_df.Titre[strain1_row_start:strain1_row_stop])
+                                    temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
+                                    data_temp1 = temp_df1.sort_values(by='titre')
+                                    median1 = data_temp1['titre'].median()
+                                    nearest_median1 = find_nearest(data_temp1['titre'], median1)
+                                    median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
+                                    NumStrain_NameList.append(median_culture1.iloc[0,0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture1)
+                                    #sg.popup(NumStrain_list)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+                                #sg.popup('1st check', font=font)
+
+                            if NumStrains >= 2:
                                 strain2_row_start = values['-2start-']
                                 strain2_row_stop = values['-2stop-']
+                                try:
+                                    temp_names2 = list(master_df.Strain[strain2_row_start:strain2_row_stop])
+                                    temp_titre2 = list(master_df.Titre[strain2_row_start:strain2_row_stop])
+                                    temp_df2 = pd.DataFrame({'names': temp_names2, 'titre': temp_titre2})
+                                    data_temp2 = temp_df2.sort_values(by='titre')
+                                    median2 = data_temp2['titre'].median()
+                                    nearest_median2 = find_nearest(data_temp2['titre'], median2)
+                                    median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
+                                    NumStrain_NameList.append(median_culture2.iloc[0,0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture2)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+                                #sg.popup('2nd check', font=font)
+
+                            if NumStrains >= 3:
                                 strain3_row_start = values['-3start-']
                                 strain3_row_stop = values['-3stop-']
+                                try:
+                                    temp_names3 = list(master_df.Strain[strain3_row_start:strain3_row_stop])
+                                    temp_titre3 = list(master_df.Titre[strain3_row_start:strain3_row_stop])
+                                    temp_df3 = pd.DataFrame({'names': temp_names3, 'titre': temp_titre3})
+                                    data_temp3 = temp_df3.sort_values(by='titre')
+                                    median3 = data_temp3['titre'].median()
+                                    nearest_median3 = find_nearest(data_temp3['titre'], median3)
+                                    median_culture3 = data_temp3.loc[data_temp3['titre'] == nearest_median3]
+                                    NumStrain_NameList.append(median_culture3.iloc[0,0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture3)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+                                #sg.popup('3rd check', font=font)
+
+                            if NumStrains >= 4:
                                 strain4_row_start = values['-4start-']
                                 strain4_row_stop = values['-4stop-']
+                                try:
+                                    temp_names4 = list(master_df.Strain[strain4_row_start:strain4_row_stop])
+                                    temp_titre4 = list(master_df.Titre[strain4_row_start:strain4_row_stop])
+                                    temp_df4 = pd.DataFrame({'names': temp_names4, 'titre': temp_titre4})
+                                    data_temp4 = temp_df4.sort_values(by='titre')
+                                    median4 = data_temp4['titre'].median()
+                                    nearest_median4 = find_nearest(data_temp4['titre'], median4)
+                                    median_culture4 = data_temp4.loc[data_temp4['titre'] == nearest_median4]
+                                    NumStrain_NameList.append(median_culture4.iloc[0,0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture4)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+                                #sg.popup('4th check', font=font)
 
-                            # Actually calculating the median from the input rows given
-                                temp_names1 = list(master_df.Strain[strain1_row_start:strain1_row_stop])
-                                temp_names2 = list(master_df.Strain[strain2_row_start:strain2_row_stop])
-                                temp_names3 = list(master_df.Strain[strain3_row_start:strain3_row_stop])
-                                temp_names4 = list(master_df.Strain[strain4_row_start:strain4_row_stop])
+                            sg.popup(NumStrain_Df)
 
-                                temp_titre1 = list(master_df.Titre[strain1_row_start:strain1_row_stop])
-                                temp_titre2 = list(master_df.Titre[strain2_row_start:strain2_row_stop])
-                                temp_titre3 = list(master_df.Titre[strain3_row_start:strain3_row_stop])
-                                temp_titre4 = list(master_df.Titre[strain4_row_start:strain4_row_stop])
+                            median_list = NumStrain_Df.values.tolist()
+                            # median1_heading = temp_df1.columns.tolist() # trouble updating the headings
+                            # median2_heading = temp_df2.columns.tolist()
 
-                                temp_df1 = pd.DataFrame({'names': temp_names1, 'titre': temp_titre1})
-                                temp_df2 = pd.DataFrame({'names': temp_names2, 'titre': temp_titre2})
-                                temp_df3 = pd.DataFrame({'names': temp_names3, 'titre': temp_titre3})
-                                temp_df4 = pd.DataFrame({'names': temp_names4, 'titre': temp_titre4})
+                        # appending the table to show the median cultures
+                        # show the button to update the spreadhseet
+                            window_median_table['-Median output-'].Update(values=median_list, visible=True)
+                            window_median_table['AddButton'].Update(visible=True)
 
-                                data_temp1 = temp_df1.sort_values(by='titre')
-                                data_temp2 = temp_df2.sort_values(by='titre')
-                                data_temp3 = temp_df3.sort_values(by='titre')
-                                data_temp4 = temp_df4.sort_values(by='titre')
+                            sg.popup('Now make a note of the median cultures', font=font)
 
-                                median1 = data_temp1['titre'].median()
-                                median2 = data_temp2['titre'].median()
-                                median3 = data_temp3['titre'].median()
-                                median4 = data_temp4['titre'].median()
 
-                            # find the nearest value
-                                nearest_median1 = find_nearest(data_temp1['titre'], median1)
-                                nearest_median2 = find_nearest(data_temp2['titre'], median2)
-                                nearest_median3 = find_nearest(data_temp3['titre'], median3)
-                                nearest_median4 = find_nearest(data_temp4['titre'], median4)
-
-                            # filter the OG dataframe to return the culture with that value
-                                median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
-                                median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
-                                median_culture3 = data_temp3.loc[data_temp3['titre'] == nearest_median3]
-                                median_culture4 = data_temp4.loc[data_temp4['titre'] == nearest_median4]
-
-                                # print(median_culture1)
-                                # print(median_culture2)
-
-                                # concatenate the two dfs to show only one table
-                                median_concat = pd.concat([median_culture1, median_culture2, median_culture3, median_culture4], axis=0, ignore_index=True)
-                            #
-                                median_list = median_concat.values.tolist()
-                                # median1_heading = temp_df1.columns.tolist() # trouble updating the headings
-                                # median2_heading = temp_df2.columns.tolist()
-
-                            # appending the table to show the median cultures
-                            # show the button to update the spreadhseet
-                                window_median_table['-Median output-'].Update(values=median_list, visible=True)
-                                window_median_table['AddButton'].Update(visible=True)
-
-                                sg.popup('Now make a note of the median cultures', font=font)
-                            except:
-                                sg.popup('Enter row numbers first', font=font)
 
 
 # This needs to be more streamline to add True or False in the correct column to be called
@@ -565,32 +588,41 @@ while True:
 
                         if event == 'AddButton':
                             try:
-                                CSV_FILE = ('output_'+day+'-'+month+'.csv')
-                                CSV_DF = pd.read_csv(CSV_FILE)
-                                # use median_list to search df for indexes
+                                #CSV_FILE = ('output_'+day+'-'+month+'.csv')
+                                CSV_DF = master_df
+
+
+                                #cult1_strain = NumStrain_NameList[1]
+                                #cult2_strain = NumStrain_NameList[2]
+                                #cult3_strain = NumStrain_NameList[3]
+                                #cult4_strain = NumStrain_NameList[4]
+                            except:
+                                sg.popup('check 1')
+
+                            try:
+                                #joined_cult = cult1_strain + cult2_strain + cult3_strain + cult4_strain
+                                sg.popup(NumStrain_NameList)
                                 indexes = []
-                                cult1_strain = median_culture1['names'].to_list()
-                                cult2_strain = median_culture2['names'].to_list()
-                                joined_cult = cult1_strain + cult2_strain
                         # Retreiving the cultures that are the median values
-                                for strain1 in joined_cult:
+                                for strain1 in NumStrain_NameList:
                                     if strain1 in CSV_DF.values:
                                         indices1 = str(CSV_DF[CSV_DF['Strain'] == strain1].index.values)
                                         if indices1 not in indexes:
                                             indexes.append(indices1)
-                                    else:
-                                        sg.popup('YOU DIED on culture 1')
+                            except:
+                                sg.popup('check 2')
 
+                            try:
                                 if 'Median' not in CSV_DF.columns:  # LO here trying to add more than two cultures
                                     CSV_DF['Median'] = 'NA'
                                 else:
                                     continue
-                                for strain in joined_cult:
+                                for strain in NumStrain_NameList:
                                     CSV_DF.loc[CSV_DF.Strain == strain, 'Median'] = 'True'
                                 CSV_DF.to_csv('MEDIAN_output'+'_'+day+'-'+month+'.csv')
                                 sg.popup('Data has been added!', font=font)
                             except:
-                                sg.popup('YOU DIED earlier')
+                                sg.popup('check 3')
 
                         if event == sg.WIN_CLOSED or event == 'Close':
                             break
@@ -600,6 +632,8 @@ while True:
                     # new_data1 = values['-Median Table-']
                     # closing and exiting the median window
 
+#_____________________________________________________________________________________________
+#                                                                               Mutation Rates
                 if values['analysis_type'] == 'Mutation Rates':
                     window_analysis_question.close()
                     try:
