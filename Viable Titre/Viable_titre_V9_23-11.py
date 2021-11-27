@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib
+%matplotlib inline
 from PIL import Image
 matplotlib.use('TkAgg')
 plt.style.use('ggplot')
@@ -960,9 +961,7 @@ s = m * np.sqrt((1/N) * (divident_s/divisor_s))
 s
 
 
-# mutationrate from the 1998 program
-target = 1.288e3
-target
+# mutationrate from the 1998 program in JavaScript
 '''
 from the mutation rate program in what looks like javascript to calculate mutation rate
 
@@ -1007,26 +1006,54 @@ for strain in xlist:
 # print(indexes)
 '''
 
-'''
-# append dataframe with new column
-CSV_FILE = ('output_'+day+'-'+month+'.csv')
-CSV_DF = pd.read_csv(CSV_FILE)
-xlist = ['DG011 #5', 'DG011 #6', 'DG012 #5']
-test_df = CSV_DF
-test_df['Median'] = 'NA'
-test_df
-for strain in xlist:
-    test_df.loc[test_df.Strain == strain, 'Median'] = 'True'
-
-test_df
-'''
-
-248181818
-2.5e+09
-1E-6
-10e-7
 
 
+
+# matplotlib of mutation rates
 dict = {'A': [1, 2, 3],
         'B': [4, 5, 6]}
 pd.DataFrame(dict)
+
+# WT and Tus-
+x = ['SLM1042', 'SLM1043', 'DG011', 'DG012']
+x_pos = [i for i, _ in enumerate(x)]
+y_raw = [7E-07, 2.23E-06, 6E-07, 8E-07]
+y_factor= [1, 1.87, 0.729, 1.38]
+
+plt.bar(x_pos, y_factor, color='blue')
+plt.xlabel('Strains')
+plt.ylabel('Factor increase in recombination')
+plt.title('Rates of Recombination in single origin E.coli')
+plt.xticks(x_pos, x)
+
+# oriX and oriZ
+x = ['DG023', 'DG024', 'DG025', 'DG026']
+x_pos = [i for i, _ in enumerate(x)]
+y_raw = [1.7E-06, 1.12E-06, 5.06E-06, 5.47E-06]
+y_factor= [0.846, 0.397, 1, 1.62]
+
+plt.bar(x_pos, y_factor, color='blue')
+plt.xlabel('Strains')
+plt.ylabel('Factor increase in recombination')
+plt.title('Rates of Recombination in single origin E.coli')
+plt.xticks(x_pos, x)
+
+# combination of the two
+x = ['WT ter', 'WT ctrl', 'OriX ter', 'OriX ctrl', 'OriZ ter', 'OriZ ctrl']
+x_pos = [i for i, _ in enumerate(x)]
+y_raw = [7E-07, 2.23E-06, 5.06E-06, 5.47E-06]
+y_factor= [(7E-07/7E-07), (2.23E-06/7E-07), (1.7E-06/7E-07), (1.12E-06/7E-07), (5.06E-06/7E-07), (5.47E-06/7E-07)]
+errors = [9.09E-08*1E6, 3.00E-07*1E6, 3.66E-07*1E6, 2.61E-07*1E6, 1.07E-06*1E6, 1.10E-06*1E6]
+fig = plt.figure()
+fig.patch.set_facecolor('white')
+#fig.patch.set_alpha(0.6)
+plt.bar(x_pos, y_factor, color=['royalblue', 'royalblue', 'purple', 'purple', 'darkred', 'darkred'], yerr=errors, ecolor='black', capsize=5)
+plt.xlabel('Strains')
+plt.ylabel('Factor increase in recombination')
+plt.title('Preliminary Rates of Recombination in E.coli\nwith varying number of origins')
+plt.xticks(x_pos, x)
+plt.grid(b=None)
+
+
+plt.savefig('Recombination_rates_Ecoli_1.png')
+plt.savefig('Recombination_rates_Ecoli_1.pdf')
