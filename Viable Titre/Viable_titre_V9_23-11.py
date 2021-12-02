@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib
-%matplotlib inline
+# %matplotlib inline
 from PIL import Image
 matplotlib.use('TkAgg')
 plt.style.use('ggplot')
@@ -505,9 +505,9 @@ while True:
                                     median1 = data_temp1['titre'].median()
                                     nearest_median1 = find_nearest(data_temp1['titre'], median1)
                                     median_culture1 = data_temp1.loc[data_temp1['titre'] == nearest_median1]
-                                    NumStrain_NameList.append(median_culture1.iloc[0,0])
+                                    NumStrain_NameList.append(median_culture1.iloc[0, 0])
                                     NumStrain_Df = NumStrain_Df.append(median_culture1)
-                                    #sg.popup(NumStrain_list)
+                                    # sg.popup(NumStrain_list)
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
@@ -524,7 +524,7 @@ while True:
                                     median2 = data_temp2['titre'].median()
                                     nearest_median2 = find_nearest(data_temp2['titre'], median2)
                                     median_culture2 = data_temp2.loc[data_temp2['titre'] == nearest_median2]
-                                    NumStrain_NameList.append(median_culture2.iloc[0,0])
+                                    NumStrain_NameList.append(median_culture2.iloc[0, 0])
                                     NumStrain_Df = NumStrain_Df.append(median_culture2)
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
@@ -542,7 +542,7 @@ while True:
                                     median3 = data_temp3['titre'].median()
                                     nearest_median3 = find_nearest(data_temp3['titre'], median3)
                                     median_culture3 = data_temp3.loc[data_temp3['titre'] == nearest_median3]
-                                    NumStrain_NameList.append(median_culture3.iloc[0,0])
+                                    NumStrain_NameList.append(median_culture3.iloc[0, 0])
                                     NumStrain_Df = NumStrain_Df.append(median_culture3)
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
@@ -560,7 +560,7 @@ while True:
                                     median4 = data_temp4['titre'].median()
                                     nearest_median4 = find_nearest(data_temp4['titre'], median4)
                                     median_culture4 = data_temp4.loc[data_temp4['titre'] == nearest_median4]
-                                    NumStrain_NameList.append(median_culture4.iloc[0,0])
+                                    NumStrain_NameList.append(median_culture4.iloc[0, 0])
                                     NumStrain_Df = NumStrain_Df.append(median_culture4)
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
@@ -581,8 +581,6 @@ while True:
                             sg.popup('Now make a note of the median cultures', font=font)
 
 
-
-
 # This needs to be more streamline to add True or False in the correct column to be called
 # Later when retrieving the median cultures, this way we won't have to make more csv files
 # which keeps the process cleaner.
@@ -591,7 +589,6 @@ while True:
                             try:
                                 #CSV_FILE = ('output_'+day+'-'+month+'.csv')
                                 CSV_DF = master_df
-
 
                                 #cult1_strain = NumStrain_NameList[1]
                                 #cult2_strain = NumStrain_NameList[2]
@@ -633,7 +630,7 @@ while True:
                     # new_data1 = values['-Median Table-']
                     # closing and exiting the median window
 
-#_____________________________________________________________________________________________
+# _____________________________________________________________________________________________
 #                                                                               Mutation Rates
                 if values['analysis_type'] == 'Mutation Rates':
                     window_analysis_question.close()
@@ -1007,8 +1004,6 @@ for strain in xlist:
 '''
 
 
-
-
 # matplotlib of mutation rates
 dict = {'A': [1, 2, 3],
         'B': [4, 5, 6]}
@@ -1018,7 +1013,7 @@ pd.DataFrame(dict)
 x = ['SLM1042', 'SLM1043', 'DG011', 'DG012']
 x_pos = [i for i, _ in enumerate(x)]
 y_raw = [7E-07, 2.23E-06, 6E-07, 8E-07]
-y_factor= [1, 1.87, 0.729, 1.38]
+y_factor = [1, 1.87, 0.729, 1.38]
 
 plt.bar(x_pos, y_factor, color='blue')
 plt.xlabel('Strains')
@@ -1030,7 +1025,7 @@ plt.xticks(x_pos, x)
 x = ['DG023', 'DG024', 'DG025', 'DG026']
 x_pos = [i for i, _ in enumerate(x)]
 y_raw = [1.7E-06, 1.12E-06, 5.06E-06, 5.47E-06]
-y_factor= [0.846, 0.397, 1, 1.62]
+y_factor = [0.846, 0.397, 1, 1.62]
 
 plt.bar(x_pos, y_factor, color='blue')
 plt.xlabel('Strains')
@@ -1042,11 +1037,11 @@ plt.xticks(x_pos, x)
 x = ['WT ter', 'WT ctrl', 'OriX ter', 'OriX ctrl', 'OriZ ter', 'OriZ ctrl']
 x_pos = [i for i, _ in enumerate(x)]
 y_raw = [7E-07, 2.23E-06, 5.06E-06, 5.47E-06]
-y_factor= [(7E-07/7E-07), (2.23E-06/7E-07), (1.7E-06/7E-07), (1.12E-06/7E-07), (5.06E-06/7E-07), (5.47E-06/7E-07)]
+y_factor = [(7E-07/7E-07), (2.23E-06/7E-07), (1.7E-06/7E-07), (1.12E-06/7E-07), (5.06E-06/7E-07), (5.47E-06/7E-07)]
 errors = [9.09E-08*1E6, 3.00E-07*1E6, 3.66E-07*1E6, 2.61E-07*1E6, 1.07E-06*1E6, 1.10E-06*1E6]
 fig = plt.figure()
 fig.patch.set_facecolor('white')
-#fig.patch.set_alpha(0.6)
+# fig.patch.set_alpha(0.6)
 plt.bar(x_pos, y_factor, color=['royalblue', 'royalblue', 'purple', 'purple', 'darkred', 'darkred'], yerr=errors, ecolor='black', capsize=5)
 plt.xlabel('Strains')
 plt.ylabel('Factor increase in recombination')
