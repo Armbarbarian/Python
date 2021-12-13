@@ -338,7 +338,7 @@ while True:
         analysis_layout = [
             [sg.Text('Select a csv of your data:',  font=font, size=(20, 0)), sg.FileBrowse(key='csv_file2')],
             [sg.Text('Select type of analysis', font=font, size=(20, 0)), sg.Combo(
-                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates'], key='analysis_type', size=(25, 1), font=font)],
+                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates', 'Plot data'], key='analysis_type', size=(25, 1), font=font)],
             [sg.Submit('Select Analysis', font=font)],
             [sg.Text('_'*80)]
         ]
@@ -417,7 +417,6 @@ while True:
                         [sg.Text('how many cultures do you have?', key='-Cultures Text-', font=font, visible=True), sg.Combo(list(range(1, 12)), key='-Cultures Dropdown-', font=font, visible=True)],
                         [sg.Text('how many strains do you have?', key='-Strains Text-', font=font, visible=True), sg.Combo(list(range(1, 12)),
                                                                                                                            key='-Strains Dropdown-', font=font, visible=True), sg.Button('Go', key='paramButton', visible=True, disabled=False)],
-
                         [sg.Column(Strains_col1, background_color='lightgray'), sg.Column(Strains_col2, background_color='lightgray'),
                          sg.Column(Strains_col3, background_color='gray'), sg.Column(Strains_col4, background_color='gray')],
                         [sg.Submit('Calculate', font=font), sg.Exit('Close', font=font, button_color='firebrick')],
@@ -914,6 +913,27 @@ while True:
 
                             # left off here trying to append the csv to get an update mutation rate df which is just copied from the 1998 html prog.
                             # clear_input()
+
+            # View plot for any individual dataset
+            if values['analysis_type'] == 'Plot data':
+
+                plot_window_layout = [
+                    [sg.Text('This is where the plot will be')],
+                    [sg.Button('Graph it!')]
+                ]
+
+                plot_window = sg.Window('Plot data', plot_window_layout, resizable=True, finalize=True)
+                while True:
+                    event, values = plot_window.read()
+                    if event == sg.WIN_CLOSED or event == 'Exit':
+                        mutation_window.close()
+                        break
+                    if event == 'Graph it!':
+                        try:
+                            master_df = pd.read_csv(values['csv_file2'])
+                            sg.popup(master_df)
+                        except:
+                            sg.popup('FAIL')
 window.close()
 
 
