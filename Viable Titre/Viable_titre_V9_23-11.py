@@ -270,7 +270,7 @@ while True:
                     df = df.drop(columns=[col for col in df if col not in checked])
                     df.to_excel('output_'+day+'-'+month+'.xlsx')
                     df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
-                    #window.Element('-FILE-').InitialFolder = 'C:\\Users\\Danie\\Documents\\Python1\\Python\\Viable Titre'
+                    # window.Element('-FILE-').InitialFolder = 'C:\\Users\\Danie\\Documents\\Python1\\Python\\Viable Titre'
                     sg.popup('2 files created with todays date\nAlso browse to the file to make things easier...')
                 if popup2 == 'No':
                     df = pd.DataFrame()
@@ -282,7 +282,7 @@ while True:
                 sg.popup('Please select an existing Excel file to update')
                 continue
 
-            #popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
+            # popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
 
 # Viewing the data saved under Output
     if event == 'View Data':
@@ -510,7 +510,7 @@ while True:
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
-                                #sg.popup('1st check', font=font)
+                                # sg.popup('1st check', font=font)
 
                             if NumStrains >= 2:
                                 strain2_row_start = values['-2start-']
@@ -528,7 +528,7 @@ while True:
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
-                                #sg.popup('2nd check', font=font)
+                                # sg.popup('2nd check', font=font)
 
                             if NumStrains >= 3:
                                 strain3_row_start = values['-3start-']
@@ -546,7 +546,7 @@ while True:
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
-                                #sg.popup('3rd check', font=font)
+                                # sg.popup('3rd check', font=font)
 
                             if NumStrains >= 4:
                                 strain4_row_start = values['-4start-']
@@ -564,7 +564,7 @@ while True:
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
-                                #sg.popup('4th check', font=font)
+                                # sg.popup('4th check', font=font)
 
                             sg.popup(NumStrain_Df)
 
@@ -586,18 +586,18 @@ while True:
 
                         if event == 'AddButton':
                             try:
-                                #CSV_FILE = ('output_'+day+'-'+month+'.csv')
+                                # CSV_FILE = ('output_'+day+'-'+month+'.csv')
                                 CSV_DF = master_df
 
-                                #cult1_strain = NumStrain_NameList[1]
-                                #cult2_strain = NumStrain_NameList[2]
-                                #cult3_strain = NumStrain_NameList[3]
-                                #cult4_strain = NumStrain_NameList[4]
+                                # cult1_strain = NumStrain_NameList[1]
+                                # cult2_strain = NumStrain_NameList[2]
+                                # cult3_strain = NumStrain_NameList[3]
+                                # cult4_strain = NumStrain_NameList[4]
                             except:
                                 sg.popup('check 1')
 
                             try:
-                                #joined_cult = cult1_strain + cult2_strain + cult3_strain + cult4_strain
+                                # joined_cult = cult1_strain + cult2_strain + cult3_strain + cult4_strain
                                 sg.popup(NumStrain_NameList)
                                 indexes = []
                         # Retreiving the cultures that are the median values
@@ -643,7 +643,7 @@ while True:
 
                         median_heading = ['Culture', 'Titre']
                     except:
-                        #sg.popup('Other file selected', font=font)
+                        # sg.popup('Other file selected', font=font)
                         headings3 = list(master_df.columns)
                         data_input3 = master_df.values.tolist()
                         data_strain = master_df.Strain.tolist()
@@ -726,10 +726,10 @@ while True:
                                 Ab_total_cells1 = Ab_titre*5
 
                         # Calculations for mutation rates, all slightly different
-                                #Fraction = Ab_titre.item() / LB_titre.item()
+                                # Fraction = Ab_titre.item() / LB_titre.item()
                                 Mrates_classic = Ab_total_cells1.item() / LB_total_cells1.item()
                                 # print(Mrates_classic)
-                                #m = np.log(Mrates)
+                                # m = np.log(Mrates)
 
                                 if values['-Mrate_method-'] == 'Method 1 (Drake): \u03BC = m / Nt':
                                     Mrates = Ab_total_cells1.item() / LB_total_cells1.item()
@@ -918,8 +918,22 @@ while True:
             if values['analysis_type'] == 'Plot data':
 
                 plot_window_layout = [
-                    [sg.Text('This is where the plot will be')],
-                    [sg.Button('Graph it!')]
+                    [sg.Text('Browse the file to create the plot', font=font)],
+                    [sg.FileBrowse(key='csv_file2')],
+                    [sg.Button('Load it!', font=font)],
+                    [sg.Text('Specify The Parameters of The Plot', font=font)],
+                    [sg.Text('Select Strain 1: ', font=font),
+                        sg.Combo(values=[], key='-strain1-', size=(20, 1), font=font)],
+                    [sg.Text('Select Strain 2: ', font=font),
+                        sg.Combo(values=[], key='-strain2-', size=(20, 1), font=font)],
+                    [sg.Text('Select X Values: ', font=font),
+                        sg.Combo(values=[], key='-dropdown_x-', size=(20, 1), font=font)],
+                    [sg.Text('Select Y Values: ', font=font),
+                        sg.Combo(values=[], key='-dropdown_y-', size=(20, 1), font=font)],
+                    [sg.Text('Select Plot type: ', font=font),
+                        sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', size=(20, 1), font=font)],
+                    [sg.Button('Graph it!', font=font, button_color='green')]
+
                 ]
 
                 plot_window = sg.Window('Plot data', plot_window_layout, resizable=True, finalize=True)
@@ -927,13 +941,35 @@ while True:
                     event, values = plot_window.read()
                     if event == sg.WIN_CLOSED or event == 'Exit':
                         mutation_window.close()
-                        break
-                    if event == 'Graph it!':
+                        continue
+                    if event == 'Load it!':
                         try:
                             master_df = pd.read_csv(values['csv_file2'])
-                            sg.popup(master_df)
+                            new_list = list(master_df.columns)
+                            tempt_list = new_list
+                            Strain_list = list(master_df['Strain'])
+                            plot_window['-strain1-'].Update(values=Strain_list)
+                            plot_window['-strain2-'].Update(values=Strain_list)
+                            plot_window['-dropdown_x-'].Update(values=new_list)
+                            plot_window['-dropdown_y-'].Update(values=new_list)
                         except:
                             sg.popup('FAIL')
+
+                    # Make and show the graph
+                    if event == 'Graph it!':
+                        def graph_real():
+                            x = master_df[[values['-dropdown_x-']]]
+                            y = master_df[[values['-dropdown_y-']]]
+                            plt.plot(x, y, marker='o')
+                            plt.title('Title')
+                            plt.xlabel('X', fontsize=14)
+                            plt.ylabel('Y', fontsize=14)
+                            plt.grid(True)
+                            plt.legend(fontsize=14)
+                            # plt.savefig('2021_enzymes_graph1.png')
+                            plt.show()
+
+                        graph_real()
 window.close()
 
 
