@@ -5,9 +5,10 @@ from datetime import datetime
 import PySimpleGUI as sg
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib
+
 # %matplotlib inline
 from PIL import Image
 matplotlib.use('TkAgg')
@@ -292,28 +293,7 @@ while True:
             if popup1 == 'No':
                 continue
 
-            # popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
-            '''
-            popup1 = sg.popup_yes_no('Do you want to create a new Excel file?', font=font)
-            if popup1 == 'Yes':
-                popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
-                if popup2 == 'Yes':
-                    df = pd.DataFrame()
-                    df = df.append(values, ignore_index=True)
-                    df = df.drop(columns=[col for col in df if col not in checked])
-                    df.to_excel('output_'+day+'-'+month+'.xlsx')
-                    df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
-                    # window.Element('-FILE-').InitialFolder = 'C:\\Users\\Danie\\Documents\\Python1\\Python\\Viable Titre'
-                    sg.popup('2 files created with todays date\nAlso browse to the file to make things easier...')
-                if popup2 == 'No':
-                    df = pd.DataFrame()
-                    df = df.append(values, ignore_index=True)
-                    df = df.drop(columns=[col for col in df if col not in checked])
-                    df.to_excel('output_'+day+'-'+month+'.xlsx')
-                    sg.popup('File created, set to todays date')
-            if popup1 == 'No':
-                sg.popup('Please select an existing Excel file to update')
-                '''
+
 # Viewing the data saved under Output
     if event == 'View Data':
         auto_manual_selection = sg.popup_yes_no('Do you want to manually select the file?', font=font)
@@ -368,8 +348,8 @@ while True:
         analysis_layout = [
             [sg.Text('Select a csv of your data:',  font=font, size=(20, 0)), sg.FileBrowse(key='csv_file2')],
             [sg.Text('Select type of analysis', font=font, size=(20, 0)), sg.Combo(
-                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates', 'Plot data'], key='analysis_type', size=(25, 1), font=font)],
-            [sg.Submit('Select Analysis', font=font)],
+                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates'], key='analysis_type', size=(25, 1), font=font)],
+            [sg.Submit('Select Analysis', font=font), sg.Text(' or ', font=font), sg.Submit('Plot Data', font=font)],
             [sg.Text('_'*80)]
         ]
         window_analysis_question = sg.Window('Analysis', analysis_layout, resizable=True, finalize=True)
@@ -665,15 +645,13 @@ while True:
                     window_analysis_question.close()
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
-                        # master_df
                         headings2 = list(master_df.columns)
                         data_input2 = master_df.values.tolist()
                         data_strain = master_df.Strain.tolist()
                         data_titre = master_df.Titre.tolist()
-
                         median_heading = ['Culture', 'Titre']
                     except:
-                        # sg.popup('Other file selected', font=font)
+                        sg.popup('Other file selected', font=font)
                         headings3 = list(master_df.columns)
                         data_input3 = master_df.values.tolist()
                         data_strain = master_df.Strain.tolist()
@@ -945,41 +923,44 @@ while True:
                             # clear_input()
 
             # View plot for any individual dataset
-            if values['analysis_type'] == 'Plot data':
-
+            if event == 'Plot Data':
                 plot_window_layout = [
                     [sg.Text('Browse the file to create the plot', font=font)],
                     [sg.FileBrowse(key='csv_file2')],
                     [sg.Button('Load it!', font=font)],
                     [sg.Text('Specify The Parameters of The Plot', font=font)],
-                    [sg.Text('Select Strain 1: ', font=font),
-                        sg.Combo(values=[], key='-strain1-', size=(20, 1), font=font)],
-                    [sg.Text('Select Strain 2: ', font=font),
-                        sg.Combo(values=[], key='-strain2-', size=(20, 1), font=font)],
                     [sg.Text('Select X Values: ', font=font),
                         sg.Combo(values=[], key='-dropdown_x-', size=(20, 1), font=font)],
                     [sg.Text('Select Y Values: ', font=font),
                         sg.Combo(values=[], key='-dropdown_y-', size=(20, 1), font=font)],
+                    [sg.Text('Title: ', font=font), sg.InputText(key='-input_title-')],
                     [sg.Text('Select Plot type: ', font=font),
-                        sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', size=(20, 1), font=font)],
-                    [sg.Button('Graph it!', font=font, button_color='green')]
+                        sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', font=font)],
+                    [sg.Button('Graph it!', font=font, button_color='green'),
+                        sg.Button('Exit', font=font, button_color='firebrick')]
 
                 ]
 
                 plot_window = sg.Window('Plot data', plot_window_layout, resizable=True, finalize=True)
                 while True:
                     event, values = plot_window.read()
-                    if event == sg.WIN_CLOSED or event == 'Exit':
-                        mutation_window.close()
-                        continue
+                    if event == sg.WIN_CLOSED or event == 'Exit':#
+                        plot_window.close()
+                        break
                     if event == 'Load it!':
                         try:
+                            '''
+                            # for plotting - can't get working
+                            with open(values['csv_file2']) as master_df:
+                                master_reader = csv.DictReader(master_df)
+                            row = next(master_reader)
+                            '''
                             master_df = pd.read_csv(values['csv_file2'])
                             new_list = list(master_df.columns)
                             tempt_list = new_list
                             Strain_list = list(master_df['Strain'])
-                            plot_window['-strain1-'].Update(values=Strain_list)
-                            plot_window['-strain2-'].Update(values=Strain_list)
+                            #plot_window['-strain1-'].Update(values=Strain_list)
+                            #plot_window['-strain2-'].Update(values=Strain_list)
                             plot_window['-dropdown_x-'].Update(values=new_list)
                             plot_window['-dropdown_y-'].Update(values=new_list)
                         except:
@@ -987,19 +968,62 @@ while True:
 
                     # Make and show the graph
                     if event == 'Graph it!':
-                        def graph_real():
-                            x = master_df[[values['-dropdown_x-']]]
-                            y = master_df[[values['-dropdown_y-']]]
-                            plt.plot(x, y, marker='o')
-                            plt.title('Title')
-                            plt.xlabel('X', fontsize=14)
-                            plt.ylabel('Y', fontsize=14)
-                            plt.grid(True)
-                            plt.legend(fontsize=14)
-                            # plt.savefig('2021_enzymes_graph1.png')
-                            plt.show()
 
-                        graph_real()
+                        if values['-dropdown_plot-'] == 'Bar':
+                            try: # The better way to generate and customise the plot using pyplot
+                                def graph_main():
+                                    fig = plt.figure()
+                                    colors = ['royalblue', 'darkorchid', 'firebrick', 'green', 'red', 'blue']
+                                    x = master_df[str(values['-dropdown_x-'])].tolist()
+                                    y = master_df[str(values['-dropdown_y-'])].tolist()
+                                    errors = master_df['Sigma_n'].tolist()
+
+                                    plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
+                                    plt.title(values['-input_title-'])
+                                    plt.xlabel(values['-dropdown_x-'], fontsize=14)
+                                    plt.ylabel(values['-dropdown_y-'], fontsize=14)
+                                    plt.grid(True)
+                                    plt.legend(fontsize=14)
+                                    plt.show()
+                                graph_main()
+
+                            except: # the basic way using inbuilt pandas method if the above doesn't work.
+                                sg.popup('Except Loop started')
+                                def graph_alt():
+                                    master_df.plot.bar(x=values['-dropdown_x-'], y=values['-dropdown_y-'], color='royalblue')
+                                    plt.title('Title')
+                                    plt.xlabel(values['-dropdown_x-'], fontsize=12)
+                                    plt.ylabel(values['-dropdown_y-'], fontsize=12)
+                                    #plt.grid(True)
+                                    #plt.legend(fontsize=14)
+                                    plt.show()
+                                graph_alt()
+
+
+                        if values['-dropdown_plot-'] == 'Line':
+                            try:
+                                def graph_real():
+                                    x = master_df[[values['-dropdown_x-']]]
+                                    y = master_df[[values['-dropdown_y-']]]
+                                    plt.plot(x, y, marker='o')
+                                    plt.title('Title')
+                                    plt.xlabel(values['-dropdown_x-'], fontsize=14)
+                                    plt.ylabel(values['-dropdown_y-'], fontsize=14)
+                                    plt.grid(True)
+                                    plt.legend(fontsize=14)
+                                    # plt.savefig('2021_enzymes_graph1.png')
+                                    plt.show()
+                                graph_real()
+                            except:
+                                sg.popup('FAIL')
+                                continue
+
+
+
+                        if values['-dropdown_plot-'] == 'Scatter':
+                            sg.popup('Under construction.. choose another plot')
+
+
 window.close()
 
 
@@ -1008,14 +1032,21 @@ window.close()
 #                                         TEST SPACE
 #
 ##########################################################################################
+import numpy as np
+import pandas as pd
+import csv
+import matplotlib.pyplot as plt
 
-# trying to get a plotter page in the app to show possible VT comparison, this is not essential as can be done in R easily.
-''' # plotting the data - work this out later
-plt.scatter(data_temp1.names, data_temp1.titre, color='RoyalBlue')
-plt.xlabel('Culture')
-plt.ylabel('Cells/mL')
-plt.title('SLM1043 Cultures')
-plt.xticks(rotation=75)'''
+dict = {'Strain':[1,2,3], 'total':[20, 30, 40], 'mutants':[3, 4, 5]}
+csv = pd.read_csv('mutationrate19-12.csv')
+df = pd.DataFrame(dict)
+x = csv['Strain'].tolist()
+x
+y = csv['m_n'].tolist()
+y
+plt.bar(x, y)
+#plt.show()
+
 
 # manual calculations
 iter = 1e-8
@@ -1136,5 +1167,5 @@ plt.xticks(x_pos, x)
 plt.grid(b=None)
 
 
-plt.savefig('Recombination_rates_Ecoli_1.png')
-plt.savefig('Recombination_rates_Ecoli_1.pdf')
+#plt.savefig('Recombination_rates_Ecoli_1.png')
+#plt.savefig('Recombination_rates_Ecoli_1.pdf')
