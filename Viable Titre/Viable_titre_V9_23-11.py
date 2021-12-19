@@ -109,7 +109,7 @@ layout1 = [
         sg.InputText('', key='Titre', size=(15, 1), font=font, disabled=False), sg.Checkbox('', default=1, key='9_check', change_submits=True, enable_events=True)],
     [sg.Text('_'*65)],
     [sg.Text("Choose an existing spreadsheet to update: ", font=font), sg.FileBrowse(key='-FILE-')],
-    [sg.Submit('Update Spreadsheet', font=font)],
+    [sg.Submit('Create New Spreadsheet', font=font), sg.Submit('Update Spreadsheet', font=font)],
     [sg.Text('_'*65)],
     [sg.Text('Other Tools:', font=font)],
     [sg.Button('View Data', font=font, button_color='darkcyan'), sg.Button('Analyse Data', font=font, button_color='darkcyan'),
@@ -247,6 +247,24 @@ while True:
             sg.popup('Not enough data provided')
 
 # saving xlsx and csv file with cleaned data
+    if event == 'Create New Spreadsheet':
+        popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
+        try:
+            if popup2 == 'Yes':
+                df = pd.DataFrame()
+                df = df.append(values, ignore_index=True)
+                df = df.drop(columns=[col for col in df if col not in checked])
+                df.to_excel('output_'+day+'-'+month+'.xlsx')
+                df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
+                sg.popup('XLSX and CSV Files created, set to todays date')
+        except:
+            df = pd.DataFrame()
+            df = df.append(values, ignore_index=True)
+            df = df.drop(columns=[col for col in df if col not in checked])
+            df.to_excel('output_'+day+'-'+month+'.xlsx')
+            sg.popup('XLSX File created, set to todays date')
+
+
     if event == 'Update Spreadsheet':
         try:
             EXCEL_FILE = values['-FILE-']
@@ -256,11 +274,26 @@ while True:
             # This drops the names of the check boxes if NOT in checked list
             df = df.drop(columns=[col for col in df if col not in checked])
             df.to_excel(EXCEL_FILE, index=False)
-            popup1 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
+            df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
+            sg.popup('Data Saved!')
+
+        except:
+            EXCEL_FILE = 'output_'+day+'-'+month+'.csv'
+            df = pd.read_csv(EXCEL_FILE)
+            # keep only columns that have been appended to checked list
+            df = df.append(values, ignore_index=True)
+            # This drops the names of the check boxes if NOT in checked list
+            df = df.drop(columns=[col for col in df if col not in checked])
+            df.to_csv(EXCEL_FILE, index=False)
+            popup1 = sg.popup_yes_no('Appended CSV?', font=font)
             if popup1 == 'Yes':
                 df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
-                sg.popup('Data Saved!')
-        except:
+                sg.popup('CSV appended')
+            if popup1 == 'No':
+                continue
+
+            # popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
+            '''
             popup1 = sg.popup_yes_no('Do you want to create a new Excel file?', font=font)
             if popup1 == 'Yes':
                 popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
@@ -280,10 +313,7 @@ while True:
                     sg.popup('File created, set to todays date')
             if popup1 == 'No':
                 sg.popup('Please select an existing Excel file to update')
-                continue
-
-            # popup2 = sg.popup_yes_no('Do you want to save a separate csv file?', font=font)
-
+                '''
 # Viewing the data saved under Output
     if event == 'View Data':
         auto_manual_selection = sg.popup_yes_no('Do you want to manually select the file?', font=font)

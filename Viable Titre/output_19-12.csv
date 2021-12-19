@@ -1,0 +1,4 @@
+Strain,Condition,Time,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre
+XX,Cm,90,0.01,0.1,1e-05,456,54,356,6543,3704129.587041296
+YY,Cm,90,0.01,0.1,1e-05,6543,54,356,6543,6747325.2674732525
+FF,Cm,60,0.01,10e-4,10e-3,456,654,456,654,10090909.090909092
