@@ -1,4 +1,5 @@
 # MySimplegui Viable Titre
+import csv
 import io
 import os
 from datetime import datetime
@@ -264,7 +265,6 @@ while True:
             df = df.drop(columns=[col for col in df if col not in checked])
             df.to_excel('output_'+day+'-'+month+'.xlsx')
             sg.popup('XLSX File created, set to todays date')
-
 
     if event == 'Update Spreadsheet':
         try:
@@ -571,6 +571,40 @@ while True:
                                     median_culture4 = data_temp4.loc[data_temp4['titre'] == nearest_median4]
                                     NumStrain_NameList.append(median_culture4.iloc[0, 0])
                                     NumStrain_Df = NumStrain_Df.append(median_culture4)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+
+                            if NumStrains >= 5:
+                                strain5_row_start = values['-5start-']
+                                strain5_row_stop = values['-5stop-']
+                                try:
+                                    temp_names5 = list(master_df.Strain[strain5_row_start:strain5_row_stop])
+                                    temp_titre5 = list(master_df.Titre[strain5_row_start:strain5_row_stop])
+                                    temp_df5 = pd.DataFrame({'names': temp_names5, 'titre': temp_titre5})
+                                    data_temp5 = temp_df5.sort_values(by='titre')
+                                    median5 = data_temp5['titre'].median()
+                                    nearest_median5 = find_nearest(data_temp5['titre'], median5)
+                                    median_culture5 = data_temp5.loc[data_temp5['titre'] == nearest_median5]
+                                    NumStrain_NameList.append(median_culture5.iloc[0, 0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture5)
+                                except:
+                                    sg.popup('Error: Select rows from top to bottom only.', font=font)
+                                    continue
+
+                            if NumStrains >= 6:
+                                strain6_row_start = values['-6start-']
+                                strain6_row_stop = values['-6stop-']
+                                try:
+                                    temp_names6 = list(master_df.Strain[strain6_row_start:strain6_row_stop])
+                                    temp_titre6 = list(master_df.Titre[strain6_row_start:strain6_row_stop])
+                                    temp_df6 = pd.DataFrame({'names': temp_names6, 'titre': temp_titre6})
+                                    data_temp6 = temp_df6.sort_values(by='titre')
+                                    median6 = data_temp6['titre'].median()
+                                    nearest_median6 = find_nearest(data_temp6['titre'], median6)
+                                    median_culture6 = data_temp6.loc[data_temp6['titre'] == nearest_median6]
+                                    NumStrain_NameList.append(median_culture6.iloc[0, 0])
+                                    NumStrain_Df = NumStrain_Df.append(median_culture6)
                                 except:
                                     sg.popup('Error: Select rows from top to bottom only.', font=font)
                                     continue
@@ -944,7 +978,7 @@ while True:
                 plot_window = sg.Window('Plot data', plot_window_layout, resizable=True, finalize=True)
                 while True:
                     event, values = plot_window.read()
-                    if event == sg.WIN_CLOSED or event == 'Exit':#
+                    if event == sg.WIN_CLOSED or event == 'Exit':
                         plot_window.close()
                         break
                     if event == 'Load it!':
@@ -959,8 +993,8 @@ while True:
                             new_list = list(master_df.columns)
                             tempt_list = new_list
                             Strain_list = list(master_df['Strain'])
-                            #plot_window['-strain1-'].Update(values=Strain_list)
-                            #plot_window['-strain2-'].Update(values=Strain_list)
+                            # plot_window['-strain1-'].Update(values=Strain_list)
+                            # plot_window['-strain2-'].Update(values=Strain_list)
                             plot_window['-dropdown_x-'].Update(values=new_list)
                             plot_window['-dropdown_y-'].Update(values=new_list)
                         except:
@@ -970,7 +1004,7 @@ while True:
                     if event == 'Graph it!':
 
                         if values['-dropdown_plot-'] == 'Bar':
-                            try: # The better way to generate and customise the plot using pyplot
+                            try:  # The better way to generate and customise the plot using pyplot
                                 def graph_main():
                                     fig = plt.figure()
                                     colors = ['royalblue', 'darkorchid', 'firebrick', 'green', 'red', 'blue']
@@ -987,18 +1021,18 @@ while True:
                                     plt.show()
                                 graph_main()
 
-                            except: # the basic way using inbuilt pandas method if the above doesn't work.
+                            except:  # the basic way using inbuilt pandas method if the above doesn't work.
                                 sg.popup('Except Loop started')
+
                                 def graph_alt():
                                     master_df.plot.bar(x=values['-dropdown_x-'], y=values['-dropdown_y-'], color='royalblue')
                                     plt.title('Title')
                                     plt.xlabel(values['-dropdown_x-'], fontsize=12)
                                     plt.ylabel(values['-dropdown_y-'], fontsize=12)
-                                    #plt.grid(True)
-                                    #plt.legend(fontsize=14)
+                                    # plt.grid(True)
+                                    # plt.legend(fontsize=14)
                                     plt.show()
                                 graph_alt()
-
 
                         if values['-dropdown_plot-'] == 'Line':
                             try:
@@ -1018,8 +1052,6 @@ while True:
                                 sg.popup('FAIL')
                                 continue
 
-
-
                         if values['-dropdown_plot-'] == 'Scatter':
                             sg.popup('Under construction.. choose another plot')
 
@@ -1032,12 +1064,8 @@ window.close()
 #                                         TEST SPACE
 #
 ##########################################################################################
-import numpy as np
-import pandas as pd
-import csv
-import matplotlib.pyplot as plt
 
-dict = {'Strain':[1,2,3], 'total':[20, 30, 40], 'mutants':[3, 4, 5]}
+dict = {'Strain': [1, 2, 3], 'total': [20, 30, 40], 'mutants': [3, 4, 5]}
 csv = pd.read_csv('mutationrate19-12.csv')
 df = pd.DataFrame(dict)
 x = csv['Strain'].tolist()
@@ -1045,7 +1073,7 @@ x
 y = csv['m_n'].tolist()
 y
 plt.bar(x, y)
-#plt.show()
+# plt.show()
 
 
 # manual calculations
@@ -1167,5 +1195,5 @@ plt.xticks(x_pos, x)
 plt.grid(b=None)
 
 
-#plt.savefig('Recombination_rates_Ecoli_1.png')
-#plt.savefig('Recombination_rates_Ecoli_1.pdf')
+# plt.savefig('Recombination_rates_Ecoli_1.png')
+# plt.savefig('Recombination_rates_Ecoli_1.pdf')
