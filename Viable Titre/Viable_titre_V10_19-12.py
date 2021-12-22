@@ -684,11 +684,27 @@ while True:
                         data_strain = master_df.Strain.tolist()
                         data_titre = master_df.Titre.tolist()
                         median_heading = ['Culture', 'Titre']
+
+                        # selecting the antibiotic drop down
+                        antibiotics_list = []
+                        data_antibiotics = master_df.Condition
+                        for con in data_antibiotics:
+                            if con not in antibiotics_list:
+                                antibiotics_list.append(con)
+
+
+                        # selecting only the median strains for the dropdown later for '-Median_culture1-'
+                        medians_list = []
+                        data_medians = master_df.loc[master_df['Median'] == True].Strain
+                        for strain in data_medians:
+                            if strain not in medians_list:
+                                medians_list.append(strain)
+
                     except:
                         sg.popup('Median Spreadsheet must be used...', font=font)
-                        headings3 = list(master_df.columns)
-                        data_input3 = master_df.values.tolist()
-                        data_strain = master_df.Strain.tolist()
+                        #headings3 = list(master_df.columns)
+                        #data_input3 = master_df.values.tolist()
+                        #data_strain = master_df.Strain.tolist()
                         # continue
                     mutation_layout_text = [
                         [sg.Text('Specify your parameters below:', font=font, key='-parameters_text-', visible=True)],
@@ -713,8 +729,8 @@ while True:
 
                     mutation_layout_input = [
                         [sg.Text(' '*20)],
-                        [sg.Combo(data_strain, key='-Median_culture1-', size=(10, 1), font=font, visible=True)],
-                        [sg.InputText(key='-Ab-', size=(10, 1), font=font, visible=True)],
+                        [sg.Combo(medians_list, key='-Median_culture1-', size=(10, 1), font=font, visible=True)],
+                        [sg.Combo(antibiotics_list, key='-Ab-', size=(10, 1), font=font, visible=True)],
                         [sg.Combo(['0.1', '0.01'], key='-Vol-', size=(10, 1), font=font, visible=True)],
                         [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
                                   'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True, visible=True)],
@@ -835,6 +851,7 @@ while True:
                             except:
                                 sg.popup('No such strain found')
 
+                        mutation_file = [] # set blank then update on next run through.
                         if event == 'Save Mutation Data':
                             popup2 = sg.popup_yes_no('Do you want to append an existing file?')
                             mutation_dict = {'Strain': [values['-Median_culture1-']],
@@ -851,24 +868,32 @@ while True:
                                 try:
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
                                     mutation_dataframe.to_csv(('mutationrate'+day+'-'+month+'.csv'), index=False)
+                                    sg.popup('New file saved!')
                                 except:
-                                    sg.popup('You died...')
+                                    sg.popup('Something went wrong.')
                             if popup2 == 'Yes':
-                                browse_file_layout = [
-                                    [sg.Text('Select your csv file:'), sg.FileBrowse(key='csv_file')],
-                                    [sg.Submit(key='csv_submit')]
-                                ]
-                                browse_csv_window = sg.Window('Find the csv file to display', browse_file_layout)
-                                event, values = browse_csv_window.read()
-                                if event == 'csv_submit':
-                                    CSV_FILE_input = values['csv_file']
-                                    df1 = pd.read_csv(CSV_FILE_input)
+                                try:
+                                    df1 = pd.read_csv(mutation_file)
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
                                     df1 = df1.append(mutation_dataframe, ignore_index=True)
-                                    df1.to_csv((CSV_FILE_input), index=False)
+                                    df1.to_csv((mutation_file), index=False)
                                     sg.popup('Data saved!')
-                                    browse_csv_window.close()
-                                    continue
+                                except:
+                                    browse_file_layout = [
+                                        [sg.Text('Select your csv file:'), sg.FileBrowse(key='mutation_file')],
+                                        [sg.Submit(key='csv_submit')]
+                                    ]
+                                    browse_csv_window = sg.Window('Find the csv file to display', browse_file_layout)
+                                    event, values = browse_csv_window.read()
+                                    if event == 'csv_submit':
+                                        mutation_file = values['mutation_file']
+                                        df1 = pd.read_csv(mutation_file)
+                                        mutation_dataframe = pd.DataFrame(mutation_dict)
+                                        df1 = df1.append(mutation_dataframe, ignore_index=True)
+                                        df1.to_csv((mutation_file), index=False)
+                                        sg.popup('Data saved!')
+                                        browse_csv_window.close()
+                                        continue
                         if event == 'View Terms':
                             try:
                                 wd = os.getcwd()
@@ -1007,7 +1032,7 @@ while True:
                             try:  # The better way to generate and customise the plot using pyplot
                                 def graph_main():
                                     fig = plt.figure()
-                                    colors = ['royalblue', 'darkorchid', 'firebrick', 'green', 'red', 'blue']
+                                    colors = ['royalblue', 'darkorchid', 'firebrick', 'darkgreen', 'darkred', 'navy']
                                     x = master_df[str(values['-dropdown_x-'])].tolist()
                                     y = master_df[str(values['-dropdown_y-'])].tolist()
                                     errors = master_df['Sigma_n'].tolist()
