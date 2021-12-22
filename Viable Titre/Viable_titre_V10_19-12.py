@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # %matplotlib inline
@@ -269,15 +270,13 @@ while True:
     if event == 'Update Spreadsheet':
         try:
             EXCEL_FILE = values['-FILE-']
-            df = pd.read_excel(EXCEL_FILE)
+            df = pd.read_csv(EXCEL_FILE)
             # keep only columns that have been appended to checked list
             df = df.append(values, ignore_index=True)
             # This drops the names of the check boxes if NOT in checked list
             df = df.drop(columns=[col for col in df if col not in checked])
-            df.to_excel(EXCEL_FILE, index=False)
             df.to_csv(('output_'+day+'-'+month+'.csv'), index=False)
             sg.popup('Data Saved!')
-
         except:
             EXCEL_FILE = 'output_'+day+'-'+month+'.csv'
             df = pd.read_csv(EXCEL_FILE)
@@ -692,7 +691,6 @@ while True:
                             if con not in antibiotics_list:
                                 antibiotics_list.append(con)
 
-
                         # selecting only the median strains for the dropdown later for '-Median_culture1-'
                         medians_list = []
                         data_medians = master_df.loc[master_df['Median'] == True].Strain
@@ -702,9 +700,9 @@ while True:
 
                     except:
                         sg.popup('Median Spreadsheet must be used...', font=font)
-                        #headings3 = list(master_df.columns)
-                        #data_input3 = master_df.values.tolist()
-                        #data_strain = master_df.Strain.tolist()
+                        # headings3 = list(master_df.columns)
+                        # data_input3 = master_df.values.tolist()
+                        # data_strain = master_df.Strain.tolist()
                         # continue
                     mutation_layout_text = [
                         [sg.Text('Specify your parameters below:', font=font, key='-parameters_text-', visible=True)],
@@ -851,7 +849,7 @@ while True:
                             except:
                                 sg.popup('No such strain found')
 
-                        mutation_file = [] # set blank then update on next run through.
+                        mutation_file = []  # set blank then update on next run through.
                         if event == 'Save Mutation Data':
                             popup2 = sg.popup_yes_no('Do you want to append an existing file?')
                             mutation_dict = {'Strain': [values['-Median_culture1-']],
@@ -988,11 +986,23 @@ while True:
                     [sg.FileBrowse(key='csv_file2')],
                     [sg.Button('Load it!', font=font)],
                     [sg.Text('Specify The Parameters of The Plot', font=font)],
+                    [sg.Text('Title: ', font=font), sg.InputText(key='-input_title-')],
                     [sg.Text('Select X Values: ', font=font),
                         sg.Combo(values=[], key='-dropdown_x-', size=(20, 1), font=font)],
                     [sg.Text('Select Y Values: ', font=font),
                         sg.Combo(values=[], key='-dropdown_y-', size=(20, 1), font=font)],
-                    [sg.Text('Title: ', font=font), sg.InputText(key='-input_title-')],
+                    [sg.Text('X Label: ', font=font),
+                        sg.InputText(key='-Xlab-', size=(20, 1), font=font)],
+                    [sg.Text('Y Label: ', font=font),
+                        sg.InputText(key='-Ylab-', size=(20, 1), font=font)],
+                    [sg.Text('label rotation: '),
+                        sg.Combo(values=list(range(0, 91, 5)), key='-rotation-', font=font)],
+                    [sg.Text('Width: '),
+                        sg.Combo(list(range(0, 30)), key='-fig_w-', font=font),
+                        sg.Text('Height: '),
+                        sg.Combo(list(range(0, 30)), key='-fig_h-', font=font)],
+                    [sg.Text('Custom X labels: '),
+                        sg.InputText(key='-xticks-', font=font)],
                     [sg.Text('Select Plot type: ', font=font),
                         sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', font=font)],
                     [sg.Button('Graph it!', font=font, button_color='green'),
@@ -1039,11 +1049,39 @@ while True:
 
                                     plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
                                     plt.title(values['-input_title-'])
-                                    plt.xlabel(values['-dropdown_x-'], fontsize=14)
-                                    plt.ylabel(values['-dropdown_y-'], fontsize=14)
+                                    # X label
+                                    if not values['-Xlab-']:
+                                        plt.xlabel(values['-dropdown_x-'], fontsize=14)
+                                    else:
+                                        plt.xlabel(values['-Xlab-'], fontsize=14)
+                                    # Y label
+                                    if not values['-Ylab-']:
+                                        plt.ylabel(values['-dropdown_y-'], fontsize=14)
+                                    else:
+                                        plt.ylabel(values['-Ylab-'], fontsize=14)
+                                    # X rotation
+                                    if not values['-rotation-']:
+                                        plt.xticks(rotation=0, ha='center')
+                                    else:
+                                        plt.xticks(rotation=values['-rotation-'], ha='right')
+
                                     plt.grid(True)
                                     plt.legend(fontsize=14)
-                                    plt.show()
+                                    fig = plt.gcf()
+                                    try:
+                                        if values['-fig_w-'] > 0:
+                                            fig.set_size_inches(values['-fig_w-'], values['-fig_h-'])
+                                    except:
+                                        fig.set_size_inches(5, 5)
+                                    # Custom Xticks
+                                    if not values['-xticks-']:
+                                        pass
+                                    else:
+                                        x_list = values['-xticks-'].split(', ')
+                                        # sg.popup(x_list)
+                                        plt.xticks(range(len(Strain_list)), x_list)
+                                    fig.tight_layout()  # autosizes the plot Really handy
+                                    fig.show()
                                 graph_main()
 
                             except:  # the basic way using inbuilt pandas method if the above doesn't work.
