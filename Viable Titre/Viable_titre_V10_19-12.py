@@ -685,7 +685,7 @@ while True:
                         data_titre = master_df.Titre.tolist()
                         median_heading = ['Culture', 'Titre']
                     except:
-                        sg.popup('Other file selected', font=font)
+                        sg.popup('Median Spreadsheet must be used...', font=font)
                         headings3 = list(master_df.columns)
                         data_input3 = master_df.values.tolist()
                         data_strain = master_df.Strain.tolist()
@@ -1065,7 +1065,9 @@ window.close()
 #
 ##########################################################################################
 
-dict = {'Strain': [1, 2, 3], 'total': [20, 30, 40], 'mutants': [3, 4, 5]}
+dict = {'Strain': [1, 2, 3], 'total': [20, 30, 40], 'median': [True, False, False]}
+df = pd.DataFrame(dict)
+df
 csv = pd.read_csv('mutationrate19-12.csv')
 df = pd.DataFrame(dict)
 x = csv['Strain'].tolist()
