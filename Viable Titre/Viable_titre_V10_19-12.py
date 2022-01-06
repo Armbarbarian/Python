@@ -986,6 +986,8 @@ while True:
                     [sg.FileBrowse(key='csv_file2')],
                     [sg.Button('Load it!', font=font)],
                     [sg.Text('Specify The Parameters of The Plot', font=font)],
+                    [sg.Text('Select Plot type: ', font=font),
+                        sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', font=font)],
                     [sg.Text('Title: ', font=font), sg.InputText(key='-input_title-')],
                     [sg.Text('Select X Values: ', font=font),
                         sg.Combo(values=[], key='-dropdown_x-', size=(20, 1), font=font)],
@@ -1003,8 +1005,8 @@ while True:
                         sg.Combo(list(range(0, 30)), key='-fig_h-', font=font)],
                     [sg.Text('Custom X labels: '),
                         sg.InputText(key='-xticks-', font=font)],
-                    [sg.Text('Select Plot type: ', font=font),
-                        sg.Combo(values=['Line', 'Bar', 'Scatter'],  key='-dropdown_plot-', font=font)],
+                    [sg.Text('Custom bar colours: '),
+                        sg.InputText(key='-colours-', font=font)],
                     [sg.Button('Graph it!', font=font, button_color='green'),
                         sg.Button('Exit', font=font, button_color='firebrick')]
 
@@ -1047,7 +1049,7 @@ while True:
                                     y = master_df[str(values['-dropdown_y-'])].tolist()
                                     errors = master_df['Sigma_n'].tolist()
 
-                                    plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
+                                    #plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
                                     plt.title(values['-input_title-'])
                                     # X label
                                     if not values['-Xlab-']:
@@ -1073,13 +1075,21 @@ while True:
                                             fig.set_size_inches(values['-fig_w-'], values['-fig_h-'])
                                     except:
                                         fig.set_size_inches(5, 5)
+
                                     # Custom Xticks
                                     if not values['-xticks-']:
                                         pass
                                     else:
                                         x_list = values['-xticks-'].split(', ')
-                                        # sg.popup(x_list)
                                         plt.xticks(range(len(Strain_list)), x_list)
+
+                                    # Custom bar colours
+                                    if not values['-colours-']:
+                                        plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
+                                    else:
+                                        colors_input = values['-colours-'].split(', ')
+                                        plt.bar(x, y, color=colors_input, yerr=errors, ecolor='black', capsize=5)
+
                                     fig.tight_layout()  # autosizes the plot Really handy
                                     fig.show()
                                 graph_main()
