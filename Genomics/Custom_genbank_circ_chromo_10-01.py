@@ -2,18 +2,18 @@
 # this script will position ter sites on a circular chromosome track
 # the ter sites will be found and their position plotted
 
+import pandas as pd
+from tkinter.filedialog import askopenfilename
+from Bio.SeqFeature import SeqFeature, FeatureLocation
+from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq
+from Bio import SeqIO
 import os
 os.getcwd()
 file = askopenfilename()
 dir_path = os.path.dirname(os.path.realpath(file))
 os.chdir(dir_path)
 # libraries
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.SeqFeature import SeqFeature, FeatureLocation
-from tkinter.filedialog import askopenfilename
-import pandas as pd
 
 ter_df = pd.read_csv('ter_MG1655.csv')
 ter_df
@@ -45,7 +45,8 @@ terI_seq = Seq(terI_str)
 terJ_seq = Seq(terJ_str)
 
 #  record objects
-MG1655_record = SeqRecord(terA_seq, id='MG1655', name='ter', description='ter sites found with BT2 in R', annotations={"molecule_type": "DNA"})
+MG1655_record = SeqRecord(terA_seq, id='MG1655', name='ter',
+                          description='ter sites found with BT2 in R', annotations={"molecule_type": "DNA"})
 
 
 # annotation features (ter sites)
