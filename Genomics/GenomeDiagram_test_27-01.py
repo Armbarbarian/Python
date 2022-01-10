@@ -1,14 +1,13 @@
-# set working directory as python scripts
-from Bio.SeqFeature import SeqFeature, FeatureLocation
-from Bio import SeqIO
-from Bio.Graphics import GenomeDiagram
-from reportlab.lib.units import cm
-from reportlab.lib import colors
+# set working directory as python scripts 
 import os
 os.getcwd()
 os.chdir('C:\\Users\\Danie\\Documents\\R\\termination\\Python Scripts')
 
 # libraries
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from Bio.Graphics import GenomeDiagram
+from Bio import SeqIO
 
 ##########################################################################
 #
@@ -19,14 +18,13 @@ os.chdir('C:\\Users\\Danie\\Documents\\R\\termination\\Python Scripts')
 
 
 # read in the genbank file
-# Plasmid from Y. pestis
-record = SeqIO.read(
-    "C:\\Users\\Danie\\OneDrive\\Documents\\GitHub\\termination\\Genomes\\Ecoli\\MG1655.gb", "genbank")
+## Plasmid from Y. pestis
+record = SeqIO.read("NC_005816.gb", "genbank")
 
-# after loading in our sequence we next create an empty diagram,
-# then add an (empty) track,
+# after loading in our sequence we next create an empty diagram, 
+# then add an (empty) track, 
 # and to that add an (empty) feature set:
-gd_diagram = GenomeDiagram.Diagram("MG1655")
+gd_diagram = GenomeDiagram.Diagram("Yersinia pestis biovar Microtus plasmid pPCP1")
 gd_track_for_features = gd_diagram.new_track(1, name="Annotated Features")
 gd_feature_set = gd_track_for_features.new_set()
 
@@ -46,7 +44,7 @@ for feature in record.features:
 # Now we come to actually making the output file
 # This happens in two steps, first we call the draw method,
 # which creates all the shapes using ReportLab objects.
-# Then we call the write method which renders these to the requested file format.
+# Then we call the write method which renders these to the requested file format. 
 # Note you can output in multiple file formats:
 # draw:
 gd_diagram.draw(
@@ -59,14 +57,14 @@ gd_diagram.draw(
 )
 
 # write:
-gd_diagram.write("MG1655_linear_27-07.pdf", "PDF")
-gd_diagram.write("MG1655_linear_27-07.pdf.eps", "EPS")
-gd_diagram.write("MG1655_linear_27-07.pdf.svg", "SVG")
+gd_diagram.write("plasmid_linear.pdf", "PDF")
+gd_diagram.write("plasmid_linear.eps", "EPS")
+gd_diagram.write("plasmid_linear.svg", "SVG")
 
 
 # Provided you have the dependencies installed, you can also do bitmaps
-# for example:
-gd_diagram.write("MG1655_linear_27-07.pdf.png", "PNG")
+#for example:
+gd_diagram.write("plasmid_linear.png", "PNG")
 
 
 # Notice that the fragments argument which we set to four controls how many pieces the genome gets broken up into.
@@ -81,7 +79,8 @@ gd_diagram.draw(
     end=len(record),
     circle_core=0.7,
 )
-gd_diagram.write("MG1655_circular-27-07.pdf", "PDF")
+gd_diagram.write("plasmid_circular.pdf", "PDF")
+
 
 
 ##########################################################################
@@ -92,7 +91,7 @@ gd_diagram.write("MG1655_circular-27-07.pdf", "PDF")
 # Bottom up approach
 #####################
 
-# read gb file
+#read gb file
 MG = SeqIO.read('MG1655.gb', 'genbank')
 
 # for loop
@@ -110,8 +109,8 @@ for feature in MG.features:
     mg_feature_set.add_feature(feature, color=color, label=True)
 
 
-# after loading in our sequence we next create an empty diagram,
-# then add an (empty) track,
+# after loading in our sequence we next create an empty diagram, 
+# then add an (empty) track, 
 # and to that add an (empty) feature set:
 
 # Create a track, and a diagram
@@ -126,7 +125,7 @@ mg_diagram.add_track(mg_track_for_features, 1)
 # Now we come to actually making the output file
 # This happens in two steps, first we call the draw method,
 # which creates all the shapes using ReportLab objects.
-# Then we call the write method which renders these to the requested file format.
+# Then we call the write method which renders these to the requested file format. 
 # Note you can output in multiple file formats:
 # draw:
 mg_diagram.draw(
@@ -142,12 +141,18 @@ mg_diagram.draw(
 mg_diagram.write("MG1655_circular5.pdf", "PDF")
 
 
+
 #################################################################
 #                       A nice example
 #################################################################
 
-# Now let’s return to the pPCP1 plasmid from Yersinia pestis biovar Microtus, and the top down approach used in Section 17.1.3, but take advantage of the sigil options we’ve now discussed. This time we’ll use arrows for the genes, and overlay them with strand-less features (as plain boxes) showing the position of some restriction digest sites.
+#Now let’s return to the pPCP1 plasmid from Yersinia pestis biovar Microtus, and the top down approach used in Section 17.1.3, but take advantage of the sigil options we’ve now discussed. This time we’ll use arrows for the genes, and overlay them with strand-less features (as plain boxes) showing the position of some restriction digest sites.
 
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from Bio.Graphics import GenomeDiagram
+from Bio import SeqIO
+from Bio.SeqFeature import SeqFeature, FeatureLocation
 
 record = SeqIO.read("NC_005816.gb", "genbank")
 
@@ -207,3 +212,19 @@ gd_diagram.draw(
 gd_diagram.write("plasmid_circular_nice.pdf", "PDF")
 gd_diagram.write("plasmid_circular_nice.eps", "EPS")
 gd_diagram.write("plasmid_circular_nice.svg", "SVG")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

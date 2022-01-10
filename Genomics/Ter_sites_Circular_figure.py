@@ -2,27 +2,19 @@
 # this script will position ter sites on a circular chromosome track
 # the ter sites will be found and their position plotted
 
-from Bio.SeqFeature import SeqFeature, FeatureLocation
-from Bio import SeqIO
-from Bio.Graphics import GenomeDiagram
-from reportlab.lib.units import cm
-from reportlab.lib import colors
-from tkinter.filedialog import askopenfilename
 import os
-
-
-dir = askopenfilename()
-dir_path = os.path.dirname(os.path.realpath(dir))
-dir_path
-os.chdir(dir_path)
 os.getcwd()
-
-
+os.chdir('C:\\Users\\Danie\\Documents\\R\\termination\\Python Scripts')
 
 # libraries
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from Bio.Graphics import GenomeDiagram
+from Bio import SeqIO
+from Bio.SeqFeature import SeqFeature, FeatureLocation
 
-# read gb file
-MG = SeqIO.read(filename, 'genbank')
+#read gb file
+MG = SeqIO.read('MG1655.gb', 'genbank')
 
 # feature tracks
 mg_diagram = GenomeDiagram.Diagram(MG.id)
@@ -43,19 +35,19 @@ for feature in MG.features:
         feature, sigil="ARROW", color=color, label=True, label_size=1, label_angle=0
     )
 for feature in MG.features:
-    print(feature)
+  print(feature)
 # I want to include some strandless features,
 # ter sites
 terA = 'aattagtatgttgtaactaaagt'
 terB = 'aataagtatgttgtaactaaagt'
 terC = 'atataggatgttgtaactaatat'
 terD = 'cattagtatgttgtaactaaatg'
-terE = 'ttaaagtatgttgtaactaagca'
+terE = 'ttaaagtatgttgtaactaagca' 
 terF = 'ccttcgtatgttgtaacgacgat'
 terG = 'gtcaaggatgttgtaactaacca'
 terH = 'cgatcgtatgttgtaactatctc'
 terI = 'aacatggaagttgtaactaaccg'
-terJ = 'acgcagtaagttgtaactaatgc'
+terJ = 'acgcagtaagttgtaactaatgc' 
 
 for site, name, color in [
     (terA, "terA", colors.green),
@@ -67,7 +59,8 @@ for site, name, color in [
     (terG, "terG", colors.gray),
     (terH, "terH", colors.gray),
     (terI, "terI", colors.gray),
-        (terJ, "terJ", colors.gray)]:
+    (terJ, "terJ", colors.gray),
+]:
     index = 0
     while True:
         index = MG.seq.find(site, start=index)
@@ -101,3 +94,22 @@ mg_diagram.draw(format="linear", pagesize='A4', fragments=4,
 '''
 # write
 mg_diagram.write("MG1655_circular_ter4.pdf", "PDF")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
