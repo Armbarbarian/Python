@@ -9,10 +9,15 @@ from reportlab.lib.units import cm
 from reportlab.lib import colors
 from tkinter.filedialog import askopenfilename
 import os
-os.getcwd()
-os.chdir('C:\\Users\\Danie\\Documents\\R\\termination\\Python Scripts')
 
-filename = askopenfilename()
+
+dir = askopenfilename()
+dir_path = os.path.dirname(os.path.realpath(dir))
+dir_path
+os.chdir(dir_path)
+os.getcwd()
+
+
 
 # libraries
 
