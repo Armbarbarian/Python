@@ -8,6 +8,12 @@ import pandas as pd
 import numpy as np
 import PySimpleGUI as sg
 
+makedb_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\makeblastdb.exe'
+blastn_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\blastn.exe'
+#p1 = subprocess.run('dir', shell=True, capture_output=True)
+# print(p1.stdout.decode())
+
+
 os.getcwd()
 # date and time
 now = datetime.now()
@@ -36,16 +42,14 @@ while True:
         break
     if event == 'Run':
         try:
-            makedb = NcbimakeblastdbCommandline(dbtype='nucl', input_file='MG1655.fasta', out='db')
-            sg.popup('makedb: ' + str(makedb))
-
-            cmd1 = subprocess.call(str(makedb), shell=True)
-            sg.popup(str(cmd1))
-
-            blastn = NcbiblastnCommandline(query='OriC_MG1655.fasta', db='db', outfmt=10, out='out'+day+'-'+month+'.csv')
-            sg.popup('blatn: ' + str(blastn))
-
-            cmd2 = subprocess.call(str(blastn), shell=True)
-            sg.popup(str(cmd2))
+            makedb = NcbimakeblastdbCommandline(cmd=makedb_path, dbtype='nucl', input_file=values['-db-'], out='db'+day+'-'+month)
+            #sg.popup('makedb: ' + str(makedb))
+            cmd1 = subprocess.run(str(makedb), shell=True, capture_output=True)
+            # cmd1.stdout.decode()
+            blastn = NcbiblastnCommandline(cmd=blastn_path, query=values['-query-'], db='db'+day+'-'+month,
+                                           outfmt="10 stitle qseqid sseqid sstart send sstrand evalue sseq length btop", out='blast_out'+day+'-'+month+'.csv')
+            cmd2 = subprocess.run(str(blastn), shell=True, capture_output=True)
+            # cmd2.stdout.decode()
         except:
             sg.popup('Fail', font=font)
+        sg.popup('Finished')
