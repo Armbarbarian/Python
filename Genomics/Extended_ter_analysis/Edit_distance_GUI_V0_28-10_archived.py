@@ -84,7 +84,7 @@ def hamming_distance(s, t):
 #
 ####################################################################
 '''
-# read in the csv files with their xuence from bowtie2 in R
+# read in the csv files with their sequence from bowtie2 in R
 MG1655 = pd.read_csv('MG1655.csv')
 BW2952 = pd.read_csv('BW2952.csv')
 REL606 = pd.read_csv('REL606.csv')
@@ -307,4 +307,5 @@ while True:
 
         # CSV files into dataframes
         if values['-upload_type-'] == 'Upload CSV from alignment':
+
             sg.popup('Feature under construction')
