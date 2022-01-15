@@ -1,4 +1,5 @@
 # MySimplegui Viable Titre
+from PIL import Image
 import csv
 import io
 import os
@@ -10,9 +11,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+os.getcwd()
 # %matplotlib inline
-from PIL import Image
 matplotlib.use('TkAgg')
 plt.style.use('ggplot')
 
