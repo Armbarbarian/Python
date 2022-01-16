@@ -323,6 +323,8 @@ while True:
                 browse_csv_window = sg.Window('Find the csv file to display', browse_file_layout)
                 event, values = browse_csv_window.read()
                 if event == 'csv_submit':
+                    dir_path = os.path.dirname(os.path.realpath(values['csv_file']))
+                    os.chdir(dir_path)
                     CSV_FILE_input = values['csv_file']
                     CSV_DF_input = pd.read_csv(CSV_FILE_input)
                 # retrieve a list of the values in the csv file
