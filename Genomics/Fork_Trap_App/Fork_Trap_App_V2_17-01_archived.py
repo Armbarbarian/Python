@@ -63,16 +63,27 @@ class TerToSet():
 
 class BlastSite():
     def __init__(self, name, csv):
+        self.csv = csv
         self.name = name
-        self.start = int(csv[csv.qname == name].pos)
-        self.stop = int(csv[csv.qname == name].pos)+20000
-        self.strand_pos = csv[csv.qname == name].strand.tolist()[0]
-        self.seq = csv[csv.qname == name].seq
-        self.csv = csv[csv.qname == name]
-        if self.strand_pos == '-':
+        self.start = int(csv.sstart)
+        self.stop = int(csv.send)
+        self.strand_pos = csv.sstrand.to_list()[0]
+        self.seq = csv.sseq
+
+        if self.strand_pos == 'plus':
             self.strand = +1
-        if self.strand_pos == '+':
+        if self.strand_pos == 'minus':
             self.strand = -1
+
+
+'''
+csv = pd.read_csv('C:\\Users\\Danie\\Documents\\Python1\\Python\\Genomics\\BLAST_App\\MG1655_oriC_Blast.csv')
+csv
+x = BlastSite('blast', csv)
+x.start
+x.strand_pos
+x.strand
+'''
 
 
 class BlastToSet():
@@ -83,7 +94,7 @@ class BlastToSet():
         feature = SeqFeature(FeatureLocation(
             site.start, site.stop), strand=site.strand)
         set.add_feature(feature, name=site.name, label=True, label_size=25,
-                        label_position="end", sigil="ARROW", color=colour, arrowhead_length=1000)
+                        label_position="end", color=colour)
 
 
 # ________________________________________________________________________
@@ -131,26 +142,36 @@ while True:
         break
     if event == 'Run':
         try:
+            BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
+        except:
+            pass
+        try:
+            ter_csv = pd.read_csv(values['-BT2_csv-'])
+        except:
+            sg.popup('Error with BT2 csv file...', font=font)
+        try:
             fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
             sg.popup('Genome size: ' + str(len(fas[0])))
-            ter_csv = pd.read_csv(values['-BT2_csv-'])
-            BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
-            # sg.popup(csv
-
             # create Sites
             # Ter specific sites
-            terA = TerSite('terA', csv)
-            terB = TerSite('terB', csv)
-            terC = TerSite('terC', csv)
-            terD = TerSite('terD', csv)
-            terE = TerSite('terE', csv)
-            terF = TerSite('terF', csv)
-            terG = TerSite('terG', csv)
-            terH = TerSite('terH', csv)
-            terI = TerSite('terI', csv)
-            terJ = TerSite('terJ', csv)
+            terA = TerSite('terA', ter_csv)
+            terB = TerSite('terB', ter_csv)
+            terC = TerSite('terC', ter_csv)
+            terD = TerSite('terD', ter_csv)
+            terE = TerSite('terE', ter_csv)
+            terF = TerSite('terF', ter_csv)
+            terG = TerSite('terG', ter_csv)
+            terH = TerSite('terH', ter_csv)
+            terI = TerSite('terI', ter_csv)
+            terJ = TerSite('terJ', ter_csv)
 
-            # BLAST sites
+            try:
+                # BLAST sites
+                blast1 = BlastSite('oriC', BLAST_csv)
+            except:
+                sg.popup('BlastSite class not working')
+            #
+            #
 
             # ___________________
             # Genome Diagram using TerSite class
@@ -158,32 +179,39 @@ while True:
             gd_diagram = GenomeDiagram.Diagram('ter sites')
             gd_features1 = gd_diagram.new_track(1, greytrack=False)
             gd_set1 = gd_features1.new_set()
+            #gd_set2 = gd_features1.new_set('other')
             #
-            FeatureToSet(gd_set1, terA, 'red')
-            FeatureToSet(gd_set1, terB, 'blue')
-            FeatureToSet(gd_set1, terC, 'purple')
-            FeatureToSet(gd_set1, terD, 'green')
-            FeatureToSet(gd_set1, terE, 'gray')
-            FeatureToSet(gd_set1, terF, 'gray')
-            FeatureToSet(gd_set1, terG, 'gray')
-            FeatureToSet(gd_set1, terH, 'gray')
-            FeatureToSet(gd_set1, terI, 'gray')
-            FeatureToSet(gd_set1, terJ, 'gray')
+            TerToSet(gd_set1, terA, 'red')
+            TerToSet(gd_set1, terB, 'blue')
+            TerToSet(gd_set1, terC, 'purple')
+            TerToSet(gd_set1, terD, 'green')
+            TerToSet(gd_set1, terE, 'gray')
+            TerToSet(gd_set1, terF, 'gray')
+            TerToSet(gd_set1, terG, 'gray')
+            TerToSet(gd_set1, terH, 'gray')
+            TerToSet(gd_set1, terI, 'gray')
+            TerToSet(gd_set1, terJ, 'gray')
+            try:
+                # From BLAST App
+                BlastToSet(gd_set1, blast1, 'black')
+            except:
+                sg.popup('BlastToSet not working')
+
         except:
             sg.popup('Something Went Wrong..', font=font)
         # Change directory to save in custom location
         dir_path = os.path.dirname(os.path.realpath(values['-save_image-']))
         os.chdir(dir_path)
-
+        # Draw the actual image.
         # Add the terA TerSite class information into the Track
-        gd_diagram.draw(
-            format=values['-chromosome_shape-'], start=0, end=len(fas[0]), circle_core=0.8)
+        gd_diagram.draw(format=values['-chromosome_shape-'],
+                        start=0, end=len(fas[0]), circle_core=0.8)
+
         if not values['-image_name-']:
             gd_diagram.write('output_'+day+'-'+month+'.pdf', 'pdf')
             gd_diagram.write('output_'+day+'-'+month+'.png', 'png')
         else:
             gd_diagram.write(values['-image_name-']+'.pdf', 'pdf')
             gd_diagram.write(values['-image_name-']+'.png', 'png')
-
 
 # fragments=3, pagesize=(15*cm, 4*cm)
