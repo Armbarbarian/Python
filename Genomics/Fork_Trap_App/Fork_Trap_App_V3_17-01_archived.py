@@ -76,15 +76,6 @@ class BlastSite():
             self.strand = -1
 
 
-'''
-csv = pd.read_csv('C:\\Users\\Danie\\Documents\\Python1\\Python\\Genomics\\BLAST_App\\MG1655_oriC_Blast.csv')
-csv
-x = BlastSite('blast', csv)
-x.start
-x.strand_pos
-x.strand
-'''
-
 
 class BlastToSet():
     def __init__(self, set, site, colour):
@@ -95,6 +86,10 @@ class BlastToSet():
             site.start, site.stop), strand=site.strand)
         set.add_feature(feature, name=site.name, label=True, label_size=25,
                         label_position="end", color=colour)
+
+
+
+
 
 
 # ________________________________________________________________________
