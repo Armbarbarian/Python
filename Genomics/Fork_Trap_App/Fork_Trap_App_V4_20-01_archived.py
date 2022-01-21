@@ -66,7 +66,7 @@ class BlastSite():
         self.csv = csv
         self.name = name
         self.start = int(csv.sstart)
-        self.stop = int(csv.send)
+        self.stop = int(csv.send)+1000
         self.strand_pos = csv.sstrand.to_list()[0]
         self.seq = csv.sseq
 
@@ -74,7 +74,6 @@ class BlastSite():
             self.strand = +1
         if self.strand_pos == 'minus':
             self.strand = -1
-
 
 
 class BlastToSet():
@@ -86,7 +85,6 @@ class BlastToSet():
             site.start, site.stop), strand=site.strand)
         set.add_feature(feature, name=site.name, label=True, label_size=25,
                         label_position="end", color=colour)
-
 
 
 ####################
@@ -111,8 +109,8 @@ class ChiSite():
 
         strand_list = []
         for i in csv.strand:
-            #strand_pos = i.tolist()[0]
-            #self.csv = csv[csv.qname == name]
+            # strand_pos = i.tolist()[0]
+            # self.csv = csv[csv.qname == name]
             if i == '-':
                 strand_list.append(-1)
             if i == '+':
@@ -124,14 +122,16 @@ class ChiSite():
             name_list.append(i)
         self.name = name_list
 
+
 '''
 csv = pd.read_csv('C:/Users/Danie/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
 X = ChiSite(csv)
 X.name
 '''
 
-
 # NOT WORKING 20-01-22
+
+
 class ChiToSet():
     def __init__(self, set, chi_site, colour):
         self.set = set
@@ -139,8 +139,13 @@ class ChiToSet():
         self.colour = colour
 
 # cannot find a for loop to add all features in one go, works when i subset one individual.
-        feature = SeqFeature(FeatureLocation(chi_site.start[1], chi_site.stop[1]), strand=chi_site.strand[1])
-        set.add_feature(feature, name=chi_site.name[1], label=True, color=colour, label_size=25)
+        feature_list = []
+        for i in range(0, len(chi_site.start)):
+            feature = SeqFeature(FeatureLocation(chi_site.start[i], chi_site.stop[i]), strand=chi_site.strand[i])
+            feature_list.append(feature)
+
+        for i in range(0, len(chi_site.start)):
+            set.add_feature(feature_list[i], name=chi_site.name[i], label=False, color=colour, label_size=25)
 
 
 # ________________________________________________________________________
@@ -190,33 +195,24 @@ while True:
         break
     if event == 'Run':
         try:
-            ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+            ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
+            # ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            chi_csv = pd.read_csv(values['-chi_csv-'])
+            chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
+            # chi_csv = pd.read_csv(values['-chi_csv-'])
         except:
             sg.popup('Error with other csv file...', font=font)
         try:
-            BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
+            BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
+            # BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
         except:
             sg.popup('Error with BLAST csv file...', font=font)
         try:
-            fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
+            fas = list(SeqIO.parse(open('C:/Users/Danie/OneDrive/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
+            # fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
             sg.popup('Genome size: ' + str(len(fas[0])))
-
-            # create Sites
-            # Ter specific sites
-            terA = TerSite('terA', ter_csv)
-            terB = TerSite('terB', ter_csv)
-            terC = TerSite('terC', ter_csv)
-            terD = TerSite('terD', ter_csv)
-            terE = TerSite('terE', ter_csv)
-            terF = TerSite('terF', ter_csv)
-            terG = TerSite('terG', ter_csv)
-            terH = TerSite('terH', ter_csv)
-            terI = TerSite('terI', ter_csv)
-            terJ = TerSite('terJ', ter_csv)
 
             # Other BT2
             try:
@@ -234,13 +230,37 @@ while True:
             #
             #
 
+            # create Sites
+            # Ter specific sites
+            terA = TerSite('terA', ter_csv)
+            terB = TerSite('terB', ter_csv)
+            terC = TerSite('terC', ter_csv)
+            terD = TerSite('terD', ter_csv)
+            terE = TerSite('terE', ter_csv)
+            terF = TerSite('terF', ter_csv)
+            terG = TerSite('terG', ter_csv)
+            terH = TerSite('terH', ter_csv)
+            terI = TerSite('terI', ter_csv)
+            terJ = TerSite('terJ', ter_csv)
+
             # ___________________
             # Genome Diagram using TerSite class
             # ___________________
             gd_diagram = GenomeDiagram.Diagram('ter sites')
             gd_features1 = gd_diagram.new_track(1, greytrack=False)
             gd_set1 = gd_features1.new_set()
-            #gd_set2 = gd_features1.new_set('other')
+            # gd_set2 = gd_features1.new_set('other')
+
+            try:
+                # From BT2 in R
+                ChiToSet(gd_set1, chi, 'lightblue')
+            except:
+                sg.popup('ChiToSet not working')
+            try:
+                # From BLAST App
+                BlastToSet(gd_set1, blast1, 'black')
+            except:
+                sg.popup('BlastToSet not working')
             #
             TerToSet(gd_set1, terA, 'red')
             TerToSet(gd_set1, terB, 'blue')
@@ -252,21 +272,13 @@ while True:
             TerToSet(gd_set1, terH, 'gray')
             TerToSet(gd_set1, terI, 'gray')
             TerToSet(gd_set1, terJ, 'gray')
-            try:
-                # From BT2 in R
-                ChiToSet(gd_set1, chi, 'gray')
-            except:
-                sg.popup('ChiToSet not working')
-            try:
-                # From BLAST App
-                BlastToSet(gd_set1, blast1, 'black')
-            except:
-                sg.popup('BlastToSet not working')
 
         except:
             sg.popup('Something Went Wrong..', font=font)
         # Change directory to save in custom location
-        dir_path = os.path.dirname(os.path.realpath(values['-save_image-']))
+
+        dir_path = os.path.dirname(os.path.realpath('C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/042_RFT_11-01.pdf'))
+        #dir_path = os.path.dirname(os.path.realpath(values['-save_image-']))
         os.chdir(dir_path)
         # Draw the actual image.
         # Add the terA TerSite class information into the Track

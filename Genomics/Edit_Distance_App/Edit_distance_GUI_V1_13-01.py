@@ -210,7 +210,7 @@ layout1 = [
 ]
 
 # set up the window and the layout to use for the window
-window = sg.Window('Viable Titre GUI', layout1)  # size=(600, 450)
+window = sg.Window('Edit Distance App', layout1)  # size=(600, 450)
 
 
 while True:
