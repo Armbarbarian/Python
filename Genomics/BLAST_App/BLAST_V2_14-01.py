@@ -31,7 +31,7 @@ layout = [
     [sg.Text('Select genome to make into database: ', font=font), sg.FileBrowse(key='-db-')],
     [sg.Text('Select query fasta file: ', font=font), sg.FileBrowse(key='-query-')],
     [sg.Text('Specify task: ', font=font), sg.Combo(['blastn', 'blastn-short'], key='-task-')],
-    [sg.Text('Specify other: ', font=font), sg.InputText(key='-kwargs-')],
+    #[sg.Text('Specify other: ', font=font), sg.InputText(key='-kwargs-')],
     [sg.Text('Specify E value: ', font=font), sg.Combo([10e-9, 10e-8, 10e-7, 10e-6, 10e-5, 10e-4, 10e-3, 10e-2], key='-e_val-', font=font)],
     [sg.Text('Save CSV as: ', font=font), sg.InputText(key='-csv_savename-')],
     [sg.Text('Select directory to save image: ', font=font),
@@ -75,3 +75,5 @@ while True:
         except:
             sg.popup('Failed to alter blast output')
         sg.popup('Finished')
+        # opem the file we have just created.
+        subprocess.Popen(csv_savename, shell=True)
