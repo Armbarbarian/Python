@@ -1,5 +1,6 @@
 import io
 import os
+import subprocess  # to open the pdf after creating in automatically.
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -141,11 +142,13 @@ class ChiToSet():
 # cannot find a for loop to add all features in one go, works when i subset one individual.
         feature_list = []
         for i in range(0, len(chi_site.start)):
-            feature = SeqFeature(FeatureLocation(chi_site.start[i], chi_site.stop[i]), strand=chi_site.strand[i])
+            feature = SeqFeature(FeatureLocation(
+                chi_site.start[i], chi_site.stop[i]), strand=chi_site.strand[i])
             feature_list.append(feature)
 
         for i in range(0, len(chi_site.start)):
-            set.add_feature(feature_list[i], name=chi_site.name[i], label=False, color=colour, label_size=25)
+            set.add_feature(
+                feature_list[i], name=chi_site.name[i], label=False, color=colour, label_size=25)
 
 
 # ________________________________________________________________________
@@ -175,9 +178,11 @@ layout_input = [
     [sg.FileBrowse(key='-chi_csv-')],
     [sg.FileBrowse(key='-BLAST_csv-')],
     # [sg.Combo(['All', 'terA', 'terB', 'terC', 'terD', 'terE', 'terF', 'terG', 'terH', 'terI', 'terJ'],key = '-ter_input-')],
-    [sg.Combo(['linear', 'cicular'], key='-chromosome_shape-', font=font, text_color='black')],
+    [sg.Combo(['linear', 'cicular'], key='-chromosome_shape-',
+              font=font, text_color='black')],
     [sg.Text(' '*20)],
-    [sg.InputText(key='-image_name-', font=font, size=(0, 20), text_color='black')],
+    [sg.InputText(key='-image_name-', font=font,
+                  size=(0, 20), text_color='black')],
     [sg.FileBrowse(key='-save_image-')],
 ]
 
@@ -216,7 +221,7 @@ while True:
 
             # Other BT2
             try:
-                # BLAST sites
+                # Chi from BT2
                 chi = ChiSite(chi_csv)
             except:
                 sg.popup('ChiSite class not working')
@@ -278,9 +283,11 @@ while True:
         # Change directory to save in custom location
 
         if not values['-save_image-']:
-            dir_path = os.path.dirname(os.path.realpath('C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/042_RFT_11-01.pdf'))
+            dir_path = os.path.dirname(os.path.realpath(
+                'C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/042_RFT_11-01.pdf'))
         else:
-            dir_path = os.path.dirname(os.path.realpath(values['-save_image-']))
+            dir_path = os.path.dirname(
+                os.path.realpath(values['-save_image-']))
         os.chdir(dir_path)
         # Draw the actual image.
         # Add the terA TerSite class information into the Track
@@ -293,5 +300,8 @@ while True:
         else:
             gd_diagram.write(values['-image_name-']+'.pdf', 'pdf')
             gd_diagram.write(values['-image_name-']+'.png', 'png')
+
+        # opem the file we have just created.
+        subprocess.Popen([values['-image_name-']+'.pdf'], shell=True)
 
 # fragments=3, pagesize=(15*cm, 4*cm)
