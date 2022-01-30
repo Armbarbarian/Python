@@ -8,9 +8,11 @@ from tkinter.filedialog import askopenfilename
 from reportlab.lib import colors
 from reportlab.lib.units import cm
 from Bio.Graphics import GenomeDiagram
+from Bio.SeqUtils import GC
 from Bio import SeqIO
 from Bio.SeqFeature import SeqFeature, FeatureLocation
 import PySimpleGUI as sg
+
 
 # set the date and time
 now = datetime.now()
