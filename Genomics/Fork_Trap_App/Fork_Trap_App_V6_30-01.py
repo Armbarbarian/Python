@@ -73,6 +73,8 @@ class BlastSite():
         self.strand_pos = csv.sstrand.to_list()[0]
         self.seq = csv.sseq
 
+        if self.strand_pos == 'NA':
+            self.strand = +1
         if self.strand_pos == 'plus':
             self.strand = +1
         if self.strand_pos == 'minus':
@@ -231,7 +233,7 @@ while True:
             # BLAST sites
             try:
 
-                blast1 = BlastSite('oriC', BLAST_csv)
+                blast1 = BlastSite('yjhR', BLAST_csv)
             except:
                 sg.popup('BlastSite class not working')
             #

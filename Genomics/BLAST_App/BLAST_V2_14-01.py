@@ -1,4 +1,5 @@
 from Bio.Blast.Applications import NcbiblastnCommandline
+from Bio.Blast.Applications import NcbitblastnCommandline
 from Bio.Blast.Applications import NcbimakeblastdbCommandline
 import io
 import os
@@ -10,6 +11,7 @@ import PySimpleGUI as sg
 
 makedb_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\makeblastdb.exe'
 blastn_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\blastn.exe'
+tblastn_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\tblastn.exe'
 # p1 = subprocess.run('dir', shell=True, capture_output=True)
 # print(p1.stdout.decode())
 
@@ -30,7 +32,7 @@ font_small = ('Calibri', 12)
 layout = [
     [sg.Text('Select genome to make into database: ', font=font), sg.FileBrowse(key='-db-')],
     [sg.Text('Select query fasta file: ', font=font), sg.FileBrowse(key='-query-')],
-    [sg.Text('Specify task: ', font=font), sg.Combo(['blastn', 'blastn-short'], key='-task-')],
+    [sg.Text('Specify task: ', font=font), sg.Combo(['blastn', 'blastn-short', 'tblastn'], key='-task-')],
     #[sg.Text('Specify other: ', font=font), sg.InputText(key='-kwargs-')],
     [sg.Text('Specify E value: ', font=font), sg.Combo([10e-9, 10e-8, 10e-7, 10e-6, 10e-5, 10e-4, 10e-3, 10e-2], key='-e_val-', font=font)],
     [sg.Text('Save CSV as: ', font=font), sg.InputText(key='-csv_savename-')],
@@ -60,13 +62,25 @@ while True:
             # sg.popup('makedb: ' + str(makedb))
             cmd1 = subprocess.run(str(makedb), shell=True, capture_output=True)
             # cmd1.stdout.decode()
-            blastn = NcbiblastnCommandline(cmd=blastn_path, query=values['-query-'], db='db'+day+'-'+month,
-                                           outfmt="10 stitle qseqid sseqid sstart send sstrand evalue sseq length btop", out=csv_savename, task=values['-task-'], evalue=values['-e_val-'])
-            cmd2 = subprocess.run(str(blastn), shell=True, capture_output=True)
+        except:
+            sg.popup('Error with blastdb...')
+
+        try:
+            if values['-task-'] == 'blastn':
+                blastn = NcbiblastnCommandline(cmd=blastn_path, query=values['-query-'], db='db'+day+'-'+month,
+                                               outfmt="10 stitle qseqid sseqid sstart send sstrand evalue sseq length btop", out=csv_savename, task='blastn',
+                                               evalue=values['-e_val-'])
+                cmd2 = subprocess.run(str(blastn), shell=True, capture_output=True)
+            if values['-task-'] == 'tblastn':
+                tblastn = NcbitblastnCommandline(cmd=tblastn_path, query=values['-query-'], db='db'+day+'-'+month,
+                                                 outfmt="10 stitle qseqid sseqid sstart send sstrand evalue sseq length btop", out=csv_savename, task='tblastn',
+                                                 evalue=values['-e_val-'])
+                cmd2 = subprocess.run(str(tblastn), shell=True, capture_output=True)
+
             # cmd2.stdout.decode()
 
         except:
-            sg.popup('Fail', font=font)
+            sg.popup('Error with blastn or tblastn...', font=font)
         try:
             # Add column names as the header
             blast_output = pd.read_csv(csv_savename,
