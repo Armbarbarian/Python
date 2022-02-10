@@ -15,10 +15,10 @@ MUTy_data = df.loc[df['Strain'] == 'DG033'].Titre
 fig = plt.figure(figsize=(7, 5))
 plt.plot(MUTx_data, MUTy_data, color='firebrick', marker='o', label='DG033', linewidth=3)
 plt.plot(WTx_data, WTy_data, color='royalblue', marker='o', label='DG028', linewidth=3)
-
+plt.yscale('log')
 plt.title('DG028 vs DG033 Growth Curve 10/02/2022')
 plt.xlabel('Time')
 plt.ylabel('Viable Titre')
 plt.legend()
 plt.show()
-fig.savefig('DG028_DG033_Growth_Cruve_10-02.png', dpi=fig.dpi)
+fig.savefig('DG028_DG033_log_Growth_Cruve_10-02.png', dpi=fig.dpi)
