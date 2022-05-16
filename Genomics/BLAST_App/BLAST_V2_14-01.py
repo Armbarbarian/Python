@@ -77,6 +77,11 @@ while True:
                                                  evalue=values['-e_val-'])
                 cmd2 = subprocess.run(str(tblastn), shell=True, capture_output=True)
 
+            # Trying blastn-short
+            if values['-task-'] == 'blastn-short':
+                blastn_short = NcbiblastnCommandline(cmd=blastn_path, task= 'blastn-short', query=values['-query-'], db='db'+day+'-'+month, outfmt="10 stitle qseqid sseqid sstart send sstrand evalue sseq length btop", out=csv_savename,
+                                                 evalue=values['-e_val-'])
+                cmd2 = subprocess.run(str(blastn_short), shell=True, capture_output=True)
             # cmd2.stdout.decode()
 
         except:
