@@ -165,7 +165,7 @@ font_small = ('Calibri', 12)
 
 layout_text = [
     [sg.Text('Fork Trap App', font=font_heading)],
-    [sg.Text('Select Genome (fasta): ', font=font)],
+    [sg.Text('Select Genome (fasta): ', font=font, key='Select_Genome')],
     [sg.Text('Ter BT2 csv: ', font=font)],
     [sg.Text('Chi BT2 csv: ', font=font)],
     [sg.Text('BLAST csv: ', font=font)],
@@ -202,6 +202,7 @@ while True:
     event, values = window1.read()
     if event == sg.WIN_CLOSED:
         break
+
     if event == 'Run':
         try:
             #ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
@@ -209,10 +210,13 @@ while True:
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
-            chi_csv = pd.read_csv(values['-chi_csv-'])
+            if values['-chi_csv-'] == 1:
+                #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
+                chi_csv = pd.read_csv(values['-chi_csv-'])
+            else:
+                sg.popup('No Chi csv chosen', font=font)
         except:
-            sg.popup('Error with other csv file...', font=font)
+            pass
         try:
             #BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
             BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
@@ -224,16 +228,18 @@ while True:
             sg.popup('Genome size: ' + str(len(fas[0])))
 
             # Other BT2
-            try:
-                # Chi from BT2
-                chi = ChiSite(chi_csv)
-            except:
-                sg.popup('ChiSite class not working')
+            if values['-chi_csv-'] == 1:
+                try:
+                    # Chi from BT2
+                    chi = ChiSite(chi_csv)
+                except:
+                    sg.popup('ChiSite class not working')
+                    pass
 
             # BLAST sites
             try:
 
-                blast1 = BlastSite('yjhR', BLAST_csv)
+                blast1 = BlastSite(BLAST_csv.qseqid, BLAST_csv)
             except:
                 sg.popup('BlastSite class not working')
             #
