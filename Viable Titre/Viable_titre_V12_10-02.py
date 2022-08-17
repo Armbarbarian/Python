@@ -1054,6 +1054,7 @@ while True:
                                     x = master_df[str(values['-dropdown_x-'])].tolist()
                                     y = master_df[str(values['-dropdown_y-'])].tolist()
                                     errors = master_df['Sigma_n'].tolist()
+                                    master_df.to_csv('Master_DF'+'_'+day+'-'+month+'.csv')
 
                                     #plt.bar(x, y, color=colors[:len(x)], yerr=errors, ecolor='black', capsize=5)
                                     plt.title(values['-input_title-'])
