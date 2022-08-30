@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import PySimpleGUI as sg
 
+
 makedb_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\makeblastdb.exe'
 blastn_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\blastn.exe'
 tblastn_path = 'C:\\Program Files\\NCBI\\BLAST\\bin\\tblastn.exe'
