@@ -65,9 +65,12 @@ class TerToSet():
 ####################
 
 class BlastSite():
-    def __init__(self, name, csv):
+    def __init__(self, csv):
         self.csv = csv
-        self.name = name
+        name_list = []
+        for i in csv.qseqid:
+            name_list.append(i)
+        self.name = name_list
         self.start = int(csv.sstart)
         self.stop = int(csv.send)+1000
         self.strand_pos = csv.sstrand.to_list()[0]
@@ -84,6 +87,11 @@ class BlastSite():
 class BlastToSet():
     def __init__(self, set, site, colour):
         self.set = set
+        set_list = []
+        for i in range(0, len(site.qseqid)):
+            feature = SeqFeature(FeatureLocation(
+                site.start[i], site.stop[i]), strand=site.strand[i])
+            set_list.append(feature)
         self.site = site
         self.colour = colour
         feature = SeqFeature(FeatureLocation(
@@ -128,15 +136,6 @@ class ChiSite():
         self.name = name_list
 
 
-'''
-csv = pd.read_csv('C:/Users/Danie/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
-X = ChiSite(csv)
-X.name
-'''
-
-# NOT WORKING 20-01-22
-
-
 class ChiToSet():
     def __init__(self, set, chi_site, colour):
         self.set = set
@@ -165,36 +164,24 @@ font_small = ('Calibri', 12)
 
 layout_text = [
     [sg.Text('Fork Trap App', font=font_heading)],
-    [sg.Text('Select Genome (fasta): ', font=font, key='Select_Genome')],
-    [sg.Text('Ter BT2 csv: ', font=font)],
-    [sg.Text('Chi BT2 csv: ', font=font)],
-    [sg.Text('BLAST csv: ', font=font)],
-    [sg.Text('Chromosome Shape: ', font=font)],
+    [sg.Text('Select Genome (fasta): ', font=font), sg.FileBrowse(key='-genome1-')],
+    [sg.Text('Ter csv: ', font=font), sg.FileBrowse(key='-ter_BT2_csv-')],
+    [sg.Text('Chi csv: ', font=font), sg.FileBrowse(key='-chi_csv-')],
+    [sg.Text('BLAST csv: ', font=font), sg.FileBrowse(key='-BLAST_csv-')],
+    [sg.Text('Chromosome Shape: ', font=font), sg.Combo(['linear', 'cicular'], key='-chromosome_shape-',
+                                                        font=font, text_color='black')],
     [sg.Text(' '*20)],
-    [sg.Text('Save file as: ', font=font)],
-    [sg.Text('Select directory to save image: ', font=font)]
+    [sg.Text('Save file as: ', font=font), sg.InputText(key='-image_name-', font=font,
+                                                        size=(0, 20), text_color='black')],
+    [sg.Text('Select directory to save image: ', font=font), sg.FileBrowse(key='-save_image-')]
 ]
 
-layout_input = [
-    [sg.Text(' '*20, font=font_heading)],
-    [sg.FileBrowse(key='-genome1-')],
-    [sg.FileBrowse(key='-ter_BT2_csv-')],
-    [sg.FileBrowse(key='-chi_csv-')],
-    [sg.FileBrowse(key='-BLAST_csv-')],
-    # [sg.Combo(['All', 'terA', 'terB', 'terC', 'terD', 'terE', 'terF', 'terG', 'terH', 'terI', 'terJ'],key = '-ter_input-')],
-    [sg.Combo(['linear', 'cicular'], key='-chromosome_shape-',
-              font=font, text_color='black')],
-    [sg.Text(' '*20)],
-    [sg.InputText(key='-image_name-', font=font,
-                  size=(0, 20), text_color='black')],
-    [sg.FileBrowse(key='-save_image-')],
-]
 
 # layout pad pad=((0, 0), (40, 0)))
 
 layout_cols = [
-    [sg.Column(layout_text), sg.Column(layout_input)],
-    [sg.Button('Run', font=font)]
+    [sg.Column(layout_text)],
+    [sg.Button('Run', font=font, button_color='DarkRed')]
 ]
 
 window1 = sg.Window('Fork Trap App', layout_cols, resizable=True)
@@ -210,13 +197,10 @@ while True:
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            if values['-chi_csv-'] == 1:
-                #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
-                chi_csv = pd.read_csv(values['-chi_csv-'])
-            else:
-                sg.popup('No Chi csv chosen', font=font)
+            #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
+            chi_csv = pd.read_csv(values['-chi_csv-'])
         except:
-            pass
+            sg.popup('Error with other csv file...', font=font)
         try:
             #BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
             BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
@@ -228,18 +212,16 @@ while True:
             sg.popup('Genome size: ' + str(len(fas[0])))
 
             # Other BT2
-            if values['-chi_csv-'] == 1:
-                try:
-                    # Chi from BT2
-                    chi = ChiSite(chi_csv)
-                except:
-                    sg.popup('ChiSite class not working')
-                    pass
+            try:
+                # Chi from BT2
+                chi = ChiSite(chi_csv)
+            except:
+                sg.popup('ChiSite class not working')
 
             # BLAST sites
             try:
 
-                blast1 = BlastSite(BLAST_csv.qseqid, BLAST_csv)
+                blast1 = BlastSite('yjhR', BLAST_csv)
             except:
                 sg.popup('BlastSite class not working')
             #
