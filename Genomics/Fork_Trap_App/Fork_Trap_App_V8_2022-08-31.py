@@ -72,7 +72,7 @@ class BlastSite():
             name_list.append(i)
         self.name = name_list
         self.start = int(csv.sstart)
-        self.stop = int(csv.send)+1000
+        self.stop = int(csv.send)
         self.strand_pos = csv.sstrand.to_list()[0]
         self.seq = csv.sseq
 
@@ -164,7 +164,7 @@ font_small = ('Calibri', 12)
 
 layout_text = [
     [sg.Text('Fork Trap App', font=font_heading)],
-    [sg.Text('Select Genome (fasta): ', font=font), sg.FileBrowse(key='-genome1-')],
+    [sg.Text('Select Genome (fasta): ', font=font), sg.FileBrowse(key='-genome1-'), sg.Combo(['MG1655'], key='-MG1655-', font=font)],
     [sg.Text('Ter csv: ', font=font), sg.FileBrowse(key='-ter_BT2_csv-')],
     [sg.Text('Chi csv: ', font=font), sg.FileBrowse(key='-chi_csv-')],
     [sg.Text('BLAST csv: ', font=font), sg.FileBrowse(key='-BLAST_csv-')],
@@ -192,25 +192,33 @@ while True:
 
     if event == 'Run':
         try:
-            #ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
+            # ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
             ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
+            # chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
             chi_csv = pd.read_csv(values['-chi_csv-'])
         except:
             sg.popup('Error with other csv file...', font=font)
         try:
-            #BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
+            # BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
             BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
         except:
             sg.popup('Error with BLAST csv file...', font=font)
-        try:
-            #fas = list(SeqIO.parse(open('C:/Users/Danie/OneDrive/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
-            fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
-            sg.popup('Genome size: ' + str(len(fas[0])))
 
+        if values['-MG1655-'] != 'MG1655':
+            try:
+                # fas = list(SeqIO.parse(open('C:/Users/Danie/OneDrive/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
+                fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
+                sg.popup('Genome size: ' + str(len(fas[0])))
+            except:
+                sg.popup('ERROR: Cannot locate the genome')
+        else:
+            try:
+                fas = list(SeqIO.parse(open('C:/Users/Danie/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
+            except:
+                sg.popup('ERROR: Cannot locate the MG1655 genome')
             # Other BT2
             try:
                 # Chi from BT2
@@ -221,7 +229,7 @@ while True:
             # BLAST sites
             try:
 
-                blast1 = BlastSite('yjhR', BLAST_csv)
+                blast1 = BlastSite(name_list, BLAST_csv)
             except:
                 sg.popup('BlastSite class not working')
             #
@@ -243,7 +251,7 @@ while True:
             # ___________________
             # Genome Diagram using TerSite class
             # ___________________
-            gd_diagram = GenomeDiagram.Diagram('ter sites')
+            gd_diagram = GenomeDiagram.Diagram('Chromosome Map')
             gd_features1 = gd_diagram.new_track(1, greytrack=False)
             gd_set1 = gd_features1.new_set()
             # gd_set2 = gd_features1.new_set('other')
@@ -270,8 +278,6 @@ while True:
             TerToSet(gd_set1, terI, 'gray')
             TerToSet(gd_set1, terJ, 'gray')
 
-        except:
-            sg.popup('Something Went Wrong..', font=font)
         # Change directory to save in custom location
 
         if not values['-save_image-']:
