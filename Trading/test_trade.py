@@ -25,12 +25,13 @@ print(client.get_asset_balance(asset='ETH'))
 print(client.get_asset_balance(asset='ADA'))
 print(client.get_asset_balance(asset='GBP'))
 
-# actual order
-order = client.order_market_buy(
+# actual orders that worrks instantly! BE Careful as there are no conditions.
+# BUY
+'''order = client.order_market_buy(
     symbol='ETHGBP',
-    quantity=0.01)
+    quantity=0.01)'''
 
-
-order = client.order_market_sell(
+# SELL
+'''order = client.order_market_sell(
     symbol='ETHGBP',
-    quantity=0.01)
+    quantity=0.01)'''

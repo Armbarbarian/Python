@@ -11,7 +11,7 @@ api_secret = 'iMXWqiiYZPL1drhDHcinqVdO5QtRYIXAHMlvff6K3tW0l8YkVjpLX1oUJlrRymqw'
 # set the key we have copied from Binance Account
 client = Client(api_key, api_secret)
 bsm = BinanceSocketManager(client)
-socket = bsm.trade_socket('BTCUSDT')
+socket = bsm.trade_socket('BTCGBP')
 
 # Test if the account is reachable
 client.get_account()
@@ -32,11 +32,11 @@ def CreateFrame(msg):
 CreateFrame(msg)
 
 # Append the live data to SQL database using sqlalchemy
-engine = sqlalchemy.create_engine('sqlite:///BTCUSDTstream.db')
+engine = sqlalchemy.create_engine('sqlite:///BTCGBPstream.db')
 
 while True:
     await socket.__aenter__()
     new_msg = await socket.recv()
     new_frame = CreateFrame(new_msg)
-    new_frame.to_sql('BTCUSDT', engine, if_exists='append', index=False)
+    new_frame.to_sql('BTCGBP', engine, if_exists='append', index=False)
     #print(frame)
