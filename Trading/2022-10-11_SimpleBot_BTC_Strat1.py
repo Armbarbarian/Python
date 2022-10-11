@@ -11,6 +11,10 @@ import sqlalchemy
 from binance import Client
 from binance import BinanceSocketManager
 
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
+=======
+
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
 api_key = 'ktVeNaWZwqJSQadqieUCKhZvIlgNco4eu0tF9OOhCit6n4h48WdYEZJznFPFwnDQ'
 api_secret = 'iMXWqiiYZPL1drhDHcinqVdO5QtRYIXAHMlvff6K3tW0l8YkVjpLX1oUJlrRymqw'
 
@@ -20,9 +24,14 @@ bsm = BinanceSocketManager(client)
 #socket = bsm.trade_socket('ETHGBP')
 
 # Test if the account is reachable
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
 #client.get_account()
 
 ## get balance for a specific asset only one coin
+=======
+client.get_account()
+# get balance for a specific asset only one coin
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
 print(client.get_asset_balance(asset='BTC'))
 print(client.get_asset_balance(asset='ETH'))
 print(client.get_asset_balance(asset='ADA'))
@@ -32,17 +41,24 @@ print(client.get_asset_balance(asset='GBP'))
 
 # Get the price data from a set period of time ago
 # - can use this to train a bot to predict future trends?
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
+=======
+pd.DataFrame(client.get_historical_klines('BTCUSDT', '1m', '30 min ago UTC'))
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
 
 # function to get minute data on ANY COIN building on from above.
+
+
 def GetMinuteData(symbol, interval, lookback):
     frame = pd.DataFrame(client.get_historical_klines(symbol, interval, lookback+' min ago UTC'))
-    frame = frame.iloc[:,:6] # arbitrary cutting off at col 6
+    frame = frame.iloc[:, :6]  # arbitrary cutting off at col 6
     frame.columns = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
     frame = frame.set_index('Time')
     # transform the unix timestamp to a readable one.
     frame.index = pd.to_datetime(frame.index, unit='ms')
     frame = frame.astype(float)
     return frame
+
 
 # call the new function to get minute data on any coin! try it out for ETH BTC and ADA
 # - in minutes.
@@ -72,23 +88,36 @@ print(info['filters'][2]['minQty'])
 # - Buy if the asset fell by more than 0.2% (this is x, find this to adjust) within last 30 mins
 # - Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
 df = GetMinuteData('ETHGBP', '1m', '60 min')
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
 #df
 #df.plot()
+=======
+df
+# df.plot()
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
 
 
 # Previous function - works as of 2022-10-10 and took roughly 2 minutes to complete a sell.
+
+
 def StratTest(symbol, qty, interval, entried=False):
     df = GetMinuteData(symbol, '1m', interval)
-    performance = (df.Open.pct_change() +1).cumprod() - 1
+    performance = (df.Open.pct_change() + 1).cumprod() - 1
     print(performance[-1])
     # Buying condition
     if entried == False:
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
         if performance[-1] < -0.001: # if last entry is below 0.1%, then place order
             order = client.order_market_buy(symbol=symbol,
                                         quantity=qty)
             print('BOUGHT: ' + symbol)
+=======
+        if performance[-1] < -0.001:  # if last entry is below 0.2%, then place order
+            order = client.order_market_buy(symbol=symbol,
+                                            quantity=qty)
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
             print(order)
-            entried=True
+            entried = True
         else:
             print('No Trade Executed')
     # Selling condition
@@ -96,9 +125,9 @@ def StratTest(symbol, qty, interval, entried=False):
         while True:
             df = GetMinuteData(symbol, '1m', interval)
             sincebuy = df.loc[df.index > pd.to_datetime(
-            order['transactTime'], unit='ms')]
+                order['transactTime'], unit='ms')]
             if len(sincebuy) > 0:
-                sincebuy_returns = (sincebuy.Open.pct_change() +1).cumprod() - 1
+                sincebuy_returns = (sincebuy.Open.pct_change() + 1).cumprod() - 1
                 # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
                 if sincebuy_returns[-1] > 0.0015 or sincebuy_returns[-1] < -0.0015:
                     order = client.order_market_sell(symbol=symbol, quantity=qty)
@@ -106,10 +135,17 @@ def StratTest(symbol, qty, interval, entried=False):
                     print(order)
                     break
 
+
 # call the function to start the trading loop.
 
 
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
 # Simple trading using one condition
+=======
+# Call the StratTest function and buy crypto using real money
+# - qty of 0.001 ETH is aroughly £1.19 on the ETH/GBP market as of 2022-10-10
+# time.time()
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
 
 # SELLONLY
 
@@ -171,6 +207,7 @@ order = client.order_market_sell(
     quantity=0.0001)'''
 
 
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
 
 
 
@@ -238,13 +275,22 @@ def Strat1(symbol, qty, interval, entried=False):
 
 
     # Selling condition
+=======
+# Testing algorithm
+# Selling condition
+def SellOnly(symbol, qty, interval, entried=False):
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
     if entried == True:
         while True:
             df = GetMinuteData(symbol, '1m', interval)
             sincebuy = df.loc[df.index > pd.to_datetime(
-            order['transactTime'], unit='ms')]
+                order['transactTime'], unit='ms')]
             if len(sincebuy) > 0:
+<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
                 sincebuy_returns = (sincebuy.Close.pct_change() +1).cumprod() - 1
+=======
+                sincebuy_returns = (sincebuy.Open.pct_change() + 1).cumprod() - 1
+>>>>>>> Stashed changes:Trading/2022-10-10_Simple_Crypto_Bot_Binance.py
                 # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
                 if sincebuy_returns[-1] > 0.001 or sincebuy_returns[-1] < -0.001:
                     order = client.order_market_sell(symbol=symbol, quantity=qty)
