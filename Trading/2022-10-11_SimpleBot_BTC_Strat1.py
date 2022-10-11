@@ -99,11 +99,9 @@ def StratTest(symbol, qty, interval, entried=False):
     if entried == False:
         if performance[-1] < -0.001:  # if last entry is below 0.1%, then place order
             order = client.order_market_buy(symbol=symbol,
-                                        quantity=qty)
+                                            quantity=qty)
             print('BOUGHT: ' + symbol)
 
-
-== == == =
         if performance[-1] < -0.001:  # if last entry is below 0.2%, then place order
             order = client.order_market_buy(symbol=symbol,
                                             quantity=qty)
@@ -131,7 +129,7 @@ def StratTest(symbol, qty, interval, entried=False):
 
 
 # Simple trading using one condition
-=======
+== == == =
 # Call the StratTest function and buy crypto using real money
 # - qty of 0.001 ETH is aroughly £1.19 on the ETH/GBP market as of 2022-10-10
 # time.time()
@@ -141,6 +139,8 @@ def StratTest(symbol, qty, interval, entried=False):
 #########################################################
 # Testing algorithm
 # Selling condition
+
+
 def SellOnly(symbol, qty, interval):
     while True:
         df = GetMinuteData(symbol, '1m', interval)
@@ -156,7 +156,7 @@ def SellOnly(symbol, qty, interval):
         if trend_data[-1] > 1:
             print('Sell Order Placed!')
             order = client.order_market_sell(symbol=symbol,
-                                        quantity=qty)
+                                             quantity=qty)
             print(order)
         else:
             print('Chose not to sell. You are welcome.')
@@ -165,13 +165,10 @@ def SellOnly(symbol, qty, interval):
         break
 
 
-
 # SELL
 while True:
     SellOnly('ETHGBP', 0.02, '10')
     time.sleep(10)
-
-
 
 
 # keep appending the database for 5 minutes before executing any trades
@@ -196,13 +193,10 @@ order = client.order_market_sell(
     quantity=0.0001)'''
 
 
-<<<<<<< Updated upstream:Trading/2022-10-11_SimpleBot_BTC_Strat1.py
-
-
+<< << << < Updated upstream: Trading/2022-10-11_SimpleBot_BTC_Strat1.py
 
 
 # BUY AND SELL
-
 
 
 # BUY
@@ -224,23 +218,17 @@ StratTest(symbol='BNBGBP', qty=0.00100000, interval='30')
 ###############################################################
 
 
-
-
-
-
-
-
 # 2022-10-11 New Strategy taking into account monitoring of the current health of a market.
 # Principle is simple, buy if the average is below 0.999 and sell if it is above 1.005
 # Working Strat
 # Previous function - works as of 2022-10-10 and took roughly 2 minutes to complete a sell.
 def Strat1(symbol, qty, interval, entried=False):
     trend_data = []
-    end_time = time.time() + 60*1 # How many minutes to build up the data for before starting to trade.
+    end_time = time.time() + 60*1  # How many minutes to build up the data for before starting to trade.
     while time.time() < end_time:
         # Read in the data
         df = GetMinuteData(symbol, '1m', interval)
-        performance = (df.Close.pct_change() +1).cumprod() - 1
+        performance = (df.Close.pct_change() + 1).cumprod() - 1
         trend = (df.Close.tail(5))
         diff = trend[-1] / trend[0]
         trend_data.append(diff)
@@ -254,19 +242,45 @@ def Strat1(symbol, qty, interval, entried=False):
         print(average_trend)
         print(performance[-1])
 
-        if average_trend < 1.001: # Change this value to alter the threshold
+        if average_trend < 1.000:  # Change this value to alter the threshold
+            order = client.order_market_buy(symbol=symbol,
+                                            quantity=qty)
+            print(order)
+            entried = True
+        else:
+            print('No order placed.')
+
+        # Place multiple orders per loop! Start with 1 first.
+        '''
+        if performance[-1] > 0.001: # Change this value to alter the threshold
             order = client.order_market_buy(symbol=symbol,
                                         quantity=qty)
             print(order)
             entried=True
         else:
             print('No order placed.')
-
+'''
 
     # Selling condition
-=======
+    if entried == True:
+        while True:
+            df = GetMinuteData(symbol, '1m', interval)
+            sincebuy = df.loc[df.index > pd.to_datetime(
+                order['transactTime'], unit='ms')]
+            if len(sincebuy) > 0:
+                sincebuy_returns = (sincebuy.Close.pct_change() + 1).cumprod() - 1
+                # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
+                if sincebuy_returns[-1] > 0.001 or sincebuy_returns[-1] < -0.001:
+                    order = client.order_market_sell(symbol=symbol, quantity=qty)
+                    print(order)
+                    break
+        print('Algorithm Complete. Thank you for choosing Goodall Logistics Ltd.')
+
+    # Selling condition
 # Testing algorithm
 # Selling condition
+
+
 def SellOnly(symbol, qty, interval, entried=False):
     if entried == True:
         while True:
@@ -274,8 +288,8 @@ def SellOnly(symbol, qty, interval, entried=False):
             sincebuy = df.loc[df.index > pd.to_datetime(
                 order['transactTime'], unit='ms')]
             if len(sincebuy) > 0:
-                sincebuy_returns = (sincebuy.Close.pct_change() +1).cumprod() - 1
-=======
+                sincebuy_returns = (sincebuy.Close.pct_change() + 1).cumprod() - 1
+
                 sincebuy_returns = (sincebuy.Open.pct_change() + 1).cumprod() - 1
                 # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
                 if sincebuy_returns[-1] > 0.001 or sincebuy_returns[-1] < -0.001:
@@ -285,14 +299,10 @@ def SellOnly(symbol, qty, interval, entried=False):
         print('Algorithm Complete. Thank you for choosing Goodall Logistics Ltd.')
 
 
-
-
 # Buy sell single run.
 Strat1(symbol='BTCGBP', qty=0.001, interval='30')
 Strat1(symbol='ETHGBP', qty=0.01, interval='30')
 Strat1(symbol='ADAGBP', qty=0.1, interval='30')
-
-
 
 
 ######################################### MAIN CURRENT STRATEGY 2022-10-11 #######################################################
