@@ -1,7 +1,7 @@
 # live Binance data and storing into SQL database.
 # Part 1
 # From: https://www.youtube.com/watch?v=rc_Y6rdBqXM
-
+#
 # My API backup key from Binance = QRUDQ3HMSYTOSDXN
 import os
 import time
