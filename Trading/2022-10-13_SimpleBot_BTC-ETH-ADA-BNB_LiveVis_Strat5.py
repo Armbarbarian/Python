@@ -283,12 +283,13 @@ print(End_GBP)
 # strat 5
 # SIMPLY LOOK AT PRICE
 temp_list = []
-try:
-    for i in range(5):
-        last_datapoint = GetMinuteData('ETHGBP', '1m', '1m')
-        temp_list.append(last_datapoint)
-        print(pd.DtataFrame(temp_list))
-        time.sleep(15)
+
+last_datapoint = GetMinuteData('ETHGBP', '1m', '1m')
+print(last_datapoint)
+
+temp_list.append(last_datapoint.Close)
+print(pd.DtataFrame(temp_list))
+time.sleep(15)
 except:
     print(temp_list)
     'Finished'
@@ -333,7 +334,7 @@ def Strat5(symbol_list, interval, entried=False):
         # Buying condition
         if entried == False:
             print(performance1[-1])
-            if performance1[-1] > 0.0023:  # if last entry is below 0.1%, then place order
+            if df1.Close > 0.0023:  # if last entry is below 0.1%, then place order
                 order1 = client.order_market_buy(symbol=symbol_list[0],
                                                  quantity=0.01)
                 # order2 = client.order_market_buy(symbol=symbol_list[1],quantity = 0.001)
