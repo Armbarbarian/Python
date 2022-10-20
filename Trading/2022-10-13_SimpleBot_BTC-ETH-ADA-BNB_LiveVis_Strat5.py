@@ -41,7 +41,8 @@ print(client.get_asset_balance(asset='GBP'))
 
 
 def GetMinuteData(symbol, interval, lookback):
-    frame = pd.DataFrame(client.get_historical_klines(symbol, interval, lookback+' min ago UTC'))
+    frame = pd.DataFrame(client.get_historical_klines(
+        symbol, interval, lookback+' min ago UTC'))
     frame = frame.iloc[:, :6]  # arbitrary cutting off at col 6
     frame.columns = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
     frame = frame.set_index('Time')
@@ -96,28 +97,29 @@ def SellOnly(symbol, qty, interval):
 
 # SELL EVERYTHING of one coin
 
-while True:
+'''while True:
     try:
-        SellOnly('ETHGBP', 0.0199, '10')
+        SellOnly('ETHGBP', 0.01, '10')
         time.sleep(5)
     except:
         print('No more coin...')
-        break
+        break'''
 
 
+# BUY or SELL without a condition
 # actual orders that worrks instantly! BE Careful as there are no conditions.
 '''
 # BUY
-order = client.order_market_buy(
+orderBUY_now = client.order_market_buy(
     symbol='ETHGBP',
-    quantity=0.01)
+    quantity=)
 
 # SELL
-order = client.order_market_sell(
+orderSELL_now = client.order_market_sell(
     symbol='ETHGBP',
-    quantity=0.0001)'''
+    quantity=)
 
-
+'''
 # BUY AND SELL
 
 
@@ -153,7 +155,8 @@ def Strat4(symbol_list, interval, entried=False):
     trend_data1 = []
     trend_data2 = []
     trend_data3 = []
-    end_time = time.time() + 60*1  # How many minutes to build up the data for before starting to trade.
+    # How many minutes to build up the data for before starting to trade.
+    end_time = time.time() + 60*1
     while True:
         # Read in the data
         df1 = GetMinuteData(symbol_list[0], '1m', interval)
@@ -206,10 +209,12 @@ def Strat4(symbol_list, interval, entried=False):
                     '''
                 # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
                 if len(sincebuy1) > 0:
-                    sincebuy_returns1 = (sincebuy1.Open.pct_change() + 1).cumprod() - 1
+                    sincebuy_returns1 = (
+                        sincebuy1.Open.pct_change() + 1).cumprod() - 1
                     try:
                         if sincebuy_returns1[-1] > 0.0003 or sincebuy_returns1[-1] < -0.003:
-                            sell1 = client.order_market_sell(symbol=symbol_list[0], quantity=0.01)
+                            sell1 = client.order_market_sell(
+                                symbol=symbol_list[0], quantity=0.01)
                             print('SOLD' + symbol_list[0])
                             print(sell1)
                             entried = False
@@ -266,6 +271,7 @@ print(info3['filters'][2]['minQty'])'''
 
 '''
 # EXECUTE SCHEME
+
 final_time = time.time() + 60*60
 while time.time() < final_time:
     Strat4(symbol_list=['ETHGBP'], interval='20m')
@@ -282,126 +288,98 @@ print(End_GBP)
 
 # strat 5
 # SIMPLY LOOK AT PRICE
-temp_list = []
-
-last_datapoint = GetMinuteData('ETHGBP', '1m', '1m')
-print(last_datapoint)
-
-temp_list.append(last_datapoint.Close)
-print(pd.DtataFrame(temp_list))
-time.sleep(15)
-except:
-    print(temp_list)
-    'Finished'
-
-
-print(df1.loc[df1.Open > 1097])
-for i in df1:
-    if df1.Open > 1090:
-        print('Up')
-    else:
-        print('Low')
-
 
 ##################################################################
 
 # Plotting the current trend under the current strat.
 # Place Trades Based off the Vis function plot. If they look good then run it manually.
 
-def Strat5(symbol_list, interval, entried=False):
-    trend_data1 = []
-    trend_data2 = []
-    trend_data3 = []
-    end_time = time.time() + 60*1  # How many minutes to build up the data for before starting to trade.
+def TradeETH_V5(symbol, interval, qty, entried=False):
+
     while True:
         # Read in the data
-        df1 = GetMinuteData(symbol_list[0], '1m', interval)
-        #df2 = GetMinuteData(symbol_list[1], '1m', interval)
-        #df3 = GetMinuteData(symbol_list[2], '1m', interval)
+        df1 = GetMinuteData(symbol, '1m', interval)
+        trend_data1 = []
+        # previous calculations to work out perc increase
+
         performance1 = (df1.Open.pct_change() + 1).cumprod() - 1
-        #performance2 = (df2.Open.pct_change() + 1).cumprod() - 1
-        #performance3 = (df3.Open.pct_change() + 1).cumprod() - 1
         trend1 = (df1.Open.tail(5))
-        #trend2 = (df2.Open.tail(5))
-        #trend3 = (df3.Open.tail(5))
         diff1 = trend1[-1] / trend1[0]
-        #diff2 = trend2[-1] / trend2[0]
-        #diff3 = trend3[-1] / trend3[0]
         trend_data1.append(diff1)
-        # trend_data2.append(diff2)
-        # trend_data3.append(diff3)
         # print(pd.DataFrame(trend_data))
-        # Buying condition
+
+        try:
+            # Simple Buying condition to buy and store the price data
+            if entried == False:
+                buy_price = df1.Open
+                print(buy_price)
+                if trend_data1[-1] < 1:
+                    order1 = client.order_market_buy(symbol=symbol,
+                                                     quantity=qty)
+                    print('Buy Order Filled!')
+                    print(order1)
+                    entried = True
+                    print('Transfering to Sales Department')
+                    Print('. . .')
+                    break
+                else:
+                    print('Chose not to buy right now.')
+
+        except:
+            print('Something went wrong')
+
+        # Old sell condition
+        '''
         if entried == False:
             print(performance1[-1])
-            if df1.Close > 0.0023:  # if last entry is below 0.1%, then place order
+            if df1.Close > 0.002:  # if last entry is below 0.1%, then place order
                 order1 = client.order_market_buy(symbol=symbol_list[0],
                                                  quantity=0.01)
-                # order2 = client.order_market_buy(symbol=symbol_list[1],quantity = 0.001)
-                # order3 = client.order_market_buy(symbol=symbol_list[2], quantity=0.1)
                 print('Buy Order Filled!')
                 print(order1)
-                # print(order2)
-                # print(order3)
                 entried = True
                 time.sleep(2)
                 print('Transfering to Sales Department...')
             else:
                 print('Chose not to buy. You are welcome.')
                 time.sleep(2)
+
+            '''
+
+        # Sell Conditions loop
         if entried == True:
             while True:
-                df1 = GetMinuteData(symbol_list[0], '1m', interval)
-                # df2 = GetMinuteData(symbol_list[1], '1m', interval)
-                # df3 = GetMinuteData(symbol_list[2], '1m', interval)
-
+                trend_data2 = []
+                df2 = GetMinuteData(symbol, '1m', interval)
+                trend2 = (df2.Open.tail(5))
+                diff2 = trend2[-1] / trend1[0]
+                trend_data2.append(diff1)
                 sincebuy1 = df1.loc[df1.index > pd.to_datetime(
-                    order1['transactTime'], unit='ms')]
-                '''
-                sincebuy2 = df2.loc[df2.index > pd.to_datetime(
-                    order2['transactTime'], unit='ms')]
-                sincebuy3 = df3.loc[df3.index > pd.to_datetime(
-                    order3['transactTime'], unit='ms')]
-                    '''
+                    order1['transactTime'], unit='ms')]  # convert timestamp
+
+                # Sell if trend data is positive
+                if trend_data2[-1] > 1.001:
+                    sell1 = client.order_market_sell(
+                        symbol=symbol, quantity=qty)
+                    print(sell1)
+                    entried = False
+                    break
+
                 # Sell if asset rises by more than 0.15% (This is minimum as otherwise fees get us) OR falls again by 0.15%
+                '''
                 if len(sincebuy1) > 0:
                     sincebuy_returns1 = (sincebuy1.Open.pct_change() + 1).cumprod() - 1
                     try:
-                        if sincebuy_returns1[-1] > 0.0003 or sincebuy_returns1[-1] < -0.003:
-                            sell1 = client.order_market_sell(symbol=symbol_list[0], quantity=0.01)
-                            print('SOLD' + symbol_list[0])
+                        if sincebuy_returns1[-1] > 0.0003:
+                            # or sincebuy_returns1[-1] < -0.003:
+                            sell1 = client.order_market_sell(symbol=symbol, quantity=qty)
                             print(sell1)
                             entried = False
                             break
-                    except:
-                        continue
-                        print(sincebuy_returns1[-1])
-
-                    '''
-                if len(sincebuy2) > 0:
-                    sincebuy_returns2 = (sincebuy2.Open.pct_change() + 1).cumprod() - 1
-                    try:
-                        print(sincebuy_returns2[-1])
-                        if sincebuy_returns2[-1] > 0.0003 or sincebuy_returns2[-1] < -0.0015:
-                            sell2 = client.order_market_sell(symbol=symbol_list[1], quantity=0.001)
-                            print('SOLD' + symbol_list[1])
-                            print(sell2)
-                            break
-                    except:
-                        continue
-                    '''
+                            '''
 
 
-'''
-                if len(sincebuy3) > 0:
-                    sincebuy_returns3 = (sincebuy3.Open.pct_change() + 1).cumprod() - 1
-                    try:
-                        print(sincebuy_returns3[-1])
-                        if sincebuy_returns3[-1] > 0.0003 or sincebuy_returns1[-1] < -0.0015:
-                            sell3 = client.order_market_sell(symbol=symbol_list[2], quantity=0.1)
-                            print('SOLD' + symbol_list[2])
-                            print(sell3)
-                            break
-                    except:
-                        continue
-'''
+# Call New function
+end_time = time.time() + 60*60
+while time.time() < end_time:
+    TradeETH_V5(symbol='ETHGBP', interval='10m', qty=0.01)
