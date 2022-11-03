@@ -51,6 +51,7 @@ def GetMinuteData(symbol, interval, lookback):
     frame = frame.astype(float)
     return frame
 
+
 # call the new function to get minute data on any coin! try it out for ETH BTC and ADA
 # - in minutes.
 # Check how the markets look before trading and figure out which time frame gives us an increasing trends
@@ -108,18 +109,18 @@ def SellOnly(symbol, qty, interval):
 
 # BUY or SELL without a condition
 # actual orders that worrks instantly! BE Careful as there are no conditions.
-'''
+
 # BUY
 orderBUY_now = client.order_market_buy(
-    symbol='ETHGBP',
+    symbol='BNBETH',
     quantity=)
 
 # SELL
 orderSELL_now = client.order_market_sell(
-    symbol='ETHGBP',
+    symbol='BNBETH',
     quantity=)
 
-'''
+
 # BUY AND SELL
 
 
@@ -380,6 +381,13 @@ def TradeETH_V5(symbol, interval, qty, entried=False):
 
 
 # Call New function
+
+# ETH GBP
 end_time = time.time() + 60*60
 while time.time() < end_time:
     TradeETH_V5(symbol='ETHGBP', interval='10m', qty=0.01)
+
+
+# ETH BNBGBPend_time = time.time() + 60*60
+while time.time() < end_time:
+    TradeETH_V5(symbol='ETHBNB', interval='10m', qty=0.01)
