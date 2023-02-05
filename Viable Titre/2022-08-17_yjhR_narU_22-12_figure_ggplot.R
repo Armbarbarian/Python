@@ -3,7 +3,7 @@ library(tidyverse)
 
 # Set dir and slight tidy getting rid of first column
 Set_Directory <- setwd(dirname(file.choose()))
-master_df <- read.csv(file.choose())
+master_df <- read.csv('Master_DF_17-08.csv')
 master_df <- master_df[,-1]
 master_df
 
@@ -11,10 +11,10 @@ master_df
 # plot using ggplot
 plot <-  ggplot(data=master_df) +
   geom_bar(aes(reorder(Strain, m_n), m_n, fill = m_n),stat='identity') +
-  geom_errorbar(aes(x=Strain, ymin= m_n - Sigma_n ,ymax = m_n + Sigma_n ), width=0.4, colour="black", alpha=0.8, size=0.4) +
+  geom_errorbar(aes(x=Strain, ymin= m_n - Sigma_n ,ymax = m_n + Sigma_n ), width=0.2, colour="black", alpha=1, size=0.8) +
   scale_fill_viridis_c(option='H') + # A-E
   xlab('Strain') + ylab('Mutation Rate') +
-  ggtitle('Mutation Rate in Double Origin Strain\n2022-08-17') +
+  ggtitle('Mutation Rate in Double Origin Strains') +
   theme(plot.title = element_text(hjust = 0.5), 
         axis.text.x = element_text(angle=50,hjust = 1)) +
   theme_classic() +
@@ -26,4 +26,4 @@ plot <-  ggplot(data=master_df) +
 # Call the plot and save
 plot
 setwd(dirname(file.choose()))
-ggsave('2022-08-17_Recombination_Rates_Update.png')
+ggsave('2023-02-05_AllStrain_Recombination_Rates.png', width = 5, height = 5)
