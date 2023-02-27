@@ -718,6 +718,7 @@ while True:
                         [sg.Text('Plated Volume:', font=font, key='-Volume_text-', visible=True)],
                         [sg.Text('Mutation Rate Calculation:', key='-Rate_text-', visible=True)],
                         [sg.Text('Number of Cultures (N):', font=font, key='-Number_text-', visible=True)],
+                        [sg.Text('Volume of Cultures (mL):', font=font, key='-vol_text_mrate-', visible=True)],
                         [sg.Button('Retrieve Strain and Calculate', visible=True)],
                         [sg.Text('_'*20)],
                         [sg.Text('Cell Count per Culture (n):', font=font, key='-Count_text-', visible=True)],
@@ -739,6 +740,7 @@ while True:
                         [sg.Combo(['Method 1 (Drake): \u03BC = m / Nt', 'Method 2: \u03BC = m / (Nt-1)', 'Method 3: \u03BC = m / 2Nt',
                                   'Method 4: \u03BC = m ln(2) / Nt'], key='-Mrate_method-', enable_events=True, visible=True)],
                         [sg.InputText(key='-Cultures-', size=(20, 1), font=font, visible=True)],
+                        [sg.Combo(list(range(1, 6)), key='-Cultures Dropdown2-', font=font, visible=True)],
                         [sg.Text(' '*20)],
                         [sg.Text(' '*20)],
                         [sg.InputText(key='-Cells-', size=(20, 1), font=font, visible=True)],
@@ -784,8 +786,9 @@ while True:
                                 LB_titre = LB_strain1.Titre
                                 Ab_titre = Ab_strain1.Titre
 
-                                LB_total_cells1 = LB_titre*5
-                                Ab_total_cells1 = Ab_titre*5
+                                # Multiply by the volume of the Overnight culture.
+                                LB_total_cells1 = LB_titre*values['-Cultures Dropdown2-']
+                                Ab_total_cells1 = Ab_titre*values['-Cultures Dropdown2-']
 
                         # Calculations for mutation rates, all slightly different
                                 # Fraction = Ab_titre.item() / LB_titre.item()
