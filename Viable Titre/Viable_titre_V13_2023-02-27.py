@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 os.getcwd()
+
 # %matplotlib inline
 matplotlib.use('TkAgg')
 plt.style.use('ggplot')
