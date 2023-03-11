@@ -350,7 +350,7 @@ while True:
         analysis_layout = [
             [sg.Text('Select a csv of your data:',  font=font, size=(20, 0)), sg.FileBrowse(key='csv_file2')],
             [sg.Text('Select type of analysis', font=font, size=(20, 0)), sg.Combo(
-                ['Growth Curve', 'Stand Alone Titre Comparison', 'Calculate Median Culture', 'Mutation Rates'], key='analysis_type', size=(25, 1), font=font)],
+                ['Calculate Median Culture', 'Mutation Rates'], key='analysis_type', size=(25, 1), font=font)],
             [sg.Submit('Select Analysis', font=font), sg.Text(' or ', font=font), sg.Submit('Plot Data', font=font)],
             [sg.Text('_'*80)]
         ]
@@ -361,18 +361,6 @@ while True:
                 break
             # sg.popup('Feature not ready')
             if event == 'Select Analysis':
-                # Growth curve analysis
-                if values['analysis_type'] == 'Growth Curve':
-                    #sg.popup('Growth Curve Analysis not ready yet', font=font)
-                    # continue
-                    try:
-                        Growth_df = pd.read_csv(values['csv_file2'])
-                    except:
-                        sg.popup('Trouble reading in Growth Curve CSV..', font=font)
-
-            # Stand alone titre analysis
-                if values['analysis_type'] == 'Stand Alone Titre Comparison':
-                    sg.popup('Stand Alone Titre Comparison not ready yet', font=font)
 
             # Median calculation (Recombination rates)
                 if values['analysis_type'] == 'Calculate Median Culture':
@@ -699,11 +687,14 @@ while True:
                                 antibiotics_list.append(con)
 
                         # selecting only the median strains for the dropdown later for '-Median_culture1-'
+
                         medians_list = []
-                        data_medians = master_df.loc[master_df['Median'] == True].Strain
+                        #data_medians = master_df.loc[master_df['Median'] == True].Strain
+                        data_medians = master_df.Strain
                         for strain in data_medians:
                             if strain not in medians_list:
                                 medians_list.append(strain)
+
 
                     except:
                         sg.popup('Median Spreadsheet must be used...', font=font)
@@ -761,7 +752,6 @@ while True:
                           sg.Button('View Terms', font=font, pad=((0, 0), (0.0))),
                           sg.Image(key='-Terms-', visible=False), sg.Button('Close Image', key='-close_image-', visible=False)],
                          [sg.Button('Save Mutation Data', font=font), sg.Exit(font=font, button_color='firebrick', size=(10, 1), pad=((330, 0), (0, 0)))],
-                         [sg.Button('Compare Two Strains', font=font, button_color='teal')],
                          [sg.Text('_'*30, key='-divider10-', visible=False)],
                          [sg.Text('Strain 1:', key='-strain1-', visible=False),
                             sg.Combo(data_strain, key='-strain1_dropdown-', visible=False)],
@@ -881,12 +871,14 @@ while True:
                                     sg.popup('Something went wrong.')
                             if popup2 == 'Yes':
                                 try:
-                                    df1 = pd.read_csv(mutation_file)
+                                    df1 = pd.read_csv('mutationrate'+day+'-'+month+'.csv')
                                     mutation_dataframe = pd.DataFrame(mutation_dict)
                                     df1 = df1.append(mutation_dataframe, ignore_index=True)
-                                    df1.to_csv((mutation_file), index=False)
+                                    df1.to_csv(('mutationrate'+day+'-'+month+'.csv'), index=False)
                                     sg.popup('Data saved!')
                                 except:
+                                    sg.popup('Could not load previous CSV!')
+                                    '''
                                     browse_file_layout = [
                                         [sg.Text('Select your csv file:'), sg.FileBrowse(key='mutation_file')],
                                         [sg.Submit(key='csv_submit')]
@@ -902,6 +894,9 @@ while True:
                                         sg.popup('Data saved!')
                                         browse_csv_window.close()
                                         continue
+                                        '''
+
+
                         if event == 'View Terms':
                             try:
                                 wd = os.getcwd()
@@ -1148,7 +1143,7 @@ window.close()
 #                                         TEST SPACE
 #
 ##########################################################################################
-
+'''
 dict = {'Strain': [1, 2, 3], 'total': [20, 30, 40], 'median': [True, False, False]}
 df = pd.DataFrame(dict)
 df
@@ -1190,7 +1185,7 @@ s
 
 
 # mutationrate from the 1998 program in JavaScript
-'''
+
 from the mutation rate program in what looks like javascript to calculate mutation rate
 
 # mutation rate
@@ -1214,11 +1209,11 @@ function SigmaBerechnen()
    divisor =  (2.24 + Math.log(this.m)) * (2.24 + Math.log(this.m));
    this.s = this.m * Math.sqrt((1/this.N) * (divident/divisor));
 }
-'''
+
 
 # retrieving index for the median values in the dataframe to append/add with button
 # https://www.edureka.co/community/43215/how-to-find-the-index-of-a-particular-value-in-a-dataframe
-'''
+
 CSV_FILE = ('output_'+day+'-'+month+'.csv')
 CSV_DF = pd.read_csv(CSV_FILE)
 CSV_DF
@@ -1232,7 +1227,8 @@ for strain in xlist:
     else:
         print('not here')
 # print(indexes)
-'''
+
+
 
 
 # matplotlib of mutation rates
@@ -1280,6 +1276,6 @@ plt.title('Preliminary Rates of Recombination in E.coli\nwith varying number of 
 plt.xticks(x_pos, x)
 plt.grid(b=None)
 
-
+'''
 # plt.savefig('Recombination_rates_Ecoli_1.png')
 # plt.savefig('Recombination_rates_Ecoli_1.pdf')
