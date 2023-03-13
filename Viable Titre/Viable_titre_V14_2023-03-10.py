@@ -362,7 +362,7 @@ while True:
             # sg.popup('Feature not ready')
             if event == 'Select Analysis':
 
-            # Median calculation (Recombination rates)
+                # Median calculation (Recombination rates)
                 if values['analysis_type'] == 'Calculate Median Culture':
                     try:
                         master_df = pd.read_csv(values['csv_file2'])
@@ -695,7 +695,6 @@ while True:
                             if strain not in medians_list:
                                 medians_list.append(strain)
 
-
                     except:
                         sg.popup('Median Spreadsheet must be used...', font=font)
                         # headings3 = list(master_df.columns)
@@ -895,7 +894,6 @@ while True:
                                         browse_csv_window.close()
                                         continue
                                         '''
-
 
                         if event == 'View Terms':
                             try:
