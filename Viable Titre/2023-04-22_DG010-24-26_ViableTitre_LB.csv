@@ -1,0 +1,4 @@
+Strain,Condition,Volume,Dilution_1,Dilution_2,Colonies_1A,Colonies_1B,Colonies_2A,Colonies_2B,Titre
+DG026,LB,0.01,0.001,0.01,21,11,4,2,172727.2727
+DG024,LB,0.01,0.001,0.01,8,7,2,3,90909.09091
+DG010,LB,0.01,1.00E-04,1.00E-03,32,35,8,9,3818181.818
