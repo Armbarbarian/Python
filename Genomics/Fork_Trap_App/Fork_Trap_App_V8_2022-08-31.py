@@ -162,6 +162,10 @@ font = ('Calibri', 14)
 font_heading = ('Calibri', 24)
 font_small = ('Calibri', 12)
 
+#easy_fas = list(SeqIO.parse(open('MG1655.fasta'), 'fasta'))
+#easy_ter_csv = pd.read_csv('MG1655.csv')
+
+
 layout_text = [
     [sg.Text('Fork Trap App', font=font_heading)],
     [sg.Text('Select Genome (fasta): ', font=font), sg.FileBrowse(key='-genome1-'), sg.Combo(['MG1655'], key='-MG1655-', font=font)],
@@ -192,18 +196,20 @@ while True:
 
     if event == 'Run':
         try:
-            # ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
-            ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+            ter_csv = pd.read_csv('ter_MG1655.csv')
+            #ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            # chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
-            chi_csv = pd.read_csv(values['-chi_csv-'])
+            chi_csv = pd.read_csv('Chi_MG1655.csv')
+            #chi_csv = pd.read_csv(values['-chi_csv-'])
+
         except:
             sg.popup('Error with other csv file...', font=font)
         try:
-            # BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
-            BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
+            BLAST_csv = pd.read_csv('MG1655_oriC_Blast.csv')
+            #BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
         except:
             sg.popup('Error with BLAST csv file...', font=font)
 
@@ -216,7 +222,7 @@ while True:
                 sg.popup('ERROR: Cannot locate the genome')
         else:
             try:
-                fas = list(SeqIO.parse(open('C:/Users/Danie/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
+                fas = list(SeqIO.parse(open('MG1655.fasta'), 'fasta'))
             except:
                 sg.popup('ERROR: Cannot locate the MG1655 genome')
             # Other BT2
@@ -248,6 +254,8 @@ while True:
             terI = TerSite('terI', ter_csv)
             terJ = TerSite('terJ', ter_csv)
 
+            # ADD BACK genom diagram chunk here if not working
+
             # ___________________
             # Genome Diagram using TerSite class
             # ___________________
@@ -255,6 +263,7 @@ while True:
             gd_features1 = gd_diagram.new_track(1, greytrack=False)
             gd_set1 = gd_features1.new_set()
             # gd_set2 = gd_features1.new_set('other')
+
 
             try:
                 # From BT2 in R
@@ -282,7 +291,7 @@ while True:
 
         if not values['-save_image-']:
             dir_path = os.path.dirname(os.path.realpath(
-                'C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/042_RFT_11-01.pdf'))
+                'C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/MG1655.csv'))
         else:
             dir_path = os.path.dirname(
                 os.path.realpath(values['-save_image-']))
