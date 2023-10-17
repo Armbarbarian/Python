@@ -23,6 +23,9 @@ month = now.strftime("%m")
 Great tutorial on how to get started here:
 
 https://biopython-tutorial.readthedocs.io/en/latest/notebooks/17%20-%20Graphics%20including%20GenomeDiagram.html
+
+Also someone elses project with good examples:
+https://corytophanes.github.io/BIO_BIT_Bioinformatics_209/biopython-genomediagram.html
 '''
 
 # ________________________________________________________________________
@@ -97,8 +100,8 @@ class BlastToSet():
 ####################
 
 
-class ChiSite():
-    def __init__(self, csv, name='chi'):
+class XSite():
+    def __init__(self, csv, name='X'):
         self.csv = csv
 
         # start
@@ -116,7 +119,7 @@ class ChiSite():
         # end
         end_list = []
         for i in csv.pos:
-            end_temp = int(i) + 30
+            end_temp = int(i) + 5000
             end_list.append(end_temp)
         self.stop = end_list
 
@@ -136,22 +139,22 @@ class ChiSite():
         self.name = name_list
 
 
-class ChiToSet():
-    def __init__(self, set, chi_site, colour):
+class XToSet():
+    def __init__(self, set, X_site, colour):
         self.set = set
-        self.chi_site = chi_site
+        self.X_site = X_site
         self.colour = colour
 
 # cannot find a for loop to add all features in one go, works when i subset one individual.
         feature_list = []
-        for i in range(0, len(chi_site.start)):
+        for i in range(0, len(X_site.start)):
             feature = SeqFeature(FeatureLocation(
-                chi_site.start[i], chi_site.stop[i]), strand=chi_site.strand[i])
+                X_site.start[i], X_site.stop[i]), strand=X_site.strand[i])
             feature_list.append(feature)
 
-        for i in range(0, len(chi_site.start)):
+        for i in range(0, len(X_site.start)):
             set.add_feature(
-                feature_list[i], name=chi_site.name[i], label=False, color=colour, label_size=25)
+                feature_list[i], name=X_site.name[i], label=False, color=colour, label_size=25)
 
 
 # ________________________________________________________________________
@@ -166,7 +169,7 @@ layout_text = [
     [sg.Text('Fork Trap App', font=font_heading)],
     [sg.Text('Select Genome (fasta): ', font=font)],
     [sg.Text('Ter csv: ', font=font)],
-    [sg.Text('Chi csv: ', font=font)],
+    [sg.Text('X csv: ', font=font)],
     [sg.Text('BLAST csv: ', font=font)],
     [sg.Text('Chromosome Shape: ', font=font)],
     [sg.Text('Select core size: ', font=font)],
@@ -179,7 +182,7 @@ layout_input = [
     [sg.Text(' '*20, font=font_heading)],
     [sg.FileBrowse(key='-genome1-')],
     [sg.FileBrowse(key='-ter_BT2_csv-')],
-    [sg.FileBrowse(key='-chi_csv-')],
+    [sg.FileBrowse(key='-X_csv-')],
     [sg.FileBrowse(key='-BLAST_csv-')],
     # [sg.Combo(['All', 'terA', 'terB', 'terC', 'terD', 'terE', 'terF', 'terG', 'terH', 'terI', 'terJ'],key = '-ter_input-')],
     [sg.Combo(['linear', 'cicular'], key='-chromosome_shape-',
@@ -206,31 +209,31 @@ while True:
         break
     if event == 'Run':
         try:
-            #ter_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Ecoli_matched_ter_sequences_csv/MG1655.csv')
-            ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+            ter_csv = pd.read_csv('ter_MG1655.csv')
+            #ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
-            #chi_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/Chi sites/Chi_MG1655_20-01.csv')
-            chi_csv = pd.read_csv(values['-chi_csv-'])
+            #X_csv = pd.read_csv('C:/Users/Danie/OneDrive/Documents/GitHub/termination/bowtie2/X sites/X_MG1655_20-01.csv')
+            X_csv = pd.read_csv(values['-X_csv-'])
         except:
             sg.popup('Error with other csv file...', font=font)
         try:
-            #BLAST_csv = pd.read_csv('C:/Users/Danie/Documents/Python1/Python/Genomics/BLAST_App/MG1655_oriC_Blast.csv')
-            BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
+            BLAST_csv = pd.read_csv('MG1655_oriC_Blast.csv')
+            #BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
         except:
             sg.popup('Error with BLAST csv file...', font=font)
         try:
-            #fas = list(SeqIO.parse(open('C:/Users/Danie/OneDrive/Documents/GitHub/termination/Genomes/Ecoli/MG1655.fasta'), 'fasta'))
-            fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
+            fas = list(SeqIO.parse(open('MG1655.fasta'), 'fasta'))
+            #fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
             sg.popup('Genome size: ' + str(len(fas[0])))
 
             # Other BT2
             try:
-                # Chi from BT2
-                chi = ChiSite(chi_csv)
+                # X from BT2
+                X = XSite(X_csv)
             except:
-                sg.popup('ChiSite class not working')
+                sg.popup('XSite class not working')
 
             # BLAST sites
             try:
@@ -257,22 +260,16 @@ while True:
             # ___________________
             # Genome Diagram using TerSite class
             # ___________________
-            gd_diagram = GenomeDiagram.Diagram('ter sites')
-            gd_features1 = gd_diagram.new_track(1, greytrack=False)
-            gd_set1 = gd_features1.new_set()
-            # gd_set2 = gd_features1.new_set('other')
 
-            try:
-                # From BT2 in R
-                ChiToSet(gd_set1, chi, 'blue')
-            except:
-                sg.popup('ChiToSet not working')
-            try:
-                # From BLAST App
-                BlastToSet(gd_set1, blast1, 'black')
-            except:
-                sg.popup('BlastToSet not working')
-            #
+            gd_diagram = GenomeDiagram.Diagram('MG1655')
+            # Track 1
+            gd_features1 = gd_diagram.new_track(0, greytrack=True)
+            gd_set1 = gd_features1.new_set()
+            # Track2
+            gd_features2 = gd_diagram.new_track(2, greytrack=False)
+            gd_set2 = gd_features2.new_set()
+
+            # Add ter Sites
             TerToSet(gd_set1, terA, 'red')
             TerToSet(gd_set1, terB, 'blue')
             TerToSet(gd_set1, terC, 'purple')
@@ -284,10 +281,21 @@ while True:
             TerToSet(gd_set1, terI, 'gray')
             TerToSet(gd_set1, terJ, 'gray')
 
+            try:
+                # From BT2 formated csvs
+                XToSet(gd_set2, X, 'blue')
+            except:
+                sg.popup('XToSet not working')
+            try:
+                # From BLAST App
+                BlastToSet(gd_set1, blast1, 'black')
+            except:
+                sg.popup('BlastToSet not working')
+
         except:
             sg.popup('Something Went Wrong..', font=font)
-        # Change directory to save in custom location
 
+        # Change directory to save in custom location
         if not values['-save_image-']:
             dir_path = os.path.dirname(os.path.realpath(
                 'C:/Users/Danie/Documents/Python1/Python/Genomics/Fork_Trap_App/042_RFT_11-01.pdf'))
@@ -295,8 +303,8 @@ while True:
             dir_path = os.path.dirname(
                 os.path.realpath(values['-save_image-']))
         os.chdir(dir_path)
+
         # Draw the actual image.
-        # Add the terA TerSite class information into the Track
         gd_diagram.draw(format=values['-chromosome_shape-'],
                         start=0, end=len(fas[0]), circle_core=float(values['-core_size-']))
 
