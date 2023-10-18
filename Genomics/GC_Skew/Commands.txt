@@ -1,0 +1,4 @@
+# skewi
+python src\skewi.py -i MG1655.fasta -o MG1655_GCskew.csv --all -k 5000 -f 5000
+
+# gcskew.py
