@@ -210,23 +210,23 @@ while True:
     if event == 'Run':
         try:
             ter_csv = pd.read_csv('ter_MG1655.csv')
-            #ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+            # ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
             X_csv = pd.read_csv('Rlooptracker_MG1655.csv')  # R-loops
             X2_csv = pd.read_csv('MG1655_G4s_command5.csv')  # G4s
-            #X_csv = pd.read_csv(values['-X_csv-'])
+            # X_csv = pd.read_csv(values['-X_csv-'])
         except:
             sg.popup('Error with other csv file...', font=font)
         try:
             BLAST_csv = pd.read_csv('MG1655_oriC_Blast.csv')
-            #BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
+            # BLAST_csv = pd.read_csv(values['-BLAST_csv-'])
         except:
             sg.popup('Error with BLAST csv file...', font=font)
         try:
             fas = list(SeqIO.parse(open('MG1655.fasta'), 'fasta'))
-            #fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
+            # fas = list(SeqIO.parse(open(values['-genome1-']), 'fasta'))
             sg.popup('Genome size: ' + str(len(fas[0])))
 
             # Other BT2
@@ -309,7 +309,8 @@ while True:
 
         # Draw the actual image.
         gd_diagram.draw(format=values['-chromosome_shape-'],
-                        start=0, end=len(fas[0]), circle_core=float(values['-core_size-']))
+                        start=0, end=len(fas[0]), circle_core=0.7)
+        # float(values['-core_size-']
 
         if not values['-image_name-']:
             gd_diagram.write('output_'+day+'-'+month+'.pdf', 'pdf')
