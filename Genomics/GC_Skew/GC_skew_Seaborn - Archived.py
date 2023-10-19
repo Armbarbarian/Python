@@ -25,12 +25,21 @@ df['Angle'] = df['Index'] / len(record) * 2 * np.pi
 df['Cumulative'] = df['GC']
 
 # Create plot
-fig, ax = plt.subplots(figsize=(12, 12), dpi=150, subplot_kw={'projection': 'polar'})
+fig, ax = plt.subplots(figsize=(5, 5), dpi=150, subplot_kw={'projection': 'polar'}, facecolor='white')
 
 # Plot smoothed cumulative GC against angle
-sns.lineplot(x='Angle', y='Cumulative', data=df, color='lightblue')
-'''
-# Add shaded regions for Ori and Ter
+#sns.lineplot(x='Angle', y='Cumulative', data=df, color='blue')
+
+
+# Split data into negative and positive subsets
+df_neg = df.query('Cumulative < 0')
+df_pos = df.query('Cumulative > 0')
+
+# Plot smoothed cumulative GC against angle with different colors for each subset
+sns.lineplot(x='Angle', y='Cumulative', data=df_neg, color='purple')
+sns.lineplot(x='Angle', y='Cumulative', data=df_pos, color='green')
+
+'''# Add shaded regions for Ori and Ter
 ax.axvspan(0, np.pi/2, color='blue', alpha=0.1)
 ax.axvspan(np.pi, 3*np.pi/2, color='red', alpha=0.1)'''
 
@@ -38,13 +47,14 @@ ax.axvspan(np.pi, 3*np.pi/2, color='red', alpha=0.1)'''
 ax.set_title('MG1655 GC Skew', size=20)
 ax.set_rticks([])
 ax.set_rlabel_position(0)
+ax.set_ylim(-1, 0.2)
+ax.grid(False)
 
-# plt.show()
+# new line to change grids
+
+
+# View
+plt.show()
 
 # Save figure
-plt.savefig('2023-10-18_MG1655_GCskew_seaborn.png', bbox_inches='tight')
-
-
-'''
-Bing test for bigger circle
-'''
+#plt.savefig('2023-10-18_MG1655_GCskew_PurpleGreen_seaborn.png', bbox_inches='tight')

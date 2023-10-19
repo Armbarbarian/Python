@@ -209,8 +209,8 @@ while True:
         break
     if event == 'Run':
         try:
-            ter_csv = pd.read_csv('ter_MG1655.csv')
-            # ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
+            #ter_csv = pd.read_csv('ter_MG1655.csv')
+            ter_csv = pd.read_csv(values['-ter_BT2_csv-'])
         except:
             sg.popup('Error with ter csv file...', font=font)
         try:
@@ -265,7 +265,7 @@ while True:
 
             gd_diagram = GenomeDiagram.Diagram('MG1655')
             # Track 1
-            gd_features1 = gd_diagram.new_track(1, greytrack=False)
+            gd_features1 = gd_diagram.new_track(0, greytrack=False)
             gd_set1 = gd_features1.new_set()
             # Track2
             gd_features2 = gd_diagram.new_track(2, greytrack=False)
