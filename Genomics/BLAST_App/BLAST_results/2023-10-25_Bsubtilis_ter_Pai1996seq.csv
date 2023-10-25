@@ -1,0 +1,2 @@
+stitle,qseqid,sseqid,sstart,send,sstrand,evalue,sseq,length,btop
+NC_000964.3 Bacillus subtilis subsp. subtilis str. 168 complete genome,ter,NC_000964.3,2018430,2018384,minus,1.05e-20,ACTAAGAAAACTATGTACCAAATGTTCAGTCGAAATTTATTTTTTCC,47,47
