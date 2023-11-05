@@ -14,12 +14,12 @@ aug = transforms.Compose([
 
 sequences = np.loadtxt('MG1655_random_promoter_SAPPHIRE.tsv', delimiter='\t')
 
-sequences = []
-for row in promoters:
-    sequence = row[0]  # assuming sequence is first column
-    sequences.append(sequence)
+sequences_list = []
+for row in sequences:
+    sequence = sequences  # assuming sequence is first column
+    sequences_list.append(sequence)
 
-sequences = np.array(sequences)
+sequences = np.array(sequences_list)
 
 sequences = aug(sequences)
 labels = ['promoter_MG1655']
