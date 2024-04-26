@@ -4,9 +4,13 @@
 #                           Custom function for G4s - Llama3 70B
 ###############################################################################
 
-
+import os
+os.getcwd()
+# Set the working directory to the directory of the current file
+os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Postdoc\\Machine_Learning')
 import re
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
@@ -43,6 +47,8 @@ def normalize_read_counts(read_counts):
     normalized_read_counts = scaler.fit_transform(log_read_counts.reshape(-1, 1)).flatten()
     return normalized_read_counts
 
+# Load the data from a CSV file
+data = pd.read_csv('random_dna_sequences.csv')
 
 # Separate the sequences and read counts
 sequences = data['sequence'].tolist()
@@ -50,8 +56,13 @@ read_counts = data['read_count'].tolist()
 
 #
 g4_data = detect_g4(sequences)
-normalized_read_counts = normalize_read_counts(read_counts)
+g4_data
 
+#
+normalized_read_counts = normalize_read_counts(read_counts)
+normalized_read_counts
+
+#
 g4_features = ['num_guanines', 'min_loop_length', 'max_loop_length', 'avg_loop_length', 'gc_content']
 fig, axs = plt.subplots(nrows=len(g4_features), ncols=1, figsize=(8, 12))
 for i, feature in enumerate(g4_features):

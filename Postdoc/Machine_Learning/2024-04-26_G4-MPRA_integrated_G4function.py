@@ -7,14 +7,21 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv1D, MaxPooling1D, Flatten, Dense, Dropout, Concatenate
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import re
 
+# Set the working directory to the directory of the current file
+os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Postdoc\\Machine_Learning')
+
+
 # Function to detect G4 patterns and extract features
-def detect_g4(sequences):
+'''def detect_g4(sequences):
+    print("Number of sequences:", len(sequences))
     g4_data = []
     for seq in sequences:
+        print("Processing sequence:", seq)
         g4_features = {}
         g4_patterns = []
         for x in range(2, 5):  # variable x (2-4)
@@ -38,19 +45,50 @@ def detect_g4(sequences):
             g4_features["gc_content"] = sum(c in "GC" for c in g4_seq) / len(g4_seq)
             g4_data.append(g4_features)
     return g4_data
+'''
+def detect_g4(sequences):
+    print("Number of sequences:", len(sequences))
+    g4_data = []
+    for seq in sequences:
+        print("Processing sequence:", seq)
+        g4_features = {}
+        g4_patterns = []
+        for x in range(2, 5):  # variable x (2-4)
+            for y in range(1, 10):  # variable y (highly variable)
+                pattern = f"G{{{x}}}[ACGT]{{{y}}}G{{{x}}}[ACGT]{{{y}}}G{{{x}}}[ACGT]{{{y}}}G{{{x}}}"
+                matches = re.finditer(pattern, seq)
+                for match in matches:
+                    start = match.start()
+                    end = match.end()
+                    g4_patterns.append((start, end))
+        print("Number of G4 patterns found:", len(g4_patterns))
+        for start, end in g4_patterns:
+            g4_seq = seq[start:end]
+            g_tracts = re.findall(r"G+", g4_seq)
+            g_tract_lengths = [len(tract) for tract in g_tracts]
+            loop_lengths = [len(g4_seq[i:j]) for i, j in zip([m.end() for m in re.finditer(r"G+", g4_seq)][:-1], [m.start() for m in re.finditer(r"G+", g4_seq)][1:])]
+            g4_features["num_guanines"] = sum(g_tract_lengths)
+            g4_features["loop_lengths"] = loop_lengths
+            g4_features["min_loop_length"] = min(loop_lengths)
+            g4_features["max_loop_length"] = max(loop_lengths)
+            g4_features["avg_loop_length"] = np.mean(loop_lengths)
+            g4_features["gc_content"] = sum(c in "GC" for c in g4_seq) / len(g4_seq)
+            g4_data.append(g4_features)
+        print("Number of G4 features appended:", len(g4_data))
+    return g4_data
 
-# Get current working directory
-current_directory = os.getcwd()
 
-# Set the working directory to the directory of the current file
-os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Postdoc\\Machine_Learning')
 
-print(f"Current working directory: {current_directory}")
+
+
 
 # Step 2: Load and preprocess the data
 
 # Load the data from a CSV file
-data = pd.read_csv('random_dna_sequences.csv')
+if os.path.isfile('random_dna_sequences.csv'):
+    data = pd.read_csv('random_dna_sequences.csv')
+else:
+    raise FileNotFoundError("The CSV file 'random_dna_sequences.csv' does not exist.")
 
 # Separate the sequences and read counts
 sequences = data['sequence'].tolist()
@@ -73,20 +111,43 @@ read_counts_normalized = np.log1p(read_counts)
 # Detect G4 patterns and extract features
 g4_features = detect_g4(sequences)
 
+# Extract loop_lengths as a separate feature
+loop_lengths = [features.pop("loop_lengths") for features in g4_features]
+
 # Find the maximum length of the loop_lengths array
-max_loop_length = max(len(features["loop_lengths"]) for features in g4_features)
+max_loop_length = max(len(lengths) for lengths in loop_lengths)
 
 # Pad the loop_lengths arrays to the maximum length
-for features in g4_features:
-    features["loop_lengths"] = features["loop_lengths"] + [0] * (max_loop_length - len(features["loop_lengths"]))
+padded_loop_lengths = [lengths + [0] * (max_loop_length - len(lengths)) for lengths in loop_lengths]
 
 # Convert the g4_features list to a numpy array
 g4_features_array = np.array([list(features.values()) for features in g4_features])
+
+# Convert padded_loop_lengths to a numpy array
+loop_lengths_array = np.array(padded_loop_lengths)
+
+# Concatenate g4_features_array and loop_lengths_array
+g4_features_array = np.concatenate((g4_features_array, loop_lengths_array), axis=1)
+
+print("Shapes of input arrays:")
+print("sequence_padded:", sequence_padded.shape)
+print("g4_features_array:", g4_features_array.shape)
+print("read_counts_normalized:", read_counts_normalized.shape)
 
 
 # Split the data into training and testing sets
 X_train_seq, X_test_seq, X_train_g4, X_test_g4, y_train, y_test = train_test_split(
     sequence_padded, g4_features_array, read_counts_normalized, test_size=0.2, random_state=42)
+
+print("Shapes of training data:")
+print("X_train_seq:", X_train_seq.shape)
+print("X_train_g4:", X_train_g4.shape)
+print("y_train:", y_train.shape)
+
+print("Shapes of testing data:")
+print("X_test_seq:", X_test_seq.shape)
+print("X_test_g4:", X_test_g4.shape)
+print("y_test:", y_test.shape)
 
 # Step 4: Build the CNN model
 
@@ -111,15 +172,22 @@ model = Model(inputs=[sequence_input, g4_input], outputs=output)
 # Compile the model
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
-# Print the model summarFy
+# Print the model summary
 model.summary()
 
 # Step 5: Train the model
 
+# Define early stopping and model checkpointing callbacks
+early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+model_checkpoint = ModelCheckpoint('best_model.h5', save_best_only=True)
+
 # Train the model
 batch_size = 32
 epochs = 10
-history = model.fit([X_train_seq, X_train_g4], y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+history = model.fit([X_train_seq, X_train_g4], y_train, 
+                    batch_size=batch_size, epochs=epochs, 
+                    validation_split=0.1, 
+                    callbacks=[early_stopping, model_checkpoint])
 
 # Step 6: Evaluate the model
 
