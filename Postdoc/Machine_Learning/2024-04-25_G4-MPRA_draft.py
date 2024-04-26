@@ -1,6 +1,6 @@
 
 # Step 1: Set up the environment and dependencies
-
+import os
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -11,6 +11,21 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 import matplotlib as plt
 
+
+# Get current working directory
+current_directory = os.getcwd()
+
+# Get the absolute path of the current file
+current_file_path = os.path.abspath(__file__)
+
+# Get the directory of the current file
+current_directory = os.path.dirname(current_file_path)
+
+# Set the working directory to the directory of the current file
+os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Postdoc\\Machine_Learning')
+
+#
+print(f"Current working directory: {current_directory}")
 
 
 # Step 2: Load and preprocess the data
@@ -115,72 +130,3 @@ plt.ylabel('G4 Score')
 plt.title('Predicted G4 Scores')
 plt.show()
 
-
-
-###############################################################################
-#                           Custom function for G4s
-###############################################################################
-
-import re
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler
-
-def detect_g4(sequences):
-    """
-    Detect potential G-quadruplex formations in each sequence.
-
-    Parameters:
-    sequences (list): List of DNA sequences
-
-    Returns:
-    g4_data (list): List of dictionaries containing G4 features for each sequence
-    """
-    g4_data = []
-    for seq in sequences:
-        g4_features = {}
-        # Identify potential G4 formations
-        g4_patterns = []
-        for x in range(2, 5):  # variable x (2-4)
-            for y in range(1, 10):  # variable y (highly variable)
-                pattern = f"G{{{x}}}[ACGT]{{{y}}}G{{{x}}}[ACGT]{{{y}}}G{{{x}}}[ACGT]{{{y}}}G{{{x}}}"
-                matches = re.finditer(pattern, seq)
-                for match in matches:
-                    g4_patterns.append((match.start(), match.end()))
-        # Calculate G4 features for each potential G4
-        for start, end in g4_patterns:
-            g4_features = {}
-            g4_seq = seq[start:end]
-            g_tracts = re.findall(r"G+", g4_seq)
-            g_tract_lengths = [len(tract) for tract in g_tracts]
-            loop_lengths = [len(g4_seq[i:j]) for i, j in zip(g_tracts[:-1], g_tracts[1:])]
-            g4_features["num_guanines"] = sum(g_tract_lengths)
-            g4_features["loop_lengths"] = loop_lengths
-            g4_features["min_loop_length"] = min(loop_lengths)
-            g4_features["max_loop_length"] = max(loop_lengths)
-            g4_features["avg_loop_length"] = np.mean(loop_lengths)
-            g4_features["gc_content"] = sum(c in "GC" for c in g4_seq) / len(g4_seq)
-            g4_data.append(g4_features)
-    return g4_data
-
-def normalize_read_counts(read_counts):
-    """
-    Normalize read count data.
-
-    Parameters:
-    read_counts (list): List of read counts
-
-    Returns:
-    normalized_read_counts (list): List of normalized read counts
-    """
-    # Log-transform read counts
-    log_read_counts = np.log1p(read_counts)
-    # Scale read counts to a consistent range (0-1)
-    scaler = MinMaxScaler()
-    normalized_read_counts = scaler.fit_transform(log_read_counts.reshape(-1, 1)).flatten()
-    return normalized_read_counts
-
-# Example usage
-sequences = ["ATCGGCTAGCTAGCTAGCTAGC", "TGCTAGCTAGCTAGCTAGCTA", ...]
-g4_data = detect_g4(sequences)
-read_counts = [10, 20, 30, ...]
-normalized_read_counts = normalize_read_counts(read_counts)
