@@ -14,12 +14,7 @@ import matplotlib as plt
 
 # Get current working directory
 current_directory = os.getcwd()
-
-# Get the absolute path of the current file
-current_file_path = os.path.abspath(__file__)
-
-# Get the directory of the current file
-current_directory = os.path.dirname(current_file_path)
+current_directory
 
 # Set the working directory to the directory of the current file
 os.chdir('C:\\Users\\Danie\\Documents\\Python1\\Python\\Postdoc\\Machine_Learning')
@@ -32,7 +27,7 @@ print(f"Current working directory: {current_directory}")
 
 
 # Load the data from a CSV file
-data = pd.read_csv('random_dna_sequences.csv')
+data = pd.read_csv('random_dna_sequences_300.csv')
 
 # Separate the sequences and read counts
 sequences = data['sequence'].tolist()
@@ -86,7 +81,7 @@ model.summary()
 
 # Train the model
 batch_size = 32
-epochs = 10
+epochs = 20
 history = model.fit(X_train, y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
 
 
