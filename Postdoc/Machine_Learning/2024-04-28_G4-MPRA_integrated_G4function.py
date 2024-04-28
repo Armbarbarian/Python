@@ -54,7 +54,7 @@ def detect_g4(sequences):
     print("Number of sequences:", len(sequences))
     g4_data = []
     for seq in sequences:
-        print("Processing sequence:", seq)
+        print("Processing sequence:")
         g4_features = {}
         g4_patterns = []
         for x in range(2, 5):  # variable x (2-4)
@@ -103,8 +103,8 @@ def detect_g4(sequences):
 # Step 2: Load and preprocess the data
 
 # Load the data from a CSV file
-if os.path.isfile('random_dna_sequences_300.csv'):
-    data = pd.read_csv('random_dna_sequences_300.csv')
+if os.path.isfile('random_dna_sequences_10thousand.csv'):
+    data = pd.read_csv('random_dna_sequences_10thousand.csv')
 else:
     raise FileNotFoundError("The CSV file 'random_dna_sequences.csv' does not exist.")
 
